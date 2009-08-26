@@ -1,1 +1,0 @@
-Chiron\Chiron.exe /b:trypython/index.html
