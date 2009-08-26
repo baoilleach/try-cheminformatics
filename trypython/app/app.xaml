@@ -1,0 +1,12 @@
+<StackPanel x:Class="System.Windows.Controls.StackPanel" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Orientation="Horizontal">
+<StackPanel Margin="0,10">
+<TextBlock  Margin="5,10" FontSize="15" FontWeight="Bold">Try Python: Interactive Python Tutorial</TextBlock>
+<ComboBox Margin="5,10" FontSize="15" x:Name="comboBox" Height="25"></ComboBox>
+<ScrollViewer Height="800">
+<Border x:Name="document" Margin="10,10" Width="500">
+</Border>
+</ScrollViewer>
+</StackPanel>
+<Border x:Name="console" Margin="10,10" Width="500">
+</Border>
+</StackPanel>
