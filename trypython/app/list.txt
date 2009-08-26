@@ -1,3 +1,3 @@
 1. Introduction
 2. Numbers
-3. String
+3. Strings
