@@ -4,7 +4,6 @@ from System.Windows.Media import FontFamily
 
 class ConsoleTextBox(TextBox):
     def __init__(self):
-        self.Width = 450
         self.FontSize = 15
         self.Margin = Thickness(5, 5, 5, 5)
         self.TextWrapping = TextWrapping.Wrap

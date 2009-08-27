@@ -66,11 +66,12 @@ class Console(InteractiveConsole):
                 event.Handled = True
                 return
             
-            #if key == key.Tab:
-                #_debug('Tab')
-                #event.Handled = True
-                #console_textbox.Text = console_textbox.Text[:sender.SelectionStart] + '    ' + console_textbox.Text[sender.SelectionStart:]
-                #return
+            if key == key.Tab:
+                _debug('Tab')
+                event.Handled = True
+                console_textbox.Text = console_textbox.Text[:start] + '    ' + console_textbox.Text[end:]
+                console_textbox.SelectionStart = start + 4
+                return
                 
             _debug('Delegated')
             TextBox.OnKeyDown(console_textbox, event)
@@ -79,9 +80,9 @@ class Console(InteractiveConsole):
         event.Handled = True
         line = contents[pos:]
         
-        console.write('\n')
+        self.write('\n')
         try:
-            self.more = console.push(line)
+            self.more = self.push(line)
         except BaseException, e:
             self.more = False
             _print('\nCaught rogue exception: %r' % e)
@@ -91,7 +92,7 @@ class Console(InteractiveConsole):
         else:
             prompt = ps1
             if not self.newline_terminated:
-                console.write('\n')
+                self.write('\n')
 
         root.Dispatcher.BeginInvoke(lambda: _print(prompt))
 
@@ -100,7 +101,7 @@ class Console(InteractiveConsole):
         else:
             prompt = ps1
             if not self.newline_terminated:
-                console.write('\n')
+                self.write('\n')
 
 
 root = Application.Current.RootVisual
