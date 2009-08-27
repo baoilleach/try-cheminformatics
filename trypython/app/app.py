@@ -1,14 +1,20 @@
+from __future__ import with_statement
+
 from System.Windows import Application
 from System.Windows.Controls import StackPanel, ComboBoxItem, UserControl
 from System.Windows.Markup import XamlReader
+
 
 Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 root = Application.Current.RootVisual
 combobox = root.comboBox
 
-handle = open('list.txt')
-items = handle.readlines()
-handle.close()
+# sets up console
+# must be done after loading app.xaml
+import console
+
+with open('list.txt') as handle:
+    items = handle.readlines()
 
 for item in items:
     boxitem = ComboBoxItem()
@@ -18,9 +24,8 @@ for item in items:
     
 def onChange(sender, event):
     index = combobox.SelectedIndex
-    handle = open('docs/item%s.xaml' % (index+1))
-    xaml = handle.read()
-    handle.close()
+    with open('docs/item%s.xaml' % (index+1)) as handle:
+        xaml = handle.read()
     document = XamlReader.Load(xaml)
     root.document.Child = document
 
