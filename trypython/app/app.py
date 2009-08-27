@@ -27,7 +27,7 @@ def onChange(sender, event):
     with open('docs/item%s.xaml' % (index+1)) as handle:
         xaml = handle.read()
     document = XamlReader.Load(xaml)
-    root.document.Child = document
+    root.document.Content = document
 
 combobox.SelectionChanged += onChange
 combobox.SelectedIndex = 0

@@ -2,9 +2,11 @@
 import sys
 
 from System import Uri
-from System.Windows import Application
+from System.Windows import Application, Thickness, TextWrapping
 from System.Windows.Browser import HtmlPage
 from System.Windows.Input import Key
+from System.Windows.Controls import TextBox
+from System.Windows.Media import FontFamily
 
 from code import InteractiveConsole
 
@@ -19,7 +21,8 @@ ps1 = '>>> '
 ps2 = '... '
 
 def _debug(data):
-    HtmlPage.Document.debugging.innerHTML += '<br />%r' % (data,)
+    """Uncomment to output debug info"""
+    #HtmlPage.Document.debugging.innerHTML += '<br />%r' % (data,)
 
 # nicely format unhandled exceptions
 def excepthook(sender, e):
@@ -36,22 +39,11 @@ class Console(InteractiveConsole):
     def write(self, data):
         # Invoke it so that we can print 'safely' from another thread
         # It also makes print asynchronous!
-        global newline_terminated
-        newline_terminated = data.endswith('\n')
+        self.newline_terminated = data.endswith('\n')
         root.Dispatcher.BeginInvoke(lambda: _print(data))
 
-newline_terminated = True
-
-root = Application.Current.RootVisual
-console_textbox = root.console
-
-def _print(data):
-    console_textbox.Text += data
-    console_textbox.SelectionStart = len(console_textbox.Text)
-
-class HandleEnter(object):
-    
-    more = False
+    more = False    
+    newline_terminated = True
     
     def handle_key(self, sender, event):
         contents = console_textbox.Text
@@ -64,15 +56,19 @@ class HandleEnter(object):
             # Input is screwed - this fixes it
             pos = len(contents)
         
-        _debug((start, end, pos, key))
+        _debug((start, end, pos, repr(key.value__), key in cursor_keys))
         
-        if (start < pos) or (end < pos):
+        if ((start < pos) or (end < pos)) and (key not in cursor_keys):
             event.Handled = True
+            _debug('Skipped')
             return
-        if key == Key.Delete and end <= pos:
-            event.Handled = True
-            return
+
         if key != Key.Enter:
+            if (key in (Key.Delete, Key.Back)) and end <= pos:
+                event.Handled = True
+                return
+            _debug('Delegated')
+            TextBox.OnKeyDown(console_textbox, event)
             return
         
         event.Handled = True
@@ -85,7 +81,7 @@ class HandleEnter(object):
             prompt = ps2
         else:
             prompt = ps1
-            if not newline_terminated:
+            if not self.newline_terminated:
                 console.write('\n')
 
         root.Dispatcher.BeginInvoke(lambda: _print(prompt))
@@ -94,17 +90,41 @@ class HandleEnter(object):
             prompt = ps2
         else:
             prompt = ps1
-            if not newline_terminated:
+            if not self.newline_terminated:
                 console.write('\n')
 
 
-handler = HandleEnter()
-console_textbox.KeyDown += handler.handle_key
+root = Application.Current.RootVisual
+textbox_parent = root.consoleParent
+
+class ConsoleTextBox(TextBox):
+    def __init__(self):
+        self.Width = 450
+        self.FontSize = 15
+        self.Margin = Thickness(5, 5, 5, 5)
+        self.TextWrapping = TextWrapping.Wrap
+        self.FontFamily = FontFamily("Consolas, Global Monospace")
+
+    def OnKeyDown(self, event):
+        # needed so that we get KeyDown 
+        # for del and backspace events etc
+        pass
+        
+console_textbox = ConsoleTextBox()
+textbox_parent.Content = console_textbox
+
+def _print(data):
+    console_textbox.Text += data
+    console_textbox.SelectionStart = len(console_textbox.Text)
+
+    
+cursor_keys = (Key.Up, Key.Down, Key.Left, Key.Right)
 
 console = None
 def reset():
     global console
     console = Console(context.copy())
+    console_textbox.KeyDown += console.handle_key
     def SetBanner():
         console_textbox.Text = banner
         console_textbox.SelectionStart = len(console_textbox.Text)
@@ -129,3 +149,5 @@ reset()
 sys.stdout = console
 sys.stderr = console
 console.write(ps1)
+
+_debug('Started')
