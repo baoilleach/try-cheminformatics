@@ -1,38 +1,36 @@
-
 import sys
 
 from System import Uri
-from System.Windows import Application, Thickness, TextWrapping
+from System.Windows import Application
 from System.Windows.Browser import HtmlPage
-from System.Windows.Input import Key
 from System.Windows.Controls import TextBox
-from System.Windows.Media import FontFamily
+from System.Windows.Input import Key
+
+from consoletextbox import ConsoleTextBox
 
 from code import InteractiveConsole
 
 __version__ = '0.1.0'
 
+python_version = '.'.join(str(n) for n in sys.version_info[:3])
 doc = "Try Python: version %s" % __version__
 banner = ("Python %s on Silverlight\nPython in the Browser %s by Michael Foord\n" 
-          "Type reset() to clear the console and gohome() to exit.\n" % (sys.version, __version__))
+          "Type reset() to clear the console and gohome() to exit.\n" % (python_version, __version__))
 home = 'http://code.google.com/p/trypython/'
 
 ps1 = '>>> '
 ps2 = '... '
 
+cursor_keys = (Key.Up, Key.Down, Key.Left, Key.Right)
+
 def _debug(data):
-    """Uncomment to output debug info"""
+    """Comment / uncomment to output debug info"""
     #HtmlPage.Document.debugging.innerHTML += '<br />%r' % (data,)
 
-# nicely format unhandled exceptions
-def excepthook(sender, e):
-    print Application.Current.Environment.GetEngine('py').FormatException(e.ExceptionObject)
 
-Application.Current.UnhandledException += excepthook
-
-# Handle infinite recursion gracefully
-# CPython default is 1000 - but Firefox can't handle that deep
-sys.setrecursionlimit(500)
+def _print(data):
+    console_textbox.Text += data
+    console_textbox.SelectionStart = len(console_textbox.Text)
 
 
 class Console(InteractiveConsole):
@@ -47,8 +45,8 @@ class Console(InteractiveConsole):
     
     def handle_key(self, sender, event):
         contents = console_textbox.Text
-        start = sender.SelectionStart
-        end = start + sender.SelectionLength
+        start = console_textbox.SelectionStart
+        end = start + console_textbox.SelectionLength
         key = event.Key
 
         pos = contents.rfind('\n') + 5
@@ -67,6 +65,13 @@ class Console(InteractiveConsole):
             if (key in (Key.Delete, Key.Back)) and end <= pos:
                 event.Handled = True
                 return
+            
+            #if key == key.Tab:
+                #_debug('Tab')
+                #event.Handled = True
+                #console_textbox.Text = console_textbox.Text[:sender.SelectionStart] + '    ' + console_textbox.Text[sender.SelectionStart:]
+                #return
+                
             _debug('Delegated')
             TextBox.OnKeyDown(console_textbox, event)
             return
@@ -96,33 +101,17 @@ class Console(InteractiveConsole):
 
 root = Application.Current.RootVisual
 textbox_parent = root.consoleParent
-
-class ConsoleTextBox(TextBox):
-    def __init__(self):
-        self.Width = 450
-        self.FontSize = 15
-        self.Margin = Thickness(5, 5, 5, 5)
-        self.TextWrapping = TextWrapping.Wrap
-        self.FontFamily = FontFamily("Consolas, Global Monospace")
-
-    def OnKeyDown(self, event):
-        # needed so that we get KeyDown 
-        # for del and backspace events etc
-        pass
-        
 console_textbox = ConsoleTextBox()
 textbox_parent.Content = console_textbox
 
-def _print(data):
-    console_textbox.Text += data
-    console_textbox.SelectionStart = len(console_textbox.Text)
-
-    
-cursor_keys = (Key.Up, Key.Down, Key.Left, Key.Right)
 
 console = None
 def reset():
     global console
+    if console is not None:
+        # unhook previous handler
+        console_textbox.KeyDown -= console.handle_key
+        
     console = Console(context.copy())
     console_textbox.KeyDown += console.handle_key
     def SetBanner():

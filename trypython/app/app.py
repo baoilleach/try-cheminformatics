@@ -1,5 +1,11 @@
 from __future__ import with_statement
 
+import sys
+
+# Handle infinite recursion gracefully
+# CPython default is 1000 - but Firefox can't handle that deep
+sys.setrecursionlimit(500)
+
 from System.Windows import Application
 from System.Windows.Controls import StackPanel, ComboBoxItem, UserControl
 from System.Windows.Markup import XamlReader
@@ -8,6 +14,12 @@ from System.Windows.Markup import XamlReader
 Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 root = Application.Current.RootVisual
 combobox = root.comboBox
+
+# nicely format unhandled exceptions
+def excepthook(sender, e):
+    print Application.Current.Environment.GetEngine('py').FormatException(e.ExceptionObject)
+
+Application.Current.UnhandledException += excepthook
 
 # sets up console
 # must be done after loading app.xaml

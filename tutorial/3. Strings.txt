@@ -29,13 +29,13 @@ String literals can span multiple lines in several ways. Continuation lines can 
 
     print hello
 
-Note that newlines still need to be embedded in the string using \\n; the newline following the trailing backslash is discarded. This example would print the following::
+Note that newlines still need to be embedded in the string using ``\n``; the newline following the trailing backslash is discarded. This example would print the following::
 
     This is a rather long string containing
     several lines of text just as you would do in C.
         Note that whitespace at the beginning of the line is significant.
 
-If we make the string literal a "raw" string, however, the \\n sequences are not converted to newlines, but the backslash at the end of the line, and the newline character in the source, are both included in the string as data. Thus, the example:
+If we make the string literal a "raw" string, however, the ``\n`` sequences are not converted to newlines, but the backslash at the end of the line, and the newline character in the source, are both included in the string as data. Thus, the example:
 
 .. code-block:: python
 
@@ -49,7 +49,7 @@ would print::
     This is a rather long string containing\n\
     several lines of text much as you would do in C.
 
-Or, strings can be surrounded in a pair of matching triple-quotes: """ or '''. End of lines do not need to be escaped when using triple-quotes, but they will be included in the string.
+Or, strings can be surrounded in a pair of matching triple-quotes: ``"""`` or ``'''``. End of lines do not need to be escaped when using triple-quotes, but they will be included in the string.
 
 .. code-block:: python
 
@@ -67,7 +67,7 @@ produces the following output::
 
 The interpreter prints the result of string operations in the same way as they are typed for input: inside quotes, and with quotes and other funny characters escaped by backslashes, to show the precise value. The string is enclosed in double quotes if the string contains a single quote and no double quotes, else it's enclosed in single quotes. (The print statement, described later, can be used to write strings without quotes or escapes.)
 
-Strings can be concatenated (glued together) with the + operator, and repeated with \*:
+Strings can be concatenated (glued together) with the ``+`` operator, and repeated with ``*``:
 
 .. code-block:: python
 
@@ -77,7 +77,7 @@ Strings can be concatenated (glued together) with the + operator, and repeated w
     >>> '<' + word*5 + '>'
     '<HelpAHelpAHelpAHelpAHelpA>'
 
-Two string literals next to each other are automatically concatenated; the first line above could also have been written "word = 'Help' 'A'"; this only works with two literals, not with arbitrary string expressions:
+Two string literals next to each other are automatically concatenated; the first line above could also have been written "``word = 'Help' 'A'``"; this only works with two literals, not with arbitrary string expressions:
 
 .. code-block:: python
 
@@ -91,7 +91,7 @@ Two string literals next to each other are automatically concatenated; the first
                           ^
     SyntaxError: invalid syntax
 
-Strings can be subscripted (indexed); like in C, the first character of a string has subscript (index) 0. There is no separate character type; a character is simply a string of size one. Like in Icon, substrings can be specified with the slice notation: two indices separated by a colon.
+Strings can be subscripted (indexed); like in C, the first character of a string has subscript (index) 0. There is no separate character type; a character is simply a string of size one. Like in Icon, substrings can be specified with the *slice notation*: two indices separated by a colon.
 
 .. code-block:: python
 
@@ -133,7 +133,7 @@ However, creating a new string with the combined content is easy and efficient:
     >>> 'Splat' + word[4]
     'SplatA'
 
-Here's a useful invariant of slice operations: s[:i] + s[i:] equals s.
+Here's a useful invariant of slice operations: ``s[:i] + s[i:]`` equals s.
 
 .. code-block:: python
 
@@ -184,7 +184,7 @@ Out-of-range negative slice indices are truncated, but don't try this for single
       File "<stdin>", line 1, in ?
     IndexError: string index out of range
 
-The best way to remember how slices work is to think of the indices as pointing between characters, with the left edge of the first character numbered 0. Then the right edge of the last character of a string of n characters has index n, for example::
+One way to remember how slices work is to think of the indices as pointing *between* characters, with the left edge of the first character numbered 0. Then the right edge of the last character of a string of *n* characters has index *n*, for example::
 
      +---+---+---+---+---+ 
      | H | e | l | p | A |
@@ -192,11 +192,11 @@ The best way to remember how slices work is to think of the indices as pointing 
      0   1   2   3   4   5 
     -5  -4  -3  -2  -1
 
-The first row of numbers gives the position of the indices 0...5 in the string; the second row gives the corresponding negative indices. The slice from i to j consists of all characters between the edges labeled i and j, respectively.
+The first row of numbers gives the position of the indices 0...5 in the string; the second row gives the corresponding negative indices. The slice from i to j consists of all characters between the edges labeled *i* and *j*, respectively.
 
 For non-negative indices, the length of a slice is the difference of the indices, if both are within bounds. For example, the length of ``word[1:3]`` is 2.
 
-The built-in function len() returns the length of a string:
+The built-in function ``len()`` returns the length of a string:
 
 .. code-block:: python
 

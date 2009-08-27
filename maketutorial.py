@@ -27,6 +27,7 @@ handle.close()
 doc_dir = os.path.join(this_dir, 'trypython', 'app', 'docs')
 if os.path.isdir(doc_dir):
     shutil.rmtree(doc_dir)
+    
 os.mkdir(doc_dir)
 
 for index, name in enumerate(input_files):
