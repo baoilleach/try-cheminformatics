@@ -80,7 +80,11 @@ class Console(InteractiveConsole):
         line = contents[pos:]
         
         console.write('\n')
-        self.more = console.push(line)
+        try:
+            self.more = console.push(line)
+        except BaseException, e:
+            self.more = False
+            _print('\nCaught rogue exception: %r' % e)
 
         if self.more:
             prompt = ps2
