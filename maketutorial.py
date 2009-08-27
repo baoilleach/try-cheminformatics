@@ -18,7 +18,8 @@ input_files = sorted([
                name.endswith('.txt')
                ])
 
-handle = open(os.path.join(this_dir, 'trypython', 'app', 'list.txt'), 'w')
+# Write in binary mode to only write '\n' on Windows
+handle = open(os.path.join(this_dir, 'trypython', 'app', 'list.txt'), 'wb')
 for name in input_files:
     handle.write(os.path.splitext(name)[0] + '\n')
 handle.close()

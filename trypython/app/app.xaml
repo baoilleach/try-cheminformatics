@@ -4,22 +4,19 @@
         <ComboBox Margin="5,10" FontSize="15" x:Name="comboBox" Height="25"></ComboBox>
     </StackPanel>
     <StackPanel Orientation="Horizontal">
-        <ScrollViewer Height="550">
+        <ScrollViewer Height="600" Margin="0">
             <Border x:Name="document" Margin="5,5" Width="500">
             </Border>
         </ScrollViewer>
-        <Border Margin="5,5" Width="480">
-            <StackPanel>
-                <ScrollViewer Height="300" Margin="0,0,0,10">
-                    <TextBox x:Name="consoleOut" Height="600" FontFamily="Consolas, Global Monospace" FontSize="15" />
-                </ScrollViewer>
-                <TextBox
-                    x:Name="consoleIn" 
-                    Height="250" 
-                    FontFamily="Consolas, Global Monospace" 
-                    FontSize="15"  
-                    AcceptsReturn="True" />
-            </StackPanel>
-        </Border>
+        <ScrollViewer Height="600" Margin="5,0,0,10">
+            <TextBox 
+                x:Name="console"
+                TextWrapping="Wrap"
+                Margin="5,5"
+                Width="450"
+                FontFamily="Consolas, Global Monospace" 
+                FontSize="15" 
+            />
+        </ScrollViewer>
     </StackPanel>
 </StackPanel>

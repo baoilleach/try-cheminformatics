@@ -43,19 +43,18 @@ class Console(InteractiveConsole):
 newline_terminated = True
 
 root = Application.Current.RootVisual
-consoleOut = root.consoleOut
-consoleIn = root.consoleIn
+console_textbox = root.console
 
 def _print(data):
-    consoleOut.Text += data
-    consoleOut.SelectionStart = len(consoleOut.Text)
+    console_textbox.Text += data
+    console_textbox.SelectionStart = len(console_textbox.Text)
 
 class HandleEnter(object):
     
     more = False
     
     def handle_key(self, sender, event):
-        contents = consoleOut.Text
+        contents = console_textbox.Text
         start = sender.SelectionStart
         end = start + sender.SelectionLength
         key = event.Key
@@ -76,6 +75,7 @@ class HandleEnter(object):
         if key != Key.Enter:
             return
         
+        event.Handled = True
         line = contents[pos:]
         
         console.write('\n')
@@ -97,18 +97,17 @@ class HandleEnter(object):
             if not newline_terminated:
                 console.write('\n')
 
-        root.Dispatcher.BeginInvoke(lambda: _print(prompt))
 
 handler = HandleEnter()
-root.consoleOut.KeyDown += handler.handle_key
+console_textbox.KeyDown += handler.handle_key
 
 console = None
 def reset():
     global console
     console = Console(context.copy())
     def SetBanner():
-        consoleOut.Text = banner
-        consoleOut.SelectionStart = len(consoleOut.Text)
+        console_textbox.Text = banner
+        console_textbox.SelectionStart = len(console_textbox.Text)
                   
     root.Dispatcher.BeginInvoke(SetBanner)
 
