@@ -40,6 +40,8 @@ def onChange(sender, event):
         xaml = handle.read()
     document = XamlReader.Load(xaml)
     root.document.Content = document
+    root.document.ScrollToVerticalOffset(0)
+    console.focus_text_box(None, None)
 
 combobox.SelectionChanged += onChange
 combobox.SelectedIndex = 0
