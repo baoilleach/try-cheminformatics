@@ -223,6 +223,7 @@ print_new = printer.print_new
 
 console_output.GotFocus += focus_text_box
 scroller.GotFocus += focus_text_box
+root.container.GotFocus += focus_text_box
 
 
 
