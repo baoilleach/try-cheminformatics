@@ -5,6 +5,7 @@ clr.AddReference('IronPython')
 clr.AddReference('Microsoft.Scripting')
 
 from System import Uri
+from System.Threading import Thread
 from System.Windows import Application
 from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import TextBox, TextBlock
@@ -33,12 +34,15 @@ home = 'http://code.google.com/p/trypython/'
 ps1 = '>>> '
 ps2 = '... '
 
+_main_id = Thread.CurrentThread.ManagedThreadId
 
 def invoke(function):
-    """This decorator wraps functions to invoke them onto the GUI.
-    This makes the functions safe to call from a background thread."""
+    """This decorator wraps functions to invoke them onto the GUI if they are 
+    called from a background thread."""
     def inner(*args, **kwargs):
-        return root.Dispatcher.BeginInvoke(lambda: function(*args, **kwargs))
+        if Thread.CurrentThread.ManagedThreadId != _main_id:
+            return root.Dispatcher.BeginInvoke(lambda: function(*args, **kwargs))
+        return function(*args, **kwargs)
     return inner
 
 
@@ -56,7 +60,7 @@ def scroll():
 
 @invoke
 def focus_text_box(sender, event):
-    _debug('focus\n')
+    #_debug('focus\n')
     HtmlPage.Plugin.Focus()
     console_textbox.Focus()
     
@@ -78,6 +82,7 @@ class StatefulPrinter(object):
             self.block = None
         
         block.Text += data
+        _debug(repr(data) +'\n')
     
     def print_new(self, data):
         if self.block is not None:
@@ -94,22 +99,37 @@ class Console(object):
         self.scope = None
         self.engine = Python.CreateEngine()
         self.history = None
+        self._reset_needed = False
+    
         
     def reset(self):
+        _debug('reset\n')
+        console_output.Children.Clear()
+        self._reset_needed = False
+        
         self.scope = self.engine.CreateScope()
         for name, value in self.context.items():
             self.scope.SetVariable(name, value)
         self.scope.SetVariable('__console', self)
+        self.scope.SetVariable('reset', self.reset_console)
+        
         set_output_code = "import sys\nsys.stdout = __console\nsys.stderr = __console\n"
         source = self.engine.CreateScriptSourceFromString(set_output_code, SourceCodeKind.Statements)
         source.Execute(self.scope)
         
         self.history = ConsoleHistory()
+        print_new(banner)
     
     
+    def reset_console(self):
+        _debug('reset_console\n')
+        self._reset_needed = True
+    
+        
     def write(self, data):
         _print(data)
 
+    
     def is_complete(self, text):
         # Mac Safari uses '\r' for newlines in Silverlight TextBox??
         text = text.rstrip(' ').replace('\r\n', '\n').replace('\r', '\n')
@@ -123,15 +143,15 @@ class Console(object):
                 return False, source
         return True, source
     
+    
     def on_first_line(self, text):
-        # XXXX do we have a problem where '\r\n' has been replaced by '\n'?
         first_line_end = text.find('\n')
         if first_line_end == -1:
             return True
         return console_textbox.SelectionStart <= first_line_end
     
+    
     def on_last_line(self, text):
-        # XXXX same problem as on_first_line
         last_line_end = text.rfind('\n')
         if last_line_end == -1:
             return True
@@ -149,7 +169,6 @@ class Console(object):
                 if self.on_first_line(contents):
                     event.Handled = True
                     previous = self.history.back(contents)
-                    _debug('Prev: %r' % previous)
                     if previous is not None:
                         console_textbox.Text = previous
                         console_textbox.SelectionStart = len(previous)
@@ -159,7 +178,6 @@ class Console(object):
                 if self.on_last_line(contents):
                     event.Handled = True
                     next = self.history.forward(contents)
-                    _debug('Next: %r' % next)
                     if next is not None:
                         console_textbox.Text = next
                         console_textbox.SelectionStart = len(next)
@@ -173,12 +191,20 @@ class Console(object):
                 
             TextBox.OnKeyDown(console_textbox, event)
             return
+    
+        def empty_or_comment_only():
+            if not contents.strip():
+                return True
+            numlines = len(contents.splitlines())
+            if numlines >= 2:
+                return False
+            return contents.strip().startswith('#')
         
-        if not contents.strip():
+        if empty_or_comment_only():
             # needed or we get a SyntaxError
             event.Handled = True
             console_textbox.Text = ''
-            print_new(ps1)
+            print_lines(contents)
             return
         
         complete, source = self.is_complete(contents)
@@ -205,7 +231,11 @@ class Console(object):
                 message.extend(traceback.format_exception_only(exc_type, value))
                 print_new(''.join(message))
         
-            scroll()
+            if self._reset_needed:
+                self.reset()
+            else:
+                scroll()
+            
 
                 
                 
@@ -233,11 +263,6 @@ def print_lines(data):
     lines[1:] = [ps2 + line for line in lines[1:]]
     print_new('\n'.join(lines))
 
-def reset():
-    console.reset()
-    console_output.Children.Clear()
-    _print(banner)
-
 
 def gohome():
     HtmlPage.Window.Navigate(Uri(home))
@@ -248,15 +273,12 @@ context = {
     "__name__": "__console__", 
     "__doc__": doc,
     "__version__": __version__,
-    "reset": reset,
     "gohome": gohome
 }
 
-
-
 console = Console(context)
 console_textbox.KeyDown += console.handle_key
-reset()
+console.reset()
 
 
 _debug('Started\n')
