@@ -43,3 +43,5 @@ def onChange(sender, event):
 
 combobox.SelectionChanged += onChange
 combobox.SelectedIndex = 0
+
+console.focus_text_box(None, None)

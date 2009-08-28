@@ -6,7 +6,20 @@
     <StackPanel Orientation="Horizontal">
         <ScrollViewer Height="600" x:Name="document" Margin="5,5" Width="500">
         </ScrollViewer>
-        <ScrollViewer Height="600" Margin="5,0,0,10" x:Name="consoleParent" Width="450">
+        <ScrollViewer Height="600" Margin="5,0,0,10" Width="450" x:Name="scroller">
+            <StackPanel x:Name="scrollerChild">
+                <StackPanel x:Name="consoleOutput"></StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel x:Name="prompt">
+                        <TextBlock 
+                        FontSize = "15"
+                        Margin = "0"
+                        FontFamily = "Consolas, Global Monospace"
+                       >&gt;&gt;&gt; </TextBlock>
+                    </StackPanel>
+                    <Border x:Name="consoleParent" Margin = "0" />
+                </StackPanel>
+            </StackPanel>
         </ScrollViewer>
     </StackPanel>
 </StackPanel>
