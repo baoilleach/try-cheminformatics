@@ -45,7 +45,7 @@ def invoke(function):
 @invoke
 def _debug(data):
     """Comment / uncomment to output debug info"""
-    HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
+    #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
 
     
 @invoke
