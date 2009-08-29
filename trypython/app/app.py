@@ -16,14 +16,18 @@ Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 root = Application.Current.RootVisual
 combobox = root.comboBox
 
-root.Width = width = max(Application.Current.Host.Content.ActualWidth - 25, 700)
-root.Height = height = max(Application.Current.Host.Content.ActualHeight - 25, 700)
+def content_resized(sender, event):
+    root.Width = width = max(Application.Current.Host.Content.ActualWidth - 25, 700)
+    root.Height = height = max(Application.Current.Host.Content.ActualHeight - 25, 700)
 
-root.document.Width = int(width * 0.5)
-root.document.Height = height - 90
-root.scroller.Width = int(width * 0.4)
-root.scroller.Height = height - 90
+    root.document.Width = int(width * 0.53)
+    root.document.Height = height - 90
+    root.scroller.Width = int(width * 0.44)
+    root.scroller.Height = height - 90
 
+Application.Current.Host.Content.Resized += content_resized
+content_resized(None, None)
+    
 # nicely format unhandled exceptions
 def excepthook(sender, e):
     error = Application.Current.Environment.GetEngine('py').FormatException(e.ExceptionObject)
