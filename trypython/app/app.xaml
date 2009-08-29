@@ -3,8 +3,8 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  Background="White">
     <StackPanel Width="500">
-        <TextBlock  Margin="5,5" FontSize="15" FontWeight="Bold">Try Python: Interactive Python Tutorial</TextBlock>
-        <ComboBox Margin="5,10" FontSize="15" x:Name="comboBox" Height="25"></ComboBox>
+        <TextBlock  Margin="5, 0" FontSize="15" FontWeight="Bold">Try Python: Interactive Python Tutorial</TextBlock>
+        <ComboBox Margin="5, 5" FontSize="15" x:Name="comboBox" Height="25"></ComboBox>
     </StackPanel>
     <StackPanel Orientation="Horizontal" x:Name="container">
         <ScrollViewer x:Name="document" Margin="5,5" />

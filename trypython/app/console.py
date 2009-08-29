@@ -91,13 +91,15 @@ class StatefulPrinter(object):
             data += '\n'
         self.write(data)
 
-
+# Magic flag from the codeop module
+PyCF_DONT_IMPLY_DEDENT = 0x200          # Matches pythonrun.h
 
 class Console(object):
     def __init__(self, context):
-        self.context = context
-        self.scope = None
+        self.original_context = context
+        self.context = None
         self.engine = Python.CreateEngine()
+        self.scope = self.engine.CreateScope()
         self.history = None
         self._reset_needed = False
     
@@ -106,17 +108,8 @@ class Console(object):
         _debug('reset\n')
         console_output.Children.Clear()
         self._reset_needed = False
-        
-        self.scope = self.engine.CreateScope()
-        for name, value in self.context.items():
-            self.scope.SetVariable(name, value)
-        self.scope.SetVariable('__console', self)
-        self.scope.SetVariable('reset', self.reset_console)
-        
-        set_output_code = "import sys\nsys.stdout = __console\nsys.stderr = __console\n"
-        source = self.engine.CreateScriptSourceFromString(set_output_code, SourceCodeKind.Statements)
-        source.Execute(self.scope)
-        
+        self.context = self.original_context.copy()
+        self.context['reset'] = self.reset_console
         self.history = ConsoleHistory()
         print_new(banner)
     
@@ -137,11 +130,11 @@ class Console(object):
         
         result = source.GetCodeProperties()
         if result == ScriptCodeParseResult.IncompleteToken:
-            return False, source
-        if result == ScriptCodeParseResult.IncompleteStatement:
+            return False
+        elif result == ScriptCodeParseResult.IncompleteStatement:
             if not text.endswith('\n'):
-                return False, source
-        return True, source
+                return False
+        return True
     
     
     def on_first_line(self, text):
@@ -207,14 +200,15 @@ class Console(object):
             print_lines(contents)
             return
         
-        complete, source = self.is_complete(contents)
+        complete = self.is_complete(contents)
         if complete:
             print_lines(contents)
             console_textbox.Text = ''
             event.Handled = True
             self.history.append(contents)
             try:
-                source.Execute(self.scope)
+                code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
+                exec code in self.context
             except:
                 exc_type, value, tb = sys.exc_info()
                 if value is None:
@@ -235,7 +229,6 @@ class Console(object):
                 self.reset()
             else:
                 scroll()
-
 
 root = Application.Current.RootVisual
 console_output = root.consoleOutput
@@ -280,12 +273,7 @@ console.reset()
 
 _debug('Started\n')
 
-class Writer(object):
-    def write(self, data):
-        _debug(data)
 
-writer = Writer()
-
-sys.stdout = writer
-sys.stderr = writer
+sys.stdout = console
+sys.stderr = console
 

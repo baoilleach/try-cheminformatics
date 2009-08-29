@@ -16,8 +16,8 @@ Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 root = Application.Current.RootVisual
 combobox = root.comboBox
 
-root.Width = width = max(Application.Current.Host.Content.ActualWidth - 50, 700)
-root.Height = height = max(Application.Current.Host.Content.ActualHeight - 100, 700)
+root.Width = width = max(Application.Current.Host.Content.ActualWidth - 25, 700)
+root.Height = height = max(Application.Current.Host.Content.ActualHeight - 25, 700)
 
 root.document.Width = int(width * 0.5)
 root.document.Height = height - 90
@@ -26,7 +26,8 @@ root.scroller.Height = height - 90
 
 # nicely format unhandled exceptions
 def excepthook(sender, e):
-    print Application.Current.Environment.GetEngine('py').FormatException(e.ExceptionObject)
+    error = Application.Current.Environment.GetEngine('py').FormatException(e.ExceptionObject)
+    HtmlPage.Document.debugging.innerHTML += error.replace('\n', '<br />')
 
 Application.Current.UnhandledException += excepthook
 
@@ -67,5 +68,4 @@ if bookmark.startswith('page'):
         page = max(page, 0)
         
 combobox.SelectedIndex = page
-
 console.focus_text_box(None, None)
