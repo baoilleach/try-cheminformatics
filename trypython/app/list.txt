@@ -5,3 +5,5 @@
 5. First Steps Towards Programming
 6. if statements
 7. for statements
+8. The range Function
+9. Loops: break, continue and else
