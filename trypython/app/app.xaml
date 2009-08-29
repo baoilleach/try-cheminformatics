@@ -7,9 +7,8 @@
         <ComboBox Margin="5,10" FontSize="15" x:Name="comboBox" Height="25"></ComboBox>
     </StackPanel>
     <StackPanel Orientation="Horizontal" x:Name="container">
-        <ScrollViewer Height="600" x:Name="document" Margin="5,5" Width="500">
-        </ScrollViewer>
-        <ScrollViewer Height="600" Margin="5,0,0,10" Width="450" x:Name="scroller">
+        <ScrollViewer x:Name="document" Margin="5,5" />
+        <ScrollViewer Margin="5,0,0,10" x:Name="scroller">
             <StackPanel x:Name="scrollerChild">
                 <StackPanel x:Name="consoleOutput"></StackPanel>
                 <StackPanel Orientation="Horizontal">

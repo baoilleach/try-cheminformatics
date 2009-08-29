@@ -7,6 +7,7 @@ import sys
 sys.setrecursionlimit(500)
 
 from System.Windows import Application
+from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import StackPanel, ComboBoxItem, UserControl
 from System.Windows.Markup import XamlReader
 
@@ -14,6 +15,14 @@ from System.Windows.Markup import XamlReader
 Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 root = Application.Current.RootVisual
 combobox = root.comboBox
+
+root.Width = width = max(Application.Current.Host.Content.ActualWidth - 50, 700)
+root.Height = height = max(Application.Current.Host.Content.ActualHeight - 100, 700)
+
+root.document.Width = int(width * 0.5)
+root.document.Height = height - 90
+root.scroller.Width = int(width * 0.4)
+root.scroller.Height = height - 90
 
 # nicely format unhandled exceptions
 def excepthook(sender, e):
@@ -36,6 +45,7 @@ for item in items:
     
 def onChange(sender, event):
     index = combobox.SelectedIndex
+    HtmlPage.Window.CurrentBookmark = 'page%s' % (index + 1)
     with open('docs/item%s.xaml' % (index+1)) as handle:
         xaml = handle.read()
     document = XamlReader.Load(xaml)
@@ -44,6 +54,18 @@ def onChange(sender, event):
     console.focus_text_box(None, None)
 
 combobox.SelectionChanged += onChange
-combobox.SelectedIndex = 0
+
+page = 0
+bookmark = HtmlPage.Window.CurrentBookmark.lower()
+if bookmark.startswith('page'):
+    try:
+        page = int(bookmark[4:])
+    except ValueError:
+        pass
+    else:
+        page = min((page - 1), len(combobox.Items) - 1)
+        page = max(page, 0)
+        
+combobox.SelectedIndex = page
 
 console.focus_text_box(None, None)

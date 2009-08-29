@@ -3,3 +3,5 @@
 3. Strings
 4. Lists
 5. First Steps Towards Programming
+6. if statements
+7. for statements

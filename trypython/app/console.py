@@ -235,10 +235,8 @@ class Console(object):
                 self.reset()
             else:
                 scroll()
-            
 
-                
-                
+
 root = Application.Current.RootVisual
 console_output = root.consoleOutput
 prompt_panel = root.prompt
@@ -254,7 +252,6 @@ print_new = printer.print_new
 console_output.GotFocus += focus_text_box
 scroller.GotFocus += focus_text_box
 root.container.GotFocus += focus_text_box
-
 
 
 def print_lines(data):
@@ -291,3 +288,4 @@ writer = Writer()
 
 sys.stdout = writer
 sys.stderr = writer
+
