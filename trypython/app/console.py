@@ -64,8 +64,33 @@ def focus_text_box(sender, event):
     #_debug('focus\n')
     HtmlPage.Plugin.Focus()
     console_textbox.Focus()
-    
-    
+
+def empty_or_comment_only(contents):
+    if not contents.strip():
+        return True
+    numlines = len(contents.splitlines())
+    if numlines >= 2:
+        return False
+    return contents.strip().startswith('#')
+
+def get_indent(line):
+    spaces = ''
+    for char in line:
+        if char == ' ':
+            spaces += ' '
+        else:
+            break
+    return spaces
+
+def is_terminator(line):
+    line = line.lstrip()
+    terminators = ['pass', 'break', 'continue', 'return']
+    for entry in terminators:
+        if line.startswith(entry):
+            return True
+    return False
+
+
 class StatefulPrinter(object):
     def __init__(self, parent):
         self.block = None
@@ -135,9 +160,10 @@ class Console(object):
         _print(data)
 
     
-    def is_complete(self, text):
-        # Mac Safari uses '\r' for newlines in Silverlight TextBox??
-        text = text.rstrip(' ').replace('\r\n', '\n').replace('\r', '\n')
+    def is_complete(self, text, pos):
+        if len(text.splitlines()) > 1 and pos < len(text.rstrip()):
+            return False
+        
         source = self.engine.CreateScriptSourceFromString(text, '<stdin>', SourceCodeKind.InteractiveCode)
         
         result = source.GetCodeProperties()
@@ -164,6 +190,7 @@ class Console(object):
         
     
     def handle_key(self, sender, event):
+        # Mac Safari uses '\r' for newlines in Silverlight TextBox??
         contents = console_textbox.Text.replace('\r\n', '\n').replace('\r', '\n')
         key = event.Key
         start = console_textbox.SelectionStart
@@ -196,42 +223,17 @@ class Console(object):
                 
             TextBox.OnKeyDown(console_textbox, event)
             return
-    
-        def empty_or_comment_only():
-            if not contents.strip():
-                return True
-            numlines = len(contents.splitlines())
-            if numlines >= 2:
-                return False
-            return contents.strip().startswith('#')
         
-        if empty_or_comment_only():
+        if empty_or_comment_only(contents):
             # needed or we get a SyntaxError
             event.Handled = True
             console_textbox.Text = ''
             print_lines(contents)
             return
         
-        def get_indent(line):
-            spaces = ''
-            for char in line:
-                if char == ' ':
-                    spaces += ' '
-                else:
-                    break
-            return spaces
-
-        def is_terminator(line):
-            line = line.lstrip()
-            terminators = ['pass', 'break', 'continue', 'return']
-            for entry in terminators:
-                if line.startswith(entry):
-                    return True
-            return False
-        
-        complete = self.is_complete(contents)
+        complete = self.is_complete(contents, start)
         if not complete:
-            to_the_left = console_textbox.Text[:console_textbox.SelectionStart + 1]
+            to_the_left = console_textbox.Text[:start + 1]
             lines = to_the_left.splitlines()
             # there *must* be something here because an empty textbox
             # would already have been caught by empty_or_comment_only
