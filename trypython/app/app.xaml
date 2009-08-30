@@ -25,8 +25,9 @@
                             <TextBlock 
                             FontSize = "15"
                             Margin = "0"
+                            Padding = "0,3,0,0"
                             FontFamily = "Consolas, Global Monospace"
-                           >&gt;&gt;&gt; </TextBlock>
+                           >&gt;&gt;&gt;&#160;</TextBlock>
                         </StackPanel>
                         <Border x:Name="consoleParent" Margin = "0" />
                     </StackPanel>

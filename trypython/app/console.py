@@ -28,7 +28,7 @@ __version__ = '0.1.0'
 python_version = '.'.join(str(n) for n in sys.version_info[:3])
 doc = "Try Python: version %s" % __version__
 banner = ("Python %s on Silverlight\nPython in the Browser %s by Michael Foord\n" 
-          "Type reset() to clear the console and gohome() to exit.\n" % (python_version, __version__))
+          "Type reset to clear the console and gohome to exit.\n" % (python_version, __version__))
 home = 'http://code.google.com/p/trypython/'
 
 ps1 = '>>> '
@@ -91,12 +91,30 @@ class StatefulPrinter(object):
             data += '\n'
         self.write(data)
 
+
+def get_magic_function(function, string):
+    class MagicFunction(object):
+        def __call__(self):
+            function()
+            return string
+        def __repr__(self):
+            function()
+            return string
+    return MagicFunction()
+    
+    
 # Magic flag from the codeop module
 PyCF_DONT_IMPLY_DEDENT = 0x200          # Matches pythonrun.h
 
 class Console(object):
     def __init__(self, context):
         self.original_context = context
+        
+        def reset():
+            self._reset_needed = True
+        self.original_context['reset'] = get_magic_function(reset, 'resetting')
+        self.original_context['gohome'] = get_magic_function(lambda: HtmlPage.Window.Navigate(Uri(home)), 'Leaving...')
+        
         self.context = None
         self.engine = Python.CreateEngine()
         self.scope = self.engine.CreateScope()
@@ -109,14 +127,8 @@ class Console(object):
         console_output.Children.Clear()
         self._reset_needed = False
         self.context = self.original_context.copy()
-        self.context['reset'] = self.reset_console
         self.history = ConsoleHistory()
         print_new(banner)
-    
-    
-    def reset_console(self):
-        _debug('reset_console\n')
-        self._reset_needed = True
     
         
     def write(self, data):
@@ -253,17 +265,10 @@ def print_lines(data):
     lines[1:] = [ps2 + line for line in lines[1:]]
     print_new('\n'.join(lines))
 
-
-def gohome():
-    HtmlPage.Window.Navigate(Uri(home))
-    return 'Leaving...'
-
-
 context = {
     "__name__": "__console__", 
     "__doc__": doc,
     "__version__": __version__,
-    "gohome": gohome
 }
 
 console = Console(context)
