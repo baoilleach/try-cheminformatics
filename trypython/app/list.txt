@@ -6,4 +6,4 @@
 6. if statements
 7. for statements
 8. The range Function
-9. Loops: break, continue and else
+9. Loops. break, continue and else
