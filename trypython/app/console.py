@@ -49,6 +49,7 @@ def invoke(function):
 @invoke
 def _debug(data):
     """Comment / uncomment to output debug info"""
+    data += '\n'
     #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
 
     
@@ -82,7 +83,6 @@ class StatefulPrinter(object):
             self.block = None
         
         block.Text += data
-        _debug(repr(data) +'\n')
     
     def print_new(self, data):
         if self.block is not None:
@@ -212,8 +212,49 @@ class Console(object):
             print_lines(contents)
             return
         
+        def get_indent(line):
+            spaces = ''
+            for char in line:
+                if char == ' ':
+                    spaces += ' '
+                else:
+                    break
+            return spaces
+
+        def is_terminator(line):
+            line = line.lstrip()
+            terminators = ['pass', 'break', 'continue', 'return']
+            for entry in terminators:
+                if line.startswith(entry):
+                    return True
+            return False
+        
         complete = self.is_complete(contents)
-        if complete:
+        if not complete:
+            to_the_left = console_textbox.Text[:console_textbox.SelectionStart + 1]
+            lines = to_the_left.splitlines()
+            # there *must* be something here because an empty textbox
+            # would already have been caught by empty_or_comment_only
+            initial_indent = '    '
+            for line in lines:
+                if line.startswith(' '):
+                    initial_indent = get_indent(line)
+                    break
+            last_line = lines[-1]
+            new_indent = current_indent = get_indent(last_line)
+            if last_line.rstrip().endswith(':'):
+                new_indent = current_indent + initial_indent
+            elif is_terminator(last_line):
+                new_indent = ' ' * (len(current_indent) - len(initial_indent))
+            
+            event.Handled = True
+            new_start = console_textbox.SelectionStart
+            new_pos = new_start + len(new_indent)
+            console_textbox.Text = console_textbox.Text[:new_start] + '\n' + new_indent + console_textbox.Text[new_start:]
+            console_textbox.SelectionStart = new_pos + 1
+            return
+
+        else:
             print_lines(contents)
             console_textbox.Text = ''
             event.Handled = True
@@ -241,6 +282,7 @@ class Console(object):
                 self.reset()
             else:
                 scroll()
+
 
 root = Application.Current.RootVisual
 console_output = root.consoleOutput
@@ -274,10 +316,6 @@ context = {
 console = Console(context)
 console_textbox.KeyDown += console.handle_key
 console.reset()
-
-
-_debug('Started\n')
-
 
 sys.stdout = console
 sys.stderr = console
