@@ -5,10 +5,10 @@
     <StackPanel HorizontalAlignment="Center">
         <TextBlock Margin="5, 0" FontSize="15" FontWeight="Bold">Try Python: Interactive Python Tutorial</TextBlock>
         <StackPanel x:Name="topNavbar" Orientation="Horizontal">
-            <Button Margin="5" Content="First" x:Name="topFirst" />
-            <Button Margin="5" Content="Prev" x:Name="topPrev" />
-            <Button Margin="5" Content="Next" x:Name="topNext" />
-            <Button Margin="5" Content="Last" x:Name="topLast" />
+            <Button Margin="5" FontSize="15"  Height="25" Content="First" x:Name="topFirst" />
+            <Button Margin="5" FontSize="15"  Height="25" Content="Prev" x:Name="topPrev" />
+            <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="topNext" />
+            <Button Margin="5" FontSize="15"  Height="25" Content="Last" x:Name="topLast" />
             <ComboBox Margin="5" FontSize="15" x:Name="topComboBox" Height="25" Width="500" />
         </StackPanel>
     </StackPanel>
@@ -35,10 +35,10 @@
         </Border>
     </StackPanel>
     <StackPanel HorizontalAlignment="Center" x:Name="bottomNavbar" Orientation="Horizontal">
-        <Button Margin="5" Content="First" x:Name="bottomFirst" />
-        <Button Margin="5" Content="Prev" x:Name="bottomPrev" />
-        <Button Margin="5" Content="Next" x:Name="bottomNext" />
-        <Button Margin="5" Content="Last" x:Name="bottomLast" />
+        <Button Margin="5" FontSize="15"  Height="25" Content="First" x:Name="bottomFirst" />
+        <Button Margin="5" FontSize="15"  Height="25" Content="Prev" x:Name="bottomPrev" />
+        <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="bottomNext" />
+        <Button Margin="5" FontSize="15"  Height="25" Content="Last" x:Name="bottomLast" />
         <ComboBox Margin="5" FontSize="15" x:Name="bottomComboBox" Height="25" Width="500" />
     </StackPanel>
 </StackPanel>
