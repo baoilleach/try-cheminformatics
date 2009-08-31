@@ -14,7 +14,7 @@ The most useful form is to specify a default value for one or more arguments. Th
             if retries < 0: raise IOError, 'refusenik user'
             print complaint
 
-This function can be called either like this: ``ask_ok('Do you really want to quit?') `` or like this: ``ask_ok('OK to overwrite the file?', 2)``.
+This function can be called either like this: ``ask_ok('Do you really want to quit?')`` or like this: ``ask_ok('OK to overwrite the file?', 2)``.
 
 This example also introduces the ``in`` keyword. This tests whether or not a sequence contains a certain value.
 
