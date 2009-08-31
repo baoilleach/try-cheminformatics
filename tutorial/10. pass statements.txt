@@ -1,0 +1,29 @@
+pass statements
+=============== 
+
+The ``pass`` statement does nothing. It can be used when a statement is required syntactically but the program requires no action. For example:
+
+.. code-block:: python
+ 
+    >>> while True:
+    ...     pass  # Busy-wait for keyboard interrupt (Ctrl+C)
+    ...
+
+NOTE: There is currently no way of breaking out of infinite loops in the Try Python online interpreter. You will have to refresh the page if you try this example.
+
+This is commonly used for creating minimal classes:
+
+.. code-block:: python
+
+    >>> class MyEmptyClass:
+    ...     pass
+    ...
+
+Another place ``pass`` can be used is as a place-holder for a function or conditional body when you are working on new code, allowing you to keep thinking at a more abstract level. The ``pass`` is silently ignored:
+
+.. code-block:: python
+
+    >>> def initlog(*args):
+    ...     pass   # Remember to implement this!
+    ...
+

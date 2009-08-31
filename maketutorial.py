@@ -11,12 +11,24 @@ xamlwriter.register_directive.flowdocument = False
 from xamlwriter.writer import publish_xaml
 
 import os
+
+def name_index(name):
+    chars = ''
+    for char in name:
+        if char.isdigit():
+            chars += char
+        else:
+            break
+    # this next line *should* raise an exception
+    # if the loop above results in ''
+    return int(chars)
+
 this_dir = os.path.abspath(os.path.dirname(__file__))
 input_files = sorted([
                name for name in 
                os.listdir(os.path.join(this_dir, 'tutorial')) if
                name.endswith('.txt')
-               ])
+               ], key=name_index)
 
 # Write in binary mode to only write '\n' on Windows
 handle = open(os.path.join(this_dir, 'trypython', 'app', 'list.txt'), 'wb')
