@@ -8,3 +8,4 @@
 8. The range Function
 9. Loops. break, continue and else
 10. pass statements
+11. Defining Functions

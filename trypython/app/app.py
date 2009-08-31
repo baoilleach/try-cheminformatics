@@ -69,7 +69,7 @@ def changeDocument(index):
         page = 'page%s' % (index + 1)
     HtmlPage.Window.CurrentBookmark = page
     with open('docs/item%s.xaml' % (index+1)) as handle:
-        xaml = handle.read()
+        xaml = handle.read().decode('utf-8')
     document = XamlReader.Load(xaml)
     root.document.Child.Content = document
     root.document.Child.ScrollToVerticalOffset(0)
