@@ -10,3 +10,5 @@
 10. pass statements
 11. Defining Functions
 12. Function Default Argument Values
+13. Keyword Arguments
+14. Function Argument Lists and lambdas
