@@ -7,7 +7,8 @@ _main_id = Thread.CurrentThread.ManagedThreadId
 
 def invoke(function):
     """This decorator wraps functions to invoke them onto the GUI if they are 
-    called from a background thread."""
+    called from a background thread. We *shouldn't* invoke if called from
+    the main thread or messages can end up out of order."""
     def inner(*args, **kwargs):
         if Thread.CurrentThread.ManagedThreadId != _main_id:
             root = Application.Current.RootVisual
@@ -20,7 +21,7 @@ def invoke(function):
 def _debug(data):
     if not data.endswith('\n'):
         data += '\n'
-    # Comment / uncomment to output debug info
+    # Comment / uncomment this line to output debug info
     #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
 
     
@@ -32,6 +33,7 @@ def empty_or_comment_only(contents):
         return False
     return contents.strip().startswith('#')
 
+
 def get_indent(line):
     spaces = ''
     for char in line:
@@ -40,6 +42,7 @@ def get_indent(line):
         else:
             break
     return spaces
+
 
 def is_terminator(line):
     line = line.lstrip()
