@@ -163,7 +163,7 @@ root.MouseMove += handler.on_mouse_move
 on_mouse_move = EventHandler[HtmlEventArgs](handler.on_mouse_move)
     
 HtmlPage.Window.AttachEvent("DOMMouseScroll", on_mouse_move)
-HtmlPage.Window.AttachEvent("onmousewheel", OnMouseWheel)
+HtmlPage.Window.AttachEvent("onmousewheel", on_mouse_move)
 HtmlPage.Document.AttachEvent("onmousewheel", on_mouse_move)
 
 _debug('Started')
