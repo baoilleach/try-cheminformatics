@@ -17,10 +17,14 @@ from printer import StatefulPrinter
 from utils import invoke
 
 
-Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
-root = Application.Current.RootVisual
+root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 topCombobox = root.topComboBox
 bottomCombobox = root.bottomComboBox
+console_output = root.consoleOutput
+prompt_panel = root.prompt
+scroller = root.scroller
+textbox_parent = root.consoleParent
+
 
 def content_resized(sender, event):
     root.Width = width = max(Application.Current.Host.Content.ActualWidth - 25, 700)
@@ -46,10 +50,6 @@ def focus_text_box(sender, event):
     HtmlPage.Plugin.Focus()
     console_textbox.Focus()
 
-console_output = root.consoleOutput
-prompt_panel = root.prompt
-scroller = root.scroller
-textbox_parent = root.consoleParent
 
 printer = StatefulPrinter(console_output, scroller)
 
