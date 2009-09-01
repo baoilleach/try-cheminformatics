@@ -4,10 +4,15 @@ from context import ps1, ps2
 from utils import invoke
 
 class StatefulPrinter(object):
-    def __init__(self, parent):
+    def __init__(self, parent, scroller):
         self.block = None
         self.parent = parent
+        self.scroller = scroller
     
+    @invoke
+    def clear(self):
+        self.parent.Children.Clear()
+        
     @invoke
     def write(self, data):
         if self.block is None:
@@ -33,3 +38,9 @@ class StatefulPrinter(object):
         lines[0] = ps1 + lines[0]
         lines[1:] = [ps2 + line for line in lines[1:]]
         self.print_new('\n'.join(lines))
+    
+    @invoke
+    def scroll(self):
+        if self.scroller.ScrollableHeight > 0:
+            self.scroller.ScrollToVerticalOffset(scroller.ScrollableHeight + scroller.ActualHeight)
+

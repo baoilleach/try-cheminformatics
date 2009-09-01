@@ -1,6 +1,7 @@
 
 from System.Threading import Thread
 from System.Windows import Application
+from System.Windows.Browser import HtmlPage
 
 _main_id = Thread.CurrentThread.ManagedThreadId
 
@@ -15,6 +16,14 @@ def invoke(function):
     return inner
 
 
+@invoke
+def _debug(data):
+    if not data.endswith('\n'):
+        data += '\n'
+    # Comment / uncomment to output debug info
+    #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
+
+    
 def empty_or_comment_only(contents):
     if not contents.strip():
         return True

@@ -11,6 +11,11 @@ from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import StackPanel, ComboBoxItem, UserControl
 from System.Windows.Markup import XamlReader
 
+from consoletextbox import ConsoleTextBox
+from context import context
+from printer import StatefulPrinter
+from utils import invoke
+
 
 Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 root = Application.Current.RootVisual
@@ -35,9 +40,30 @@ def excepthook(sender, e):
 
 Application.Current.UnhandledException += excepthook
 
-# sets up console
-# must be done after loading app.xaml
-import console
+@invoke
+def focus_text_box(sender, event):
+    #_debug('focus\n')
+    HtmlPage.Plugin.Focus()
+    console_textbox.Focus()
+
+console_output = root.consoleOutput
+prompt_panel = root.prompt
+scroller = root.scroller
+textbox_parent = root.consoleParent
+
+printer = StatefulPrinter(console_output, scroller)
+
+console_textbox = ConsoleTextBox(scroller.Width - 75, printer, context)
+textbox_parent.Child = console_textbox
+console_textbox.reset()
+
+console_output.GotFocus += focus_text_box
+scroller.GotFocus += focus_text_box
+root.container.GotFocus += focus_text_box
+
+
+sys.stdout = console_textbox
+sys.stderr = console_textbox
 
 with open('list.txt') as handle:
     items = handle.readlines()
@@ -73,7 +99,7 @@ def changeDocument(index):
     document = XamlReader.Load(xaml)
     root.document.Child.Content = document
     root.document.Child.ScrollToVerticalOffset(0)
-    console.focus_text_box(None, None)
+    focus_text_box(None, None)
 
 topCombobox.SelectionChanged += onChangeTop
 bottomCombobox.SelectionChanged += onChangeBottom
@@ -111,4 +137,4 @@ root.topPrev.Click += prev
 root.bottomPrev.Click += prev
         
 topCombobox.SelectedIndex = page
-console.focus_text_box(None, None)
+focus_text_box(None, None)
