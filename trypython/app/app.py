@@ -33,7 +33,7 @@ def content_resized(sender, event):
     root.Height = height = max(Application.Current.Host.Content.ActualHeight - 25, 700)
 
     root.document.Width = int(width * 0.53)
-    root.container.Height = height - 100
+    root.container.Height = height - 120
     root.scroller.Width = int(width * 0.44)
 
 Application.Current.Host.Content.Resized += content_resized
@@ -168,10 +168,8 @@ class MouseHandler(object):
                     e.Invoke('preventDefault')
                 elif e.GetProperty('stopPropagation'):
                     e.Invoke('stopPropagation')
-                _debug('yes')
                 scroller.ScrollToVerticalOffset(scroller.VerticalOffset + delta)
                 return
-        _debug('neither')
 
 
     def mouse_over(self, scroller):
