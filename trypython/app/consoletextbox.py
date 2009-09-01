@@ -160,13 +160,16 @@ class ConsoleTextBox(TextBox):
         if not complete:
             to_the_left = self.Text[:start + 1]
             lines = to_the_left.splitlines()
-            # there *must* be something here because an empty textbox
-            # would already have been caught by empty_or_comment_only
             initial_indent = '    '
             for line in lines:
+                # we do this incase the user is using one or two space
+                # indent instead of four
                 if line.startswith(' '):
                     initial_indent = get_indent(line)
                     break
+            
+            # there *must* be something here because an empty textbox
+            # would already have been caught by empty_or_comment_only
             last_line = lines[-1]
             new_indent = current_indent = get_indent(last_line)
             if last_line.rstrip().endswith(':'):
