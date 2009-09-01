@@ -6,15 +6,16 @@ import sys
 # CPython default is 1000 - but Firefox can't handle that deep
 sys.setrecursionlimit(500)
 
+from System import EventHandler, Math
 from System.Windows import Application
-from System.Windows.Browser import HtmlPage
+from System.Windows.Browser import HtmlPage, HtmlEventArgs
 from System.Windows.Controls import StackPanel, ComboBoxItem, UserControl
 from System.Windows.Markup import XamlReader
 
 from consoletextbox import ConsoleTextBox
 from context import context
 from printer import StatefulPrinter
-from utils import invoke
+from utils import invoke, _debug
 
 
 root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
@@ -138,3 +139,31 @@ root.bottomPrev.Click += prev
         
 topCombobox.SelectedIndex = page
 focus_text_box(None, None)
+
+
+class MouseHandler(object):
+    def __init__(self):
+        self.position = None
+    
+    def on_mouse_move(self, sender, event):
+        self.position = event.GetPosition(None)
+    
+    def on_mouse_wheel(self, sender, event):
+        mouseDelta = 0
+        e = event.EventObject
+        if e.GetProperty("detail"):
+            mouseDelta = -e.GetProperty("detail")
+        elif e.GetProperty("wheelDelta"):
+            mouseDelta = e.GetProperty("wheelDelta")
+        mouseDelta = Math.Sign(mouseDelta)
+    
+
+handler = MouseHandler()
+root.MouseMove += handler.on_mouse_move
+on_mouse_move = EventHandler[HtmlEventArgs](handler.on_mouse_move)
+    
+HtmlPage.Window.AttachEvent("DOMMouseScroll", on_mouse_move)
+HtmlPage.Window.AttachEvent("onmousewheel", OnMouseWheel)
+HtmlPage.Document.AttachEvent("onmousewheel", on_mouse_move)
+
+_debug('Started')
