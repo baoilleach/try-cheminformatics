@@ -156,62 +156,67 @@ class ConsoleTextBox(TextBox):
             self.printer.print_lines(contents)
             return
         
-        complete = self.is_complete(contents, start)
-        if not complete:
-            to_the_left = self.Text[:start + 1]
-            lines = to_the_left.splitlines()
-            initial_indent = '    '
-            for line in lines:
-                # we do this incase the user is using one or two space
-                # indent instead of four
-                if line.startswith(' '):
-                    initial_indent = get_indent(line)
-                    break
-            
-            # there *must* be something here because an empty textbox
-            # would already have been caught by empty_or_comment_only
-            last_line = lines[-1]
-            new_indent = current_indent = get_indent(last_line)
-            if last_line.rstrip().endswith(':'):
-                new_indent = current_indent + initial_indent
-            elif is_terminator(last_line):
-                new_indent = ' ' * (len(current_indent) - len(initial_indent))
-            
-            event.Handled = True
-            new_start = self.SelectionStart
-            new_pos = new_start + len(new_indent)
-            self.Text = self.Text[:new_start] + '\n' + new_indent + self.Text[new_start:]
-            self.SelectionStart = new_pos + 1
-            return
-
+        event.Handled = True
+        if not self.is_complete(contents, start):
+            self.do_indent(start)
         else:
-            self.printer.print_lines(contents)
-            self.Text = ''
-            event.Handled = True
-            self.history.append(contents)
-            try:
-                code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
-                exec code in self.context
-            except:
-                exc_type, value, tb = sys.exc_info()
-                if value is None:
-                    # String exceptions
-                    # workaround for IronPython bug
-                    exc_type = Exception
-                    value = Exception('StringException')
-                    
-                tblist = traceback.extract_tb(tb)
-                message = traceback.format_list(tblist)
-                del message[:1]
-                if message:
-                    message.insert(0, "Traceback (most recent call last):\n")
-                message.extend(traceback.format_exception_only(exc_type, value))
-                self.printer.print_new(''.join(message))
+            self.execute(contents)
+
+
+    def execute(self, contents):
+        self.printer.print_lines(contents)
+        self.Text = ''
+        self.history.append(contents)
+        try:
+            code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
+            exec code in self.context
+        except:
+            exc_type, value, tb = sys.exc_info()
+            if value is None:
+                # String exceptions
+                # workaround for IronPython bug
+                exc_type = Exception
+                value = Exception('StringException')
+                
+            tblist = traceback.extract_tb(tb)
+            message = traceback.format_list(tblist)
+            del message[:1]
+            if message:
+                message.insert(0, "Traceback (most recent call last):\n")
+            message.extend(traceback.format_exception_only(exc_type, value))
+            self.printer.print_new(''.join(message))
+    
+        if self._reset_needed:
+            self.reset()
+        else:
+            self.printer.scroll()
+
+
+    def do_indent(self, start):
+        to_the_left = self.Text[:start + 1]
+        lines = to_the_left.splitlines()
+        initial_indent = '    '
+        for line in lines:
+            # we do this incase the user is using one or two space
+            # indent instead of four
+            if line.startswith(' '):
+                initial_indent = get_indent(line)
+                break
         
-            if self._reset_needed:
-                self.reset()
-            else:
-                self.printer.scroll()
+        # there *must* be something here because an empty textbox
+        # would already have been caught by empty_or_comment_only
+        last_line = lines[-1]
+        new_indent = current_indent = get_indent(last_line)
+        if last_line.rstrip().endswith(':'):
+            new_indent = current_indent + initial_indent
+        elif is_terminator(last_line):
+            new_indent = ' ' * (len(current_indent) - len(initial_indent))
+        
+        new_start = self.SelectionStart
+        new_pos = new_start + len(new_indent)
+        self.Text = self.Text[:new_start] + '\n' + new_indent + self.Text[new_start:]
+        self.SelectionStart = new_pos + 1
+        return
 
 
 def get_console_block():
