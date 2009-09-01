@@ -5,7 +5,6 @@ clr.AddReference('IronPython')
 clr.AddReference('Microsoft.Scripting')
 
 from System import Uri
-from System.Threading import Thread
 from System.Windows import Application
 from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import TextBox, TextBlock
@@ -14,7 +13,7 @@ from System.Windows.Input import Key
 from System.Windows.Media import FontFamily
 from System.Windows import TextWrapping, Thickness
 
-from consoletextbox import ConsoleTextBox, get_console_block
+from consoletextbox import ConsoleTextBox
 
 from IronPython.Hosting import Python
 from Microsoft.Scripting import ScriptCodeParseResult, SourceCodeKind
@@ -22,34 +21,23 @@ from Microsoft.Scripting import ScriptCodeParseResult, SourceCodeKind
 import traceback
 
 from consolehistory import ConsoleHistory
+from context import context, banner, home
 
-__version__ = '0.1.0'
+from utils import (
+    empty_or_comment_only, get_indent, is_terminator,
+    magic_function, invoke
+)
 
-python_version = '.'.join(str(n) for n in sys.version_info[:3])
-doc = "Try Python: version %s" % __version__
-banner = ("Python %s on Silverlight\nPython in the Browser %s by Michael Foord\n" 
-          "Type reset to clear the console and gohome to exit.\n" % (python_version, __version__))
-home = 'http://code.google.com/p/trypython/'
+from printer import StatefulPrinter
 
-ps1 = '>>> '
-ps2 = '... '
 
-_main_id = Thread.CurrentThread.ManagedThreadId
-
-def invoke(function):
-    """This decorator wraps functions to invoke them onto the GUI if they are 
-    called from a background thread."""
-    def inner(*args, **kwargs):
-        if Thread.CurrentThread.ManagedThreadId != _main_id:
-            return root.Dispatcher.BeginInvoke(lambda: function(*args, **kwargs))
-        return function(*args, **kwargs)
-    return inner
 
 
 @invoke
 def _debug(data):
-    """Comment / uncomment to output debug info"""
-    data += '\n'
+    if not data.endswith('\n'):
+        data += '\n'
+    # Comment / uncomment to output debug info
     #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
 
     
@@ -65,76 +53,6 @@ def focus_text_box(sender, event):
     HtmlPage.Plugin.Focus()
     console_textbox.Focus()
 
-def empty_or_comment_only(contents):
-    if not contents.strip():
-        return True
-    numlines = len(contents.splitlines())
-    if numlines >= 2:
-        return False
-    return contents.strip().startswith('#')
-
-def get_indent(line):
-    spaces = ''
-    for char in line:
-        if char == ' ':
-            spaces += ' '
-        else:
-            break
-    return spaces
-
-def is_terminator(line):
-    line = line.lstrip()
-    terminators = ['pass', 'break', 'continue', 'return']
-    for entry in terminators:
-        if line.startswith(entry):
-            return True
-    return False
-
-
-class StatefulPrinter(object):
-    def __init__(self, parent):
-        self.block = None
-        self.parent = parent
-    
-    @invoke
-    def write(self, data):
-        if self.block is None:
-            self.block = get_console_block()
-            self.parent.Children.Add(self.block)
-            
-        block = self.block
-        if data.endswith('\n'):
-            data = data[:-1]
-            self.block = None
-        
-        block.Text += data
-    
-    def print_new(self, data):
-        if self.block is not None:
-            self.block = None
-        if not data.endswith('\n'):
-            data += '\n'
-        self.write(data)
-
-    def print_lines(self, data):
-        lines = data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
-        lines[0] = ps1 + lines[0]
-        lines[1:] = [ps2 + line for line in lines[1:]]
-        self.print_new('\n'.join(lines))
-
-
-class magic_function(object):
-    def __init__(self, function, string):
-        self.function = function
-        self.string = string
-        
-    def __call__(self):
-        self.function()
-        return self.string
-        
-    def __repr__(self):
-        self.function()
-        return self.string
 
 # Magic flag from the codeop module
 PyCF_DONT_IMPLY_DEDENT = 0x200
@@ -178,7 +96,7 @@ class Console(object):
         if result == ScriptCodeParseResult.IncompleteToken:
             return False
         elif result == ScriptCodeParseResult.IncompleteStatement:
-            if not text.endswith('\n'):
+            if not text.rstrip(' ').endswith('\n'):
                 return False
         return True
     
@@ -313,11 +231,6 @@ root.container.GotFocus += focus_text_box
 
 
 
-context = {
-    "__name__": "__console__", 
-    "__doc__": doc,
-    "__version__": __version__,
-}
 
 console = Console(context)
 console_textbox.KeyDown += console.handle_key
