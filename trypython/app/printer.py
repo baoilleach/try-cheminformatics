@@ -41,6 +41,7 @@ class StatefulPrinter(object):
     
     @invoke
     def scroll(self):
-        if self.scroller.ScrollableHeight > 0:
-            self.scroller.ScrollToVerticalOffset(scroller.ScrollableHeight + scroller.ActualHeight)
+        scroller = self.scroller
+        if scroller.ScrollableHeight > 0:
+            scroller.ScrollToVerticalOffset(scroller.ScrollableHeight + scroller.ActualHeight)
 

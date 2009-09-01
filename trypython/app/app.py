@@ -8,6 +8,7 @@ sys.setrecursionlimit(500)
 
 from System import EventHandler, Math
 from System.Windows import Application
+from System.Windows import Point
 from System.Windows.Browser import HtmlPage, HtmlEventArgs
 from System.Windows.Controls import StackPanel, ComboBoxItem, UserControl
 from System.Windows.Markup import XamlReader
@@ -142,28 +143,59 @@ focus_text_box(None, None)
 
 
 class MouseHandler(object):
-    def __init__(self):
+    def __init__(self, scrollers):
         self.position = None
+        self.scrollers = scrollers
     
     def on_mouse_move(self, sender, event):
         self.position = event.GetPosition(None)
     
     def on_mouse_wheel(self, sender, event):
-        mouseDelta = 0
+        delta = 0
         e = event.EventObject
         if e.GetProperty("detail"):
-            mouseDelta = -e.GetProperty("detail")
+            delta = e.GetProperty("detail")
         elif e.GetProperty("wheelDelta"):
-            mouseDelta = e.GetProperty("wheelDelta")
-        mouseDelta = Math.Sign(mouseDelta)
-    
+            delta = -e.GetProperty("wheelDelta")
+        delta = Math.Sign(delta) * 40
+        
+        for scroller in self.scrollers:
+            if self.mouse_over(scroller):
+                e.SetProperty('cancel', True)
+                e.SetProperty('cancelBubble', True)
+                e.SetProperty('returnValue', False)
+                if e.GetProperty('preventDefault'):
+                    e.Invoke('preventDefault')
+                elif e.GetProperty('stopPropagation'):
+                    e.Invoke('stopPropagation')
+                _debug('yes')
+                scroller.ScrollToVerticalOffset(scroller.VerticalOffset + delta)
+                return
+        _debug('neither')
 
-handler = MouseHandler()
+
+    def mouse_over(self, scroller):
+        minX, maxX, minY, maxY = self.get_element_coords(scroller)
+        return ((minX <= self.position.X <= maxX) and
+                (minY <= self.position.Y <= maxY))
+
+
+    def get_element_coords(self, element):
+        transform = element.TransformToVisual(root)
+        topleft = transform.Transform(Point(0, 0))
+        minX = topleft.X
+        minY = topleft.Y
+        maxX = minX + element.RenderSize.Width
+        maxY = minY + element.RenderSize.Height
+        return minX, maxX, minY, maxY
+
+        
+handler = MouseHandler([scroller, root.documentScroller])
 root.MouseMove += handler.on_mouse_move
-on_mouse_move = EventHandler[HtmlEventArgs](handler.on_mouse_move)
+on_mouse_wheel = EventHandler[HtmlEventArgs](handler.on_mouse_wheel)
     
-HtmlPage.Window.AttachEvent("DOMMouseScroll", on_mouse_move)
-HtmlPage.Window.AttachEvent("onmousewheel", on_mouse_move)
-HtmlPage.Document.AttachEvent("onmousewheel", on_mouse_move)
+HtmlPage.Window.AttachEvent("DOMMouseScroll", on_mouse_wheel)
+HtmlPage.Window.AttachEvent("onmousewheel", on_mouse_wheel)
+HtmlPage.Document.AttachEvent("onmousewheel", on_mouse_wheel)
 
 _debug('Started')
