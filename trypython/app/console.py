@@ -116,20 +116,28 @@ class StatefulPrinter(object):
             data += '\n'
         self.write(data)
 
+    def print_lines(self, data):
+        lines = data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+        lines[0] = ps1 + lines[0]
+        lines[1:] = [ps2 + line for line in lines[1:]]
+        self.print_new('\n'.join(lines))
 
-def get_magic_function(function, string):
-    class MagicFunction(object):
-        def __call__(self):
-            function()
-            return string
-        def __repr__(self):
-            function()
-            return string
-    return MagicFunction()
-    
-    
+
+class magic_function(object):
+    def __init__(self, function, string):
+        self.function = function
+        self.string = string
+        
+    def __call__(self):
+        self.function()
+        return self.string
+        
+    def __repr__(self):
+        self.function()
+        return self.string
+
 # Magic flag from the codeop module
-PyCF_DONT_IMPLY_DEDENT = 0x200          # Matches pythonrun.h
+PyCF_DONT_IMPLY_DEDENT = 0x200
 
 class Console(object):
     def __init__(self, context):
@@ -137,8 +145,8 @@ class Console(object):
         
         def reset():
             self._reset_needed = True
-        self.original_context['reset'] = get_magic_function(reset, 'resetting')
-        self.original_context['gohome'] = get_magic_function(lambda: HtmlPage.Window.Navigate(Uri(home)), 'Leaving...')
+        self.original_context['reset'] = magic_function(reset, 'resetting')
+        self.original_context['gohome'] = magic_function(lambda: HtmlPage.Window.Navigate(Uri(home)), 'Leaving...')
         
         self.context = None
         self.engine = Python.CreateEngine()
@@ -297,17 +305,13 @@ textbox_parent.Child = console_textbox
 printer = StatefulPrinter(console_output)
 _print = printer.write
 print_new = printer.print_new
+print_lines = printer.print_lines
 
 console_output.GotFocus += focus_text_box
 scroller.GotFocus += focus_text_box
 root.container.GotFocus += focus_text_box
 
 
-def print_lines(data):
-    lines = data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
-    lines[0] = ps1 + lines[0]
-    lines[1:] = [ps2 + line for line in lines[1:]]
-    print_new('\n'.join(lines))
 
 context = {
     "__name__": "__console__", 
