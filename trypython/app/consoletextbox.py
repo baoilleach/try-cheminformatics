@@ -122,7 +122,7 @@ class ConsoleTextBox(TextBox):
         end = start + self.SelectionLength
 
         if key != Key.Enter:
-            if key == key.Up:
+            if key == Key.Up:
                 if self.on_first_line(contents):
                     event.Handled = True
                     previous = self.history.back(contents)
@@ -131,7 +131,7 @@ class ConsoleTextBox(TextBox):
                         self.SelectionStart = len(previous)
                     return
                 
-            elif key == key.Down:
+            elif key == Key.Down:
                 if self.on_last_line(contents):
                     event.Handled = True
                     next = self.history.forward(contents)
@@ -140,7 +140,7 @@ class ConsoleTextBox(TextBox):
                         self.SelectionStart = len(next)
                     return
             
-            elif key == key.Tab:
+            elif key == Key.Tab:
                 event.Handled = True
                 self.Text = self.Text[:start] + '    ' + self.Text[end:]
                 self.SelectionStart = start + 4
@@ -149,14 +149,13 @@ class ConsoleTextBox(TextBox):
             TextBox.OnKeyDown(self, event)
             return
         
+        event.Handled = True
         if empty_or_comment_only(contents):
             # needed or we get a SyntaxError
-            event.Handled = True
             self.Text = ''
             self.printer.print_lines(contents)
             return
         
-        event.Handled = True
         if not self.is_complete(contents, start):
             self.do_indent(start)
         else:
@@ -216,7 +215,6 @@ class ConsoleTextBox(TextBox):
         new_pos = new_start + len(new_indent)
         self.Text = self.Text[:new_start] + '\n' + new_indent + self.Text[new_start:]
         self.SelectionStart = new_pos + 1
-        return
 
 
 def get_console_block():
