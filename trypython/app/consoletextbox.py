@@ -55,15 +55,22 @@ class ConsoleTextBox(TextBox):
                                                          'Leaving...')
         self.original_context['raw_input'] = self.raw_input
         
+        def input(prompt='Input:'):
+            'input([prompt]) -> value\n\nEquivalent to eval(raw_input(prompt)).'
+            return eval(self.context['raw_input'](prompt), self.context, self.context)
+        self.original_context['input'] = input
+
+        
         # for debugging only!
         self.original_context['root'] = root
         
-        self.context = None
+        self.context = {}
         self.history = None
         self._reset_needed = False
         self._thread = None
         self._thread_reset = None
         self._raw_input_text = ''
+        self._temp_context = None
         self.engine = Python.CreateEngine()
         self.scope = self.engine.CreateScope()
         
@@ -77,10 +84,11 @@ class ConsoleTextBox(TextBox):
     def reset(self):
         self.printer.clear()
         self._reset_needed = False
+        self.context.clear()
         self.context = self.original_context.copy()
         self.history = ConsoleHistory()
         self.printer.print_new(banner)
-
+        
         
     def OnKeyDown(self, event):
         # needed so that we get KeyDown 
@@ -195,14 +203,10 @@ class ConsoleTextBox(TextBox):
         self.history.append(contents)
         
         started = ManualResetEvent(False)
+        if self._temp_context is not None:
+            self.context.update(self._temp_context)
         def _execute():
             context = self.context
-            def input(prompt='Input:'):
-                'input([prompt]) -> value\n\nEquivalent to eval(raw_input(prompt)).'
-                # we use the local context so that if it is reset this progpagates
-                # to this function
-                return eval(context['raw_input'](prompt), context, context)
-            context['input'] = input
             started.Set()
             try:
                 try:
@@ -245,7 +249,9 @@ class ConsoleTextBox(TextBox):
         
         
     @invoke
-    def completed(self):
+    def completed(self, reset_temp=True):
+        if reset_temp:
+            self._temp_context = None
         self._thread = None
         self.prompt.Visibility = Visibility.Visible
         self.CaretBrush = self._original_caret
@@ -284,11 +290,13 @@ class ConsoleTextBox(TextBox):
     def keyboard_interrupt(self):
         # Aborting threads doesn't work on Silverlight :-(
         #self._thread.Abort()
+        reset_temp = True
         if self._thread_reset is not None:
+            reset_temp = False
             # signal to background thread not to complete
             self._thread_reset.Set()
             context = self.context
-            self.context = context.copy()
+            self._temp_context = context.copy()
             # This will hopefully cause the existing thread to error out
             context.clear()
             context['raw_input'] = context['input'] = blow_up
@@ -300,7 +308,7 @@ class ConsoleTextBox(TextBox):
             self.history.append(self.Text)
         self.printer.print_new('KeyboardInterrupt')
         self.Text = ''
-        self.completed()
+        self.completed(reset_temp)
 
 
     @invoke
