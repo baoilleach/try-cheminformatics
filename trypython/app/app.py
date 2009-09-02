@@ -57,7 +57,7 @@ def focus_text_box(sender, event):
 
 printer = StatefulPrinter(console_output, scroller)
 
-console_textbox = ConsoleTextBox(scroller.Width - 75, printer, context, root.prompt)
+console_textbox = ConsoleTextBox(scroller.Width - 75, printer, context, root)
 textbox_parent.Child = console_textbox
 console_textbox.reset()
 

@@ -32,6 +32,22 @@
                         </StackPanel>
                         <Border x:Name="consoleParent" Margin = "0" />
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Visibility="Collapsed" x:Name="rawInput">
+                        <TextBlock 
+                            x:Name="rawInputPrompt"
+                            FontSize = "15"
+                            Margin = "0"
+                            Padding = "0,5,0,0"
+                            FontFamily = "Consolas, Global Monospace"
+                        />
+                        <TextBox
+                            x:Name="rawInputField"
+                            FontSize = "15"
+                            Margin = "0"
+                            Padding = "3"
+                            FontFamily = "Consolas, Global Monospace"
+                        />
+                    </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Border>

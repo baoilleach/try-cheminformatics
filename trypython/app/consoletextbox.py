@@ -22,22 +22,22 @@ from context import banner, home
 
 from utils import (
     empty_or_comment_only, get_indent, is_terminator,
-    magic_function, invoke, _debug
+    magic_function, invoke, blow_up, _debug
 )
 
 
 # Magic flag from the codeop module
 PyCF_DONT_IMPLY_DEDENT = 0x200
 
-
 class ConsoleTextBox(TextBox):
-    def __new__(cls, width, printer, context, prompt):
+    def __new__(cls, width, printer, context, root):
         return TextBox.__new__(cls)
     
-    def __init__(self, width, printer, context, prompt):
+    def __init__(self, width, printer, context, root):
         self.original_context = context
         self.printer = printer
-        self.prompt = prompt
+        self.prompt = root.prompt
+        self.root = root
         
         self.FontSize = 15
         self.Margin = Thickness(0)
@@ -53,12 +53,17 @@ class ConsoleTextBox(TextBox):
         self.original_context['reset'] = magic_function(reset, 'resetting')
         self.original_context['gohome'] = magic_function(lambda: HtmlPage.Window.Navigate(Uri(home)), 
                                                          'Leaving...')
+        self.original_context['raw_input'] = self.raw_input
+        
+        # for debugging only!
+        self.original_context['root'] = root
         
         self.context = None
         self.history = None
         self._reset_needed = False
         self._thread = None
         self._thread_reset = None
+        self._raw_input_text = ''
         self.engine = Python.CreateEngine()
         self.scope = self.engine.CreateScope()
         
@@ -192,6 +197,10 @@ class ConsoleTextBox(TextBox):
         started = ManualResetEvent(False)
         def _execute():
             context = self.context
+            def input(prompt=''):
+                'input([prompt]) -> value\n\nEquivalent to eval(raw_input(prompt)).'
+                return eval(context['raw_input'](prompt), context, context)
+            context['input'] = input
             started.Set()
             try:
                 try:
@@ -278,6 +287,7 @@ class ConsoleTextBox(TextBox):
             self.context = context.copy()
             # This will hopefully cause the existing thread to error out
             context.clear()
+            context['raw_input'] = context['input'] = blow_up
             
         self._thread_reset = None
         self._thread = None
@@ -287,6 +297,44 @@ class ConsoleTextBox(TextBox):
         self.printer.print_new('KeyboardInterrupt')
         self.Text = ''
         self.completed()
+
+
+    @invoke
+    def setup_input_box(self, prompt):
+        self.Visibility = Visibility.Collapsed
+        self.root.rawInputPrompt.Text = prompt + ' '
+        self.root.rawInputField.Text = ''
+        self.root.rawInputField.Width = self.Width - 60
+        self.root.rawInput.Visibility = Visibility.Visible
+        self.root.rawInputField.KeyDown += self.check_for_enter
+        self.root.rawInputField.Focus()
+
+
+    @invoke
+    def remove_input_box(self):
+        self.Visibility = Visibility.Visible
+        self.root.rawInput.Visibility = Visibility.Collapsed
+        self.root.rawInputField.KeyDown -= self.check_for_enter
+        self.Focus()
+
+
+    def check_for_enter(self, sender, event):
+        if event.Key == Key.Enter:
+            event.Handled = True
+            self._raw_input_text = self.root.rawInputField.Text
+            self.input_event.Set()
+
+
+    def raw_input(self, prompt='Input:'):
+        if not isinstance(prompt, str):
+            prompt = str(prompt)
+        self.input_event = ManualResetEvent(False)
+        self.setup_input_box(prompt)
+        self.input_event.WaitOne()
+        self.remove_input_box()
+        return self._raw_input_text
+    
+        
 
 
 def get_console_block():

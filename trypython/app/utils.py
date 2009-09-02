@@ -29,7 +29,7 @@ def _debug(data):
     if not data.endswith('\n'):
         data += '\n'
     # Comment / uncomment this line to output debug info
-    #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
+    HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
 
     
 def empty_or_comment_only(contents):
@@ -72,3 +72,7 @@ class magic_function(object):
     def __repr__(self):
         self.function()
         return self.string
+
+
+def blow_up():
+    raise Exception('boom')
