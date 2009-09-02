@@ -32,7 +32,7 @@ textbox_parent = root.consoleParent
 
 def content_resized(sender, event):
     root.Width = width = max(Application.Current.Host.Content.ActualWidth - 25, 700)
-    root.Height = height = max(Application.Current.Host.Content.ActualHeight - 25, 700)
+    root.Height = height = max(Application.Current.Host.Content.ActualHeight - 25, 500)
 
     root.document.Width = int(width * 0.53)
     root.container.Height = height - 120

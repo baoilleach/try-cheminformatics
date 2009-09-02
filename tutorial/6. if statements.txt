@@ -21,6 +21,5 @@ Perhaps the most well-known statement type is the ``if`` statement. For example:
     ...
     More
 
-NOTE: The ``raw_input`` function does not work (yet) in the *Try Python* interpreter.
 
 There can be zero or more ``elif`` parts, and the ``else`` part is optional. The keyword '``elif``' is short for 'else if', and is useful to avoid excessive indentation. An ``if`` ... ``elif`` ... ``elif`` ... sequence is a substitute for the ``switch`` or ``case`` statements found in other languages.
