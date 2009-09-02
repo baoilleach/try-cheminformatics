@@ -41,7 +41,7 @@ class ConsoleTextBox(TextBox):
         
         self.FontSize = 15
         self.Margin = Thickness(0)
-        self.FontFamily = FontFamily("Consolas, Global Monospace")
+        self.FontFamily = FontFamily("Consolas,  Monaco, Lucida Console, Global Monospace")
         self.AcceptsReturn = True
         self.BorderThickness = Thickness(0)
         self.VerticalScrollBarVisibility = ScrollBarVisibility.Auto
@@ -199,12 +199,15 @@ class ConsoleTextBox(TextBox):
             context = self.context
             def input(prompt='Input:'):
                 'input([prompt]) -> value\n\nEquivalent to eval(raw_input(prompt)).'
+                # we use the local context so that if it is reset this progpagates
+                # to this function
                 return eval(context['raw_input'](prompt), context, context)
             context['input'] = input
             started.Set()
             try:
                 try:
-                    code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
+                    code = compile(contents + '\n', '<stdin>', 'single', 
+                                   PyCF_DONT_IMPLY_DEDENT)
                     exec code in context
                 except:
                     if reset_event.WaitOne(0):
@@ -221,12 +224,13 @@ class ConsoleTextBox(TextBox):
                     message = traceback.format_list(tblist)
                     del message[:1]
                     if message:
+                        # we don't print the 'Traceback...' part for SyntaxError
                         message.insert(0, "Traceback (most recent call last):\n")
                     message.extend(traceback.format_exception_only(exc_type, value))
                     self.printer.print_new(''.join(message))
             finally:
                 # access through closure not on self as we may be an orphaned
-                # thread
+                # thread - with a new reset_event on self
                 if not reset_event.WaitOne(0):
                     self.completed()
             
