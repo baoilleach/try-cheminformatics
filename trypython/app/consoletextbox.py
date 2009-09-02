@@ -10,7 +10,7 @@ from System.Windows import Thickness, TextWrapping, Visibility
 from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import TextBox, TextBlock, ScrollBarVisibility
 from System.Windows.Input import Key, Keyboard, ModifierKeys
-from System.Windows.Media import FontFamily
+from System.Windows.Media import Colors, SolidColorBrush, FontFamily
 
 from IronPython.Hosting import Python
 from Microsoft.Scripting import ScriptCodeParseResult, SourceCodeKind
@@ -36,6 +36,8 @@ class ConsoleTextBox(TextBox):
     
     def __init__(self, width, printer, context, prompt):
         self.original_context = context
+        self._original_caret = self.CaretBrush
+        self._disabled = SolidColorBrush(Colors.White)
         self.printer = printer
         self.FontSize = 15
         self.Margin = Thickness(0, 0, 0, 0)
@@ -216,12 +218,14 @@ class ConsoleTextBox(TextBox):
         self._thread.Start()
         self._thread_reset = reset_event = ManualResetEvent(False)
         self.prompt.Visibility = Visibility.Collapsed
+        self.CaretBrush = self._disabled
         
         
     @invoke
     def completed(self):
         self._thread = None
         self.prompt.Visibility = Visibility.Visible
+        self.CaretBrush = self._original_caret
         if self._reset_needed:
             self.reset()
         else:
