@@ -189,12 +189,18 @@ class ConsoleTextBox(TextBox):
         self.Text = ''
         self.history.append(contents)
         
+        started = ManualResetEvent(False)
         def _execute():
+            context = self.context
+            started.Set()
             try:
                 try:
                     code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
-                    exec code in self.context
+                    exec code in context
                 except:
+                    if reset_event.WaitOne(0):
+                        # don't print exception messages if thread has been terminated
+                        return
                     exc_type, value, tb = sys.exc_info()
                     if value is None:
                         # String exceptions
@@ -222,6 +228,7 @@ class ConsoleTextBox(TextBox):
         self._thread_reset = reset_event = ManualResetEvent(False)
         self.prompt.Visibility = Visibility.Collapsed
         self.CaretBrush = self._disabled
+        started.WaitOne()
         
         
     @invoke
@@ -267,6 +274,10 @@ class ConsoleTextBox(TextBox):
         if self._thread_reset is not None:
             # signal to background thread not to complete
             self._thread_reset.Set()
+            context = self.context
+            self.context = context.copy()
+            # This will hopefully cause the existing thread to error out
+            context.clear()
             
         self._thread_reset = None
         self._thread = None

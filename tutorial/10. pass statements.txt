@@ -9,8 +9,6 @@ The ``pass`` statement does nothing. It can be used when a statement is required
     ...     pass  # Busy-wait for keyboard interrupt (Ctrl+C)
     ...
 
-NOTE: There is currently no way of breaking out of infinite loops in the Try Python online interpreter. You will have to refresh the page if you try this example.
-
 This is commonly used for creating minimal classes:
 
 .. code-block:: python
