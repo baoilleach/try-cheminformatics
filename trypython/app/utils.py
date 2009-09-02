@@ -24,6 +24,8 @@ def invoke(function):
 
 @invoke
 def _debug(data):
+    if not isinstance(data, str):
+        data = str(data)
     if not data.endswith('\n'):
         data += '\n'
     # Comment / uncomment this line to output debug info

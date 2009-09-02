@@ -5,11 +5,11 @@ clr.AddReference('IronPython')
 clr.AddReference('Microsoft.Scripting')
 
 from System import Uri
-from System.Threading import Thread, ThreadAbortException, ThreadStart
-from System.Windows import Thickness, TextWrapping
+from System.Threading import Thread, ManualResetEvent, ThreadStart
+from System.Windows import Thickness, TextWrapping, Visibility
 from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import TextBox, TextBlock, ScrollBarVisibility
-from System.Windows.Input import Key
+from System.Windows.Input import Key, Keyboard, ModifierKeys
 from System.Windows.Media import FontFamily
 
 from IronPython.Hosting import Python
@@ -31,10 +31,10 @@ PyCF_DONT_IMPLY_DEDENT = 0x200
 
 
 class ConsoleTextBox(TextBox):
-    def __new__(cls, width, printer, context):
+    def __new__(cls, width, printer, context, prompt):
         return TextBox.__new__(cls)
     
-    def __init__(self, width, printer, context):
+    def __init__(self, width, printer, context, prompt):
         self.original_context = context
         self.printer = printer
         self.FontSize = 15
@@ -60,6 +60,8 @@ class ConsoleTextBox(TextBox):
         self._reset_needed = False
         self.KeyDown += self.handle_key
         self._thread = None
+        self._thread_reset = None
+        self.prompt = prompt
 
     
     def reset(self):
@@ -122,6 +124,18 @@ class ConsoleTextBox(TextBox):
         key = event.Key
         start = self.SelectionStart
         end = start + self.SelectionLength
+        
+        modifiers = Keyboard.Modifiers
+        control = (modifiers & ModifierKeys.Control) or (modifiers & ModifierKeys.Apple)
+        if key == Key.C and control:
+            event.Handled = True
+            self.keyboard_interrupt()
+            return
+        
+        if self._thread is not None:
+            # ignore key events (we have already checked for Ctrl-C)
+            event.Handled = True
+            return
 
         if key != Key.Enter:
             if key == Key.Up:
@@ -191,17 +205,23 @@ class ConsoleTextBox(TextBox):
                     message.extend(traceback.format_exception_only(exc_type, value))
                     self.printer.print_new(''.join(message))
             finally:
-                self.completed()
+                # access through closure not on self as we may be an orphaned
+                # thread
+                if not reset_event.WaitOne(0):
+                    self.completed()
             
         self._thread = Thread(ThreadStart(_execute))
         self._thread.IsBackground = True
         self._thread.Name = "executing"
         self._thread.Start()
-        self.IsReadOnly = True
+        self._thread_reset = reset_event = ManualResetEvent(False)
+        self.prompt.Visibility = Visibility.Collapsed
+        
         
     @invoke
     def completed(self):
-        self.IsReadOnly = False
+        self._thread = None
+        self.prompt.Visibility = Visibility.Visible
         if self._reset_needed:
             self.reset()
         else:
@@ -232,6 +252,23 @@ class ConsoleTextBox(TextBox):
         new_pos = new_start + len(new_indent)
         self.Text = self.Text[:new_start] + '\n' + new_indent + self.Text[new_start:]
         self.SelectionStart = new_pos + 1
+
+        
+    def keyboard_interrupt(self):
+        # Aborting threads doesn't work on Silverlight :-(
+        #self._thread.Abort()
+        if self._thread_reset is not None:
+            # signal to background thread not to complete
+            self._thread_reset.Set()
+            
+        self._thread_reset = None
+        self._thread = None
+        
+        if self.Text.strip():
+            self.history.append(self.Text)
+        self.printer.print_new('KeyboardInterrupt')
+        self.Text = ''
+        self.completed()
 
 
 def get_console_block():

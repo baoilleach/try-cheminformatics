@@ -25,7 +25,7 @@ SetInvokeRoot(root)
 topCombobox = root.topComboBox
 bottomCombobox = root.bottomComboBox
 console_output = root.consoleOutput
-prompt_panel = root.prompt
+prompt_panel = root.promptPanel
 scroller = root.scroller
 textbox_parent = root.consoleParent
 
@@ -57,7 +57,7 @@ def focus_text_box(sender, event):
 
 printer = StatefulPrinter(console_output, scroller)
 
-console_textbox = ConsoleTextBox(scroller.Width - 75, printer, context)
+console_textbox = ConsoleTextBox(scroller.Width - 75, printer, context, root.prompt)
 textbox_parent.Child = console_textbox
 console_textbox.reset()
 
