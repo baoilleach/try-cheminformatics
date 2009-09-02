@@ -36,13 +36,12 @@ class ConsoleTextBox(TextBox):
     
     def __init__(self, width, printer, context, prompt):
         self.original_context = context
-        self._original_caret = self.CaretBrush
-        self._disabled = SolidColorBrush(Colors.White)
         self.printer = printer
+        self.prompt = prompt
+        
         self.FontSize = 15
-        self.Margin = Thickness(0, 0, 0, 0)
+        self.Margin = Thickness(0)
         self.FontFamily = FontFamily("Consolas, Global Monospace")
-        self.TextChanged += self.text_changed
         self.AcceptsReturn = True
         self.BorderThickness = Thickness(0)
         self.VerticalScrollBarVisibility = ScrollBarVisibility.Auto
@@ -56,14 +55,18 @@ class ConsoleTextBox(TextBox):
                                                          'Leaving...')
         
         self.context = None
-        self.engine = Python.CreateEngine()
-        self.scope = self.engine.CreateScope()
         self.history = None
         self._reset_needed = False
-        self.KeyDown += self.handle_key
         self._thread = None
         self._thread_reset = None
-        self.prompt = prompt
+        self.engine = Python.CreateEngine()
+        self.scope = self.engine.CreateScope()
+        
+        self._original_caret = self.CaretBrush
+        self._disabled = SolidColorBrush(Colors.White)
+        
+        self.KeyDown += self.handle_key
+        self.TextChanged += self.text_changed
 
     
     def reset(self):
