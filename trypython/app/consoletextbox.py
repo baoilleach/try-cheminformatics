@@ -41,7 +41,7 @@ class ConsoleTextBox(TextBox):
         
         self.FontSize = 15
         self.Margin = Thickness(0)
-        self.FontFamily = FontFamily("Consolas,  Monaco, Lucida Console, Global Monospace")
+        self.FontFamily = FontFamily("Consolas, Monaco, Lucida Console, Global Monospace")
         self.AcceptsReturn = True
         self.BorderThickness = Thickness(0)
         self.VerticalScrollBarVisibility = ScrollBarVisibility.Auto
