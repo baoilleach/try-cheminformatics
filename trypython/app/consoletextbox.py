@@ -197,7 +197,7 @@ class ConsoleTextBox(TextBox):
         started = ManualResetEvent(False)
         def _execute():
             context = self.context
-            def input(prompt=''):
+            def input(prompt='Input:'):
                 'input([prompt]) -> value\n\nEquivalent to eval(raw_input(prompt)).'
                 return eval(context['raw_input'](prompt), context, context)
             context['input'] = input
@@ -315,6 +315,7 @@ class ConsoleTextBox(TextBox):
         self.Visibility = Visibility.Visible
         self.root.rawInput.Visibility = Visibility.Collapsed
         self.root.rawInputField.KeyDown -= self.check_for_enter
+        self.printer.print_new(self.root.rawInputPrompt.Text + self._raw_input_text)
         self.Focus()
 
 
