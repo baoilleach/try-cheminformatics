@@ -5,6 +5,7 @@ clr.AddReference('IronPython')
 clr.AddReference('Microsoft.Scripting')
 
 from System import Uri
+from System.Threading import Thread, ThreadAbortException, ThreadStart
 from System.Windows import Thickness, TextWrapping
 from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import TextBox, TextBlock, ScrollBarVisibility
@@ -21,7 +22,7 @@ from context import banner, home
 
 from utils import (
     empty_or_comment_only, get_indent, is_terminator,
-    magic_function
+    magic_function, invoke, _debug
 )
 
 
@@ -58,6 +59,7 @@ class ConsoleTextBox(TextBox):
         self.history = None
         self._reset_needed = False
         self.KeyDown += self.handle_key
+        self._thread = None
 
     
     def reset(self):
@@ -154,6 +156,7 @@ class ConsoleTextBox(TextBox):
             # needed or we get a SyntaxError
             self.Text = ''
             self.printer.print_lines(contents)
+            self.printer.scroll()
             return
         
         if not self.is_complete(contents, start):
@@ -163,29 +166,48 @@ class ConsoleTextBox(TextBox):
 
 
     def execute(self, contents):
-        sys.exc_clear()
         self.printer.print_lines(contents)
         self.Text = ''
         self.history.append(contents)
-        try:
-            code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
-            exec code in self.context
-        except:
-            exc_type, value, tb = sys.exc_info()
-            if value is None:
-                # String exceptions
-                # workaround for IronPython bug
-                exc_type = Exception
-                value = Exception('StringException')
-                
-            tblist = traceback.extract_tb(tb)
-            message = traceback.format_list(tblist)
-            del message[:1]
-            if message:
-                message.insert(0, "Traceback (most recent call last):\n")
-            message.extend(traceback.format_exception_only(exc_type, value))
-            self.printer.print_new(''.join(message))
+        
+        def _execute():
+            try:
+                try:
+                    _debug('thread start')
+                    code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
+                    exec code in self.context
+                    _debug('executed')
+                except ThreadAbortException:
+                    pass
+                except:
+                    exc_type, value, tb = sys.exc_info()
+                    if value is None:
+                        # String exceptions
+                        # workaround for IronPython bug
+                        exc_type = Exception
+                        value = Exception('StringException')
+                        
+                    tblist = traceback.extract_tb(tb)
+                    message = traceback.format_list(tblist)
+                    del message[:1]
+                    if message:
+                        message.insert(0, "Traceback (most recent call last):\n")
+                    message.extend(traceback.format_exception_only(exc_type, value))
+                    self.printer.print_new(''.join(message))
+            finally:
+                self._completed()
     
+        self._thread = Thread(ThreadStart(_execute))
+        self._thread.IsBackground = True
+        self._thread.Name = "executing"
+        self._thread.Start()
+        self.IsReadOnly = True
+    
+    
+    @invoke
+    def completed(self):
+        _debug('completed')
+        self.IsReadOnly = False
         if self._reset_needed:
             self.reset()
         else:
