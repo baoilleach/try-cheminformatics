@@ -5,13 +5,18 @@ from System.Windows.Browser import HtmlPage
 
 _main_id = Thread.CurrentThread.ManagedThreadId
 
+root = None
+
+def SetInvokeRoot(element):
+    global root
+    root = element
+
 def invoke(function):
     """This decorator wraps functions to invoke them onto the GUI if they are 
     called from a background thread. We *shouldn't* invoke if called from
     the main thread or messages can end up out of order."""
     def inner(*args, **kwargs):
         if Thread.CurrentThread.ManagedThreadId != _main_id:
-            root = Application.Current.RootVisual
             return root.Dispatcher.BeginInvoke(lambda: function(*args, **kwargs))
         return function(*args, **kwargs)
     return inner
@@ -22,7 +27,7 @@ def _debug(data):
     if not data.endswith('\n'):
         data += '\n'
     # Comment / uncomment this line to output debug info
-    HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
+    #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
 
     
 def empty_or_comment_only(contents):

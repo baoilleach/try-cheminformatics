@@ -173,12 +173,8 @@ class ConsoleTextBox(TextBox):
         def _execute():
             try:
                 try:
-                    _debug('thread start')
                     code = compile(contents + '\n', '<stdin>', 'single', PyCF_DONT_IMPLY_DEDENT)
                     exec code in self.context
-                    _debug('executed')
-                except ThreadAbortException:
-                    pass
                 except:
                     exc_type, value, tb = sys.exc_info()
                     if value is None:
@@ -195,18 +191,16 @@ class ConsoleTextBox(TextBox):
                     message.extend(traceback.format_exception_only(exc_type, value))
                     self.printer.print_new(''.join(message))
             finally:
-                self._completed()
-    
+                self.completed()
+            
         self._thread = Thread(ThreadStart(_execute))
         self._thread.IsBackground = True
         self._thread.Name = "executing"
         self._thread.Start()
         self.IsReadOnly = True
-    
-    
+        
     @invoke
     def completed(self):
-        _debug('completed')
         self.IsReadOnly = False
         if self._reset_needed:
             self.reset()

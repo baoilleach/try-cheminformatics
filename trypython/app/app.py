@@ -16,10 +16,12 @@ from System.Windows.Markup import XamlReader
 from consoletextbox import ConsoleTextBox
 from context import context
 from printer import StatefulPrinter
-from utils import invoke, _debug
+from utils import invoke, _debug, SetInvokeRoot
 
 
 root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
+SetInvokeRoot(root)
+
 topCombobox = root.topComboBox
 bottomCombobox = root.bottomComboBox
 console_output = root.consoleOutput
