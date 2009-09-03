@@ -12,3 +12,8 @@
 12. Function Default Argument Values
 13. Keyword Arguments
 14. Function Argument Lists and lambdas
+15. Function Documentation Strings
+16. Data Structures. More on Lists
+17. Using Lists as Stacks and Queues
+18. Functional Programming Tools
+19. List Comprehensions
