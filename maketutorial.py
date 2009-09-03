@@ -36,7 +36,8 @@ for name in input_files:
     handle.write(os.path.splitext(name)[0] + '\n')
 handle.close()
 
-doc_dir = os.path.join(this_dir, 'trypython', 'app', 'docs')
+app_dir = os.path.join(this_dir, 'trypython', 'app')
+doc_dir = os.path.join(app_dir, 'docs')
 if os.path.isdir(doc_dir):
     shutil.rmtree(doc_dir)
     
@@ -55,3 +56,11 @@ for index, name in enumerate(input_files):
     handle = open(out_path, 'w')
     handle.write(output.encode('utf-8'))
     handle.close()
+
+print
+print 'Writing doc page'
+doc_source = open(os.path.join(this_dir, 'docs.txt')).read().decode('utf-8')
+doc_xaml = publish_xaml(doc_source, flowdocument=False, xclass=False)
+handle = open(os.path.join(app_dir, 'doc.xaml'), 'w')
+handle.write(doc_xaml.encode('utf-8'))
+handle.close()

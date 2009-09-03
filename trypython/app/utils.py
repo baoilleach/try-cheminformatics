@@ -64,6 +64,7 @@ class magic_function(object):
     def __init__(self, function, string):
         self.function = function
         self.string = string
+        self.__doc__ = function.__doc__
         
     def __call__(self):
         self.function()

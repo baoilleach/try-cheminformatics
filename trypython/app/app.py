@@ -5,10 +5,6 @@ import sys
 clr.AddReferenceToFile('System.Windows.Controls.dll')
 clr.AddReferenceToFile('System.Windows.Controls.Toolkit.dll')
 
-# Handle infinite recursion gracefully
-# CPython default is 1000 - but Firefox can't handle that deep
-sys.setrecursionlimit(500)
-
 from System import EventHandler, Math
 from System.Windows import Application
 from System.Windows import Point
@@ -33,6 +29,7 @@ scroller = root.scroller
 about = root.about
 textbox_parent = root.consoleParent
 tab_control = root.tabControl
+documentation = root.documentation
 
 
 def content_resized(sender, event):
@@ -198,7 +195,7 @@ class MouseHandler(object):
         maxY = minY + element.RenderSize.Height
         return minX, maxX, minY, maxY
 
-scrollers = [scroller, root.documentScroller]
+scrollers = [root.documentScroller, scroller]
 handler = MouseHandler(scrollers)
 root.MouseMove += handler.on_mouse_move
 on_mouse_wheel = EventHandler[HtmlEventArgs](handler.on_mouse_wheel)
@@ -209,15 +206,25 @@ HtmlPage.Window.AttachEvent("onmousewheel", on_mouse_wheel)
 HtmlPage.Document.AttachEvent("onmousewheel", on_mouse_wheel)
 
 def on_tabpage_changed(sender, event):
+    # all stored as module level globals... hmm...
+    scrollers.pop()
     if sender.SelectedIndex == 0:
-        if about in scrollers:
-            scrollers.remove(about)
-        if scroller not in scrollers:
-            scrollers.append(scroller)
+        scrollers.append(scroller)
     if sender.SelectedIndex == 1:
-        if scroller in scrollers:
-            scrollers.remove(scroller)
-        if about not in scrollers:
-            scrollers.append(about)
+        scrollers.append(about)
+    if sender.SelectedIndex == 2:
+        scrollers.append(documentation)
         
 tab_control.SelectionChanged += on_tabpage_changed
+changing_scrollers = [about, documentation, scroller]
+
+with open('doc.xaml') as handle:
+    xaml = handle.read().decode('utf-8')
+doc_page = XamlReader.Load(xaml)
+documentation.Content = doc_page
+    
+# Handle infinite recursion gracefully
+# CPython default is 1000 - but Firefox can't handle that deep
+# It also needs to be done after GUI init or it gets reset somewhere along
+# the way...
+sys.setrecursionlimit(500)

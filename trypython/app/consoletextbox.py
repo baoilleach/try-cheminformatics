@@ -49,15 +49,17 @@ class ConsoleTextBox(TextBox):
         self.Width = width
         
         def reset():
+            "Clear the console, its history and the execution context."
             self._reset_needed = True
-        self.original_context['reset'] = magic_function(reset, 'resetting')
-        self.original_context['gohome'] = magic_function(lambda: HtmlPage.Window.Navigate(Uri(home)), 
-                                                         'Leaving...')
-        self.original_context['raw_input'] = self.raw_input
-        
         def input(prompt='Input:'):
             'input([prompt]) -> value\n\nEquivalent to eval(raw_input(prompt)).'
             return eval(self.context['raw_input'](prompt), self.context, self.context)
+        gohome = invoke(lambda: HtmlPage.Window.Navigate(Uri(home)))
+        
+        self.original_context['reset'] = magic_function(reset, 'resetting')
+        self.original_context['gohome'] = magic_function(gohome,'Leaving...')
+        self.original_context['exit'] = 'There is no escape...'
+        self.original_context['raw_input'] = self.raw_input
         self.original_context['input'] = input
 
         

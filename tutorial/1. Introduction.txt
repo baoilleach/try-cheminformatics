@@ -5,9 +5,9 @@
  Made with rst2xaml for Silverlight
 ------------------------------------
 
-This is an interactive Python tutorial created for Silverlight by Michael Foord. 
+**Try Python** is an interactive Python tutorial created for Silverlight and Moonlight by Michael Foord. 
 
-Select a page from the dropdown list at the top.
+Select a page from the dropdown list use the navigation bar to browse the tutorial.
 
 This tutorial is based on the Python tutorial that is part of the Python documentation
 

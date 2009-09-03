@@ -15,6 +15,8 @@
             <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="topNext" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Last" x:Name="topLast" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <ComboBox Margin="5" FontSize="15" x:Name="topComboBox" Height="25" Width="500" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
+            <HyperlinkButton Content="Report a Bug" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
+             NavigateUri="mailto:michael@voidspace.org.uk" />
         </StackPanel>
     </StackPanel>
     <StackPanel Orientation="Horizontal" x:Name="container">
@@ -63,11 +65,13 @@
                     <StackPanel>
                     <TextBlock FontSize="20" Margin="5" x:Name="title2" TextWrapping="Wrap" />
                     <TextBlock FontSize="15" Margin="5" TextWrapping="Wrap">
-                        Try Python is an interactive Python tutorial that runs in the browser. The tutorial
-                        is the official Python tutorial from the Python documentation. The Python code runs
-                        in the browser; on Windows and Mac OS X using Silverlight and on Linux with
-                        Moonlight 2. The version of Python is IronPython 2.0, which is compatible with
-                        Python 2.5.
+                        <Run FontWeight="Bold">Try Python</Run> is an
+                        interactive Python tutorial that runs in the browser.
+                        The tutorial is the official Python tutorial from the
+                        Python documentation. The Python code runs in the
+                        browser; on Windows and Mac OS X using Silverlight and
+                        on Linux with Moonlight 2. The version of Python is
+                        IronPython 2.0, which is compatible with Python 2.5.
                     </TextBlock>
                     <TextBlock FontSize="15" Margin="5" TextWrapping="Wrap">
                         Try Python is fully open source, under the BSD license. Try Python is the creation
@@ -84,6 +88,7 @@
                             <TextBlock FontSize="15" TextWrapping="Wrap">&#8226;&#160;</TextBlock>
                             <HyperlinkButton Content="Silverlight" FontSize="15"
                              NavigateUri="http://silverlight.net/" />
+                            <TextBlock FontSize="15" TextWrapping="Wrap"> and </TextBlock>
                             <HyperlinkButton Content="Mono Moonlight" FontSize="15"
                              NavigateUri="http://mono-project.com/Moonlight" />
                         </StackPanel>
@@ -126,6 +131,10 @@
                     </StackPanel>
                     </ScrollViewer>
                 </controls:TabItem>
+                <controls:TabItem Header="Documentation" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif">
+                    <ScrollViewer x:Name="documentation">
+                    </ScrollViewer>
+                </controls:TabItem>
             </controls:TabControl>
         </Border>
     </StackPanel>
@@ -135,5 +144,7 @@
         <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="bottomNext" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
         <Button Margin="5" FontSize="15"  Height="25" Content="Last" x:Name="bottomLast" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
         <ComboBox Margin="5" FontSize="15" x:Name="bottomComboBox" Height="25" Width="500" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
+        <HyperlinkButton Content="Source Code" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
+         NavigateUri="http://code.google.com/p/trypython/" />
     </StackPanel>
 </StackPanel>
