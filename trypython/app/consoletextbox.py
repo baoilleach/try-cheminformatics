@@ -209,40 +209,40 @@ class ConsoleTextBox(TextBox):
             context = self.context
             started.Set()
             try:
-                try:
-                    code = compile(contents + '\n', '<stdin>', 'single', 
-                                   PyCF_DONT_IMPLY_DEDENT)
-                    exec code in context
-                except:
-                    if reset_event.WaitOne(0):
-                        # don't print exception messages if thread has been terminated
-                        return
-                    exc_type, value, tb = sys.exc_info()
-                    if value is None:
-                        # String exceptions
-                        # workaround for IronPython bug
-                        exc_type = Exception
-                        value = Exception('StringException')
-                        
-                    tblist = traceback.extract_tb(tb)
-                    message = traceback.format_list(tblist)
-                    del message[:1]
-                    if message:
-                        # we don't print the 'Traceback...' part for SyntaxError
-                        message.insert(0, "Traceback (most recent call last):\n")
-                    message.extend(traceback.format_exception_only(exc_type, value))
-                    self.printer.print_new(''.join(message))
-            finally:
-                # access through closure not on self as we may be an orphaned
-                # thread - with a new reset_event on self
-                if not reset_event.WaitOne(0):
-                    self.completed()
+                code = compile(contents + '\n', '<stdin>', 'single', 
+                               PyCF_DONT_IMPLY_DEDENT)
+                exec code in context
+            except:
+                if reset_event.WaitOne(1):
+                    # don't print exception messages if thread has been terminated
+                    return
+                exc_type, value, tb = sys.exc_info()
+                if value is None:
+                    # String exceptions
+                    # workaround for IronPython bug
+                    exc_type = Exception
+                    value = Exception('StringException')
+                    
+                tblist = traceback.extract_tb(tb)
+                message = traceback.format_list(tblist)
+                del message[:1]
+                if message:
+                    # we don't print the 'Traceback...' part for SyntaxError
+                    message.insert(0, "Traceback (most recent call last):\n")
+                message.extend(traceback.format_exception_only(exc_type, value))
+                self.printer.print_new(''.join(message))
+                
+            # access through closure not on self as we may be an orphaned
+            # thread - with a new reset_event on self
+            result = reset_event.WaitOne(0)
+            if not reset_event.WaitOne(0):
+                self.completed()
             
+        self._thread_reset = reset_event = ManualResetEvent(False)
         self._thread = Thread(ThreadStart(_execute))
         self._thread.IsBackground = True
         self._thread.Name = "executing"
         self._thread.Start()
-        self._thread_reset = reset_event = ManualResetEvent(False)
         self.prompt.Visibility = Visibility.Collapsed
         self.CaretBrush = self._disabled
         started.WaitOne()
