@@ -74,11 +74,16 @@
                         IronPython 2.0, which is compatible with Python 2.5.
                     </TextBlock>
                     <TextBlock FontSize="15" Margin="5" TextWrapping="Wrap">
-                        Try Python is fully open source, under the BSD license. Try Python is the creation
-                        of Michael Foord. If you are interested in programming the browser with IronPython
-                        and Silverlight read his book, IronPython in Action.
+                        Python is a popular open source, high level, object oriented, interpreted,
+                        dynamic programming language. Python was first released in 1991, preceding
+                        popular languages like Java. The Python philosophy emphasizes clean and
+                        readable code. It supports many programming styles including procedural,
+                        functional and object orientated. These features, combined with a large
+                        and powerful standard library, make it an excellent first language for
+                        beginners <Run FontStyle="Italic">and</Run> a great general purpose
+                        programming language for experienced developers.
                     </TextBlock>
-                    <StackPanel>
+                    <StackPanel Margin="10,0,10,5">
                         <StackPanel Orientation="Horizontal" Margin="5,1">
                             <TextBlock FontSize="15" TextWrapping="Wrap">&#8226; Try Python Source Code &#160;</TextBlock>
                             <HyperlinkButton Content="Google Code Project" FontSize="15"
@@ -127,7 +132,12 @@
                             <HyperlinkButton Content="Pygments" FontSize="15"
                              NavigateUri="http://www.pygments.org/" />
                         </StackPanel>
-                    </StackPanel>
+                    </StackPanel>    
+                    <TextBlock FontSize="15" Margin="5" TextWrapping="Wrap">
+                        Try Python is  the creation of Michael Foord and is fully open source, under the BSD license.
+                        If you are interested in programming the browser with IronPython
+                        and Silverlight read his book, IronPython in Action.
+                    </TextBlock>
                     </StackPanel>
                     </ScrollViewer>
                 </controls:TabItem>

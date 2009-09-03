@@ -6,7 +6,7 @@
 ---------------------
 
 **Try Python** should be easy to use, but here are some brief notes on its features. If you do have any problems, or
-find any bugs, *please* use the ``Report a Bug`` link to let me know. You can also use the issue tracker on the
+find any bugs, *please* use the *Report a Bug* link to let me know. You can also use the issue tracker on the
 Google Code project page for feature requests and bug reports.
 
 The online interpreter has the following features:
@@ -26,3 +26,11 @@ Not much of the Python standard library is included. I intend to expand the tuto
 Some of the console history code was contributed by Resolver Systems.
 
 
+Keyboard Interrupt
+==================
+
+Like the Python interpreter at the console Try Python allows you to interrupt execution by pressing Ctrl-C. If you accidentally create an infinite loop, or a calculation is taking longer than you expected, you can press control-c and control is restored to the console again.
+
+There is a problem with the way that keyboard interrupts are handled in Try Python and the details are a bit technical. To enable execution to be interrupted they are run on a background thread. Silverlight doesn't allow us to abort running threads, so when execution is interrupted it is moved aside *but left running*...
+
+A slight trick is employed to 'encourage' it to error out quickly (the context it executes in is cleared out), so if it accesses any local variables then it will die and the error message won't be displayed. If it *doesn't* access any local variables then it will continue, and if it prints any messages then these will be displayed in the interpreter. This doesn't stop you entering and running new code, but it can have some slightly odd results.
