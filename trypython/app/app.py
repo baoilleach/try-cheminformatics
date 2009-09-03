@@ -32,10 +32,11 @@ prompt_panel = root.promptPanel
 scroller = root.scroller
 about = root.about
 textbox_parent = root.consoleParent
+tab_control = root.tabControl
 
 
 def content_resized(sender, event):
-    root.Width = width = max(Application.Current.Host.Content.ActualWidth - 25, 700)
+    root.Width = width = max(Application.Current.Host.Content.ActualWidth - 25, 800)
     root.Height = height = max(Application.Current.Host.Content.ActualHeight - 25, 500)
 
     root.document.Width = int(width * 0.53)
@@ -197,13 +198,26 @@ class MouseHandler(object):
         maxY = minY + element.RenderSize.Height
         return minX, maxX, minY, maxY
 
-        
-handler = MouseHandler([scroller, root.documentScroller])
+scrollers = [scroller, root.documentScroller]
+handler = MouseHandler(scrollers)
 root.MouseMove += handler.on_mouse_move
 on_mouse_wheel = EventHandler[HtmlEventArgs](handler.on_mouse_wheel)
-    
+
+
 HtmlPage.Window.AttachEvent("DOMMouseScroll", on_mouse_wheel)
 HtmlPage.Window.AttachEvent("onmousewheel", on_mouse_wheel)
 HtmlPage.Document.AttachEvent("onmousewheel", on_mouse_wheel)
 
-_debug('Started')
+def on_tabpage_changed(sender, event):
+    if sender.SelectedIndex == 0:
+        if about in scrollers:
+            scrollers.remove(about)
+        if scroller not in scrollers:
+            scrollers.append(scroller)
+    if sender.SelectedIndex == 1:
+        if scroller in scrollers:
+            scrollers.remove(scroller)
+        if about not in scrollers:
+            scrollers.append(about)
+        
+tab_control.SelectionChanged += on_tabpage_changed
