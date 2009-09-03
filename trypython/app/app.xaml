@@ -59,9 +59,24 @@
                     </ScrollViewer>
                 </controls:TabItem>
                 <controls:TabItem Header="About" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif">
-                    <Border>
+                    <StackPanel>
                     <TextBlock FontSize="20" Margin="5" x:Name="title2" />
-                    </Border>
+                    <TextBlock FontSize="15" Margin="5">
+                        Try Python is an interactive Python tutorial that runs in the browser.
+                    </TextBlock>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="15">&#8226; Try Python Source Code &#160;</TextBlock>
+                            <HyperlinkButton Content="Google Code Project" FontSize="15"
+                             NavigateUri="http://code.google.com/p/trypython/" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock FontSize="15">&#8226; Python Programming Language &#160;</TextBlock>
+                            <HyperlinkButton Content="www.python.org" FontSize="15"
+                             NavigateUri="http://www.python.org" />
+                        </StackPanel>
+                    </StackPanel>
+                    </StackPanel>
                 </controls:TabItem>
             </controls:TabControl>
         </Border>
