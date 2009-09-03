@@ -65,12 +65,12 @@
                         Try Python is an interactive Python tutorial that runs in the browser.
                     </TextBlock>
                     <StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Margin="5,1">
                             <TextBlock FontSize="15">&#8226; Try Python Source Code &#160;</TextBlock>
                             <HyperlinkButton Content="Google Code Project" FontSize="15"
                              NavigateUri="http://code.google.com/p/trypython/" />
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Margin="5,1">
                             <TextBlock FontSize="15">&#8226; Python Programming Language &#160;</TextBlock>
                             <HyperlinkButton Content="www.python.org" FontSize="15"
                              NavigateUri="http://www.python.org" />
