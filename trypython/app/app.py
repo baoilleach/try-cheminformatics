@@ -1,6 +1,9 @@
 from __future__ import with_statement
 
+import clr
 import sys
+clr.AddReferenceToFile('System.Windows.Controls.dll')
+clr.AddReferenceToFile('System.Windows.Controls.Toolkit.dll')
 
 # Handle infinite recursion gracefully
 # CPython default is 1000 - but Firefox can't handle that deep
@@ -14,7 +17,7 @@ from System.Windows.Controls import StackPanel, ComboBoxItem, UserControl
 from System.Windows.Markup import XamlReader
 
 from consoletextbox import ConsoleTextBox
-from context import context
+from context import context, title
 from printer import StatefulPrinter
 from utils import invoke, _debug, SetInvokeRoot
 
@@ -36,7 +39,9 @@ def content_resized(sender, event):
 
     root.document.Width = int(width * 0.53)
     root.container.Height = height - 120
-    root.scroller.Width = int(width * 0.44)
+    root.rightSide.Width = int(width * 0.44)
+    # XXXX Why do we need to specify this precisely?
+    root.scroller.Width = root.rightSide.Width - 30
 
 Application.Current.Host.Content.Resized += content_resized
 content_resized(None, None)
@@ -65,6 +70,8 @@ console_output.GotFocus += focus_text_box
 scroller.GotFocus += focus_text_box
 root.container.GotFocus += focus_text_box
 
+root.title.Text = title
+root.title2.Text = title
 
 sys.stdout = console_textbox
 sys.stderr = console_textbox

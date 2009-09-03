@@ -3,6 +3,7 @@ import sys
 __version__ = '0.1.0'
 
 doc = "Try Python: version %s" % __version__
+title = "Try Python %s: An Interactive Python Tutorial" % __version__
 
 context = {
     "__name__": "__console__", 
