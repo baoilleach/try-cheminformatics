@@ -30,6 +30,7 @@ bottomCombobox = root.bottomComboBox
 console_output = root.consoleOutput
 prompt_panel = root.promptPanel
 scroller = root.scroller
+about = root.about
 textbox_parent = root.consoleParent
 
 
