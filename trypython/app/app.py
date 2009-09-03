@@ -41,7 +41,7 @@ def content_resized(sender, event):
     root.container.Height = height - 120
     root.rightSide.Width = int(width * 0.44)
     # XXXX Why do we need to specify this precisely?
-    root.scroller.Width = root.rightSide.Width - 30
+    scroller.Width = root.rightSide.Width - 30
 
 Application.Current.Host.Content.Resized += content_resized
 content_resized(None, None)
