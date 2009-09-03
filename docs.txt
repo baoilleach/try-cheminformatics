@@ -5,43 +5,24 @@
  Brief Documentation
 ---------------------
 
-**Try Python** should be easy to use.
+**Try Python** should be easy to use, but here are some brief notes on its features. If you do have any problems, or
+find any bugs, *please* use the ``Report a Bug`` link to let me know. You can also use the issue tracker on the
+Google Code project page for feature requests and bug reports.
 
-**Try Python** should be easy to use.
+The online interpreter has the following features:
 
-**Try Python** should be easy to use.
+    * Auto-resizes with the browser
+    * Navigation bar through the tutorial pages at the top and bottom
+    * Individual pages are bookmarkable and the URL fragment auto-updates as you change page
+    * Mouse scroll wheel supported over the tutorial and console scroll viewers
+    * Control-C interrupts the running code with a keyboard interrupt
+    * ``raw_input`` and ``input`` functions work in the interpreter
+    * Basic auto-indent and auto-dedent in the console
+    * Console history, including multiline history
+    * ``reset`` command to clear the console 
 
+Not much of the Python standard library is included. I intend to expand the tutorial adding new modules as they are needed (the whole standard library is about 5mb and would make Try Python take much longer to load).
 
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
+Some of the console history code was contributed by Resolver Systems.
 
 
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
-
-**Try Python** should be easy to use.
