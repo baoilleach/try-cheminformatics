@@ -218,7 +218,7 @@ def on_tabpage_changed(sender, event):
 tab_control.SelectionChanged += on_tabpage_changed
 changing_scrollers = [about, documentation, scroller]
 
-with open('doc.xaml') as handle:
+with open('docs.xaml') as handle:
     xaml = handle.read().decode('utf-8')
 doc_page = XamlReader.Load(xaml)
 documentation.Content = doc_page

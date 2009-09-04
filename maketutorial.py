@@ -24,6 +24,33 @@ def name_index(name):
     return int(chars)
 
 this_dir = os.path.abspath(os.path.dirname(__file__))
+tut_dir = os.path.join (this_dir, 'tutorial')
+app_dir = os.path.join(this_dir, 'trypython', 'app')
+doc_dir = os.path.join(app_dir, 'docs')
+if os.path.isdir(doc_dir):
+    shutil.rmtree(doc_dir)
+    
+os.mkdir(doc_dir)
+
+def read_and_write(input_path, output_path):
+    source = open(input_path).read().decode('utf-8')
+    xaml = publish_xaml(source, flowdocument=False, xclass=False)
+    handle = open(output_path, 'w')
+    handle.write(xaml.encode('utf-8'))
+    handle.close()
+
+    
+print 'Processing doc page'
+doc_src = os.path.join(this_dir, 'docs.txt')
+doc_dest = os.path.join(app_dir, 'docs.xaml')
+read_and_write(doc_src, doc_dest)
+
+
+print 'Processing top level index'
+top_index_src = os.path.join(tut_dir, 'index.txt')
+top_index_dest = os.path.join(doc_dir, 'index.xaml')
+
+
 input_files = sorted([
                name for name in 
                os.listdir(os.path.join(this_dir, 'tutorial')) if
@@ -36,12 +63,6 @@ for name in input_files:
     handle.write(os.path.splitext(name)[0] + '\n')
 handle.close()
 
-app_dir = os.path.join(this_dir, 'trypython', 'app')
-doc_dir = os.path.join(app_dir, 'docs')
-if os.path.isdir(doc_dir):
-    shutil.rmtree(doc_dir)
-    
-os.mkdir(doc_dir)
 
 for index, name in enumerate(input_files):
     print 'Processing', name
@@ -56,11 +77,3 @@ for index, name in enumerate(input_files):
     handle = open(out_path, 'w')
     handle.write(output.encode('utf-8'))
     handle.close()
-
-print
-print 'Writing doc page'
-doc_source = open(os.path.join(this_dir, 'docs.txt')).read().decode('utf-8')
-doc_xaml = publish_xaml(doc_source, flowdocument=False, xclass=False)
-handle = open(os.path.join(app_dir, 'doc.xaml'), 'w')
-handle.write(doc_xaml.encode('utf-8'))
-handle.close()

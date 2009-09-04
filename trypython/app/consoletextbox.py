@@ -76,7 +76,9 @@ class ConsoleTextBox(TextBox):
         self.engine = Python.CreateEngine()
         self.scope = self.engine.CreateScope()
         
-        self._original_caret = self.CaretBrush
+        self._original_caret = None
+        if hasattr(self, 'CaretBrush'):
+            self._original_caret = self.CaretBrush
         self._disabled = SolidColorBrush(Colors.White)
         
         self.KeyDown += self.handle_key
@@ -246,7 +248,8 @@ class ConsoleTextBox(TextBox):
         self._thread.Name = "executing"
         self._thread.Start()
         self.prompt.Visibility = Visibility.Collapsed
-        self.CaretBrush = self._disabled
+        if self._original_caret is not None:
+            self.CaretBrush = self._disabled
         started.WaitOne()
         
         
@@ -256,7 +259,8 @@ class ConsoleTextBox(TextBox):
             self._temp_context = None
         self._thread = None
         self.prompt.Visibility = Visibility.Visible
-        self.CaretBrush = self._original_caret
+        if self._original_caret is not None:
+            self.CaretBrush = self._original_caret
         if self._reset_needed:
             self.reset()
         else:
