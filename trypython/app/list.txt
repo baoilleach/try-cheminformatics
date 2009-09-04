@@ -1,4 +1,3 @@
-21. Tuples, Sequences and Sets
-22. Dictionaries
-23. Looping Techniques
-24. More on Conditions and Comparing Sequences
+1
+2
+3
