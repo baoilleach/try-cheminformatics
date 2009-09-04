@@ -23,6 +23,7 @@ def name_index(name):
     # if the loop above results in ''
     return int(chars)
 
+index = 'index.txt'
 this_dir = os.path.abspath(os.path.dirname(__file__))
 tut_dir = os.path.join (this_dir, 'tutorial')
 app_dir = os.path.join(this_dir, 'trypython', 'app')
@@ -38,7 +39,43 @@ def read_and_write(input_path, output_path):
     handle = open(output_path, 'w')
     handle.write(xaml.encode('utf-8'))
     handle.close()
+    
 
+def process_directory(folder, out_folder):
+    file_list = os.listdir(folder)
+    if index in file_list:
+        file_list.remove(index)
+        read_and_write(os.path.join(folder, index), os.path.join(out_folder, 'index.xaml'))
+    else:
+        open(os.path.join(out_folder, index), 'w').close() # heh!
+        
+    input_files = sorted([
+                   name for name in 
+                   file_list if
+                   name.endswith('.txt')
+                   ], key=name_index)
+    
+    
+    # Write in binary mode to only write '\n' on Windows
+    handle = open(os.path.join(app_dir, 'list.txt'), 'wb')
+    for name in input_files:
+        handle.write(os.path.splitext(name)[0] + '\n')
+    handle.close()
+
+    for i, name in enumerate(input_files):
+        print 'Processing', name
+        path = os.path.join(folder, name)
+        input_data = open(path).read().decode('utf-8')
+    
+        output = publish_xaml(input_data, flowdocument=False, xclass=False)
+        
+        out_name = 'item%s.xaml' % (i + 1)
+        out_path = os.path.join(out_folder, out_name)
+        
+        handle = open(out_path, 'w')
+        handle.write(output.encode('utf-8'))
+        handle.close()
+    
     
 print 'Processing doc page'
 doc_src = os.path.join(this_dir, 'docs.txt')
@@ -49,31 +86,15 @@ read_and_write(doc_src, doc_dest)
 print 'Processing top level index'
 top_index_src = os.path.join(tut_dir, 'index.txt')
 top_index_dest = os.path.join(doc_dir, 'index.xaml')
+read_and_write(top_index_src, top_index_dest)
 
-
-input_files = sorted([
-               name for name in 
-               os.listdir(os.path.join(this_dir, 'tutorial')) if
-               name.endswith('.txt')
-               ], key=name_index)
-
-# Write in binary mode to only write '\n' on Windows
-handle = open(os.path.join(this_dir, 'trypython', 'app', 'list.txt'), 'wb')
-for name in input_files:
-    handle.write(os.path.splitext(name)[0] + '\n')
-handle.close()
-
-
-for index, name in enumerate(input_files):
-    print 'Processing', name
-    path = os.path.join(this_dir, 'tutorial', name)
-    input_data = open(path).read().decode('utf-8')
-
-    output = publish_xaml(input_data, flowdocument=False, xclass=False)
+for path in os.listdir(tut_dir):
+    folder = os.path.join(tut_dir, path)
+    if not os.path.isdir(folder):
+        continue
+    out_folder = os.path.join(doc_dir, path)
+    os.mkdir(out_folder)
     
-    out_name = 'item%s.xaml' % (index + 1)
-    out_path = os.path.join(doc_dir, out_name)
-    
-    handle = open(out_path, 'w')
-    handle.write(output.encode('utf-8'))
-    handle.close()
+    process_directory(folder, out_folder)
+
+
