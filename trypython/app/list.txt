@@ -17,3 +17,8 @@
 17. Using Lists as Stacks and Queues
 18. Functional Programming Tools
 19. List Comprehensions
+20. The del Statement
+21. Tuples, Sequences and Sets
+22. Dictionaries
+23. Looping Techniques
+24. More on Conditions and Comparing Sequences
