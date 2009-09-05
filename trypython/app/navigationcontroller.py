@@ -4,6 +4,7 @@ from System.Windows.Browser import HtmlPage
 from System.Windows.Controls import StackPanel, ComboBoxItem
 from System.Windows.Markup import XamlReader
 
+from utils import _debug
 
 
 _xaml_cache = {}
@@ -13,23 +14,79 @@ class NavigationController(object):
     
     def __init__(self, root, focus_text_box):
         self.focus_text_box = focus_text_box
+        self.root = root
         
         self.topComboBoxPage = root.topComboBoxPage
         self.bottomComboBoxPage = root.bottomComboBoxPage
-        self.topCombobox = root.topComboBoxPart
-        self.bottomCombobox = root.bottomComboBoxPart
-        self.document = root.document
+        self.topComboBoxPart = root.topComboBoxPart
+        self.bottomComboBoxPart = root.bottomComboBoxPart
+        self.documentContainer = root.document.Child
+        
+        root.topFirst.Click += self.first
+        root.bottomFirst.Click += self.first
+        root.topLast.Click += self.last
+        root.bottomLast.Click += self.last
+        root.topNext.Click += self.next
+        root.bottomNext.Click += self.next
+        root.topPrev.Click += self.prev
+        root.bottomPrev.Click += self.prev
+    
+    
+    def invoke(self, function):
+        self.root.Dispatcher.BeginInvoke(function)
+
+
+    def setup_parts(self):
+        with open('docs/list.txt') as handle:
+            items = handle.readlines()
+
+        topCombobox = self.topComboBoxPart
+        bottomComboBox = self.bottomComboBoxPart
+        
+        items = ['Index'] + items
+        for combobox in topCombobox, bottomComboBox:
+            for item in items:
+                boxitem = ComboBoxItem()
+                boxitem.Content = item
+                boxitem.Height = 25
+                combobox.Items.Add(boxitem)
+        
+        topCombobox.SelectionChanged += self.on_change_top_part
+        bottomComboBox.SelectionChanged += self.on_change_bottom_part
+        
+        topCombobox.SelectedIndex = bottomComboBox.SelectedIndex = 0
+    
+    
+    def unhook_events(self):
+        self.bottomComboBoxPart.SelectionChanged -= self.on_change_bottom_part
+        self.topComboBoxPart.SelectionChanged -= self.on_change_top_part
+        
+        self.topComboBoxPage.SelectionChanged -= self.on_change_top_page
+        self.bottomComboBoxPage.SelectionChanged -= self.on_change_bottom_page
 
     
+    def hook_events(self):
+        self.bottomComboBoxPart.SelectionChanged += self.on_change_bottom_part
+        self.topComboBoxPart.SelectionChanged += self.on_change_top_part
+        
+        self.topComboBoxPage.SelectionChanged += self.on_change_top_page
+        self.bottomComboBoxPage.SelectionChanged += self.on_change_bottom_page
+        
     
     def change_document(self, part, page):
+        if page == -1:
+            return
         fragment = ''
-        if part == 0:
-            path = 'docs/index.xaml'
-        else:
-            path = 'docs/part%s/%s' % (part, ('item%s.xaml' % page) if page else 'index.xaml')
+        item = 'index.xaml'
+        loc = 'docs/'
+        if part > 0:
+            # page can be -1
+            if page > 0:
+                item = 'item%s.xaml' % page
+            loc += 'part%s/' % part
             fragment = 'part%s-page%s' % (part, page)
         
+        path = loc + item
         HtmlPage.Window.CurrentBookmark = fragment
         
         if path in _xaml_cache:
@@ -40,54 +97,34 @@ class NavigationController(object):
             document = XamlReader.Load(xaml)
             _xaml_cache[path] = document
         
-        self.document.Child.Content = document
-        self.document.Child.ScrollToVerticalOffset(0)
+        self.documentContainer.Content = document
+        self.documentContainer.ScrollToVerticalOffset(0)
         self.focus_text_box()
 
     
-    def setup_parts(self):
-        with open('docs/list.txt') as handle:
-            items = handle.readlines()
-
-        topCombobox = self.topCombobox
-        bottomCombobox = self.bottomCombobox
-        
-        items = ['Index'] + items
-        for combobox in topCombobox, bottomCombobox:
-            for item in items:
-                boxitem = ComboBoxItem()
-                boxitem.Content = item
-                boxitem.Height = 25
-                combobox.Items.Add(boxitem)
-            
-        topCombobox.SelectionChanged += self.on_change_top_part
-        bottomCombobox.SelectionChanged += self.on_change_bottom_part
-        topCombobox.SelectedIndex = bottomCombobox.SelectedIndex = 0
-        
-
     def on_change_top_part(self, sender, event):
-        index = self.topCombobox.SelectedIndex
-        self.bottomCombobox.SelectionChanged -= self.on_change_bottom_part
-        self.bottomCombobox.SelectedIndex = index
-        self.bottomCombobox.SelectionChanged += self.on_change_bottom_part
-        self.change_document(index, 0)
+        index = self.topComboBoxPart.SelectedIndex
+        self.unhook_events()
+        self.bottomComboBoxPart.SelectedIndex = index
         self.change_pages()
-
+        self.change_document(index, 0)
+        self.hook_events()
+        
         
     def on_change_bottom_part(self, sender, event):
-        index = self.bottomCombobox.SelectedIndex
-        self.topCombobox.SelectionChanged -= self.on_change_top_part
-        self.topCombobox.SelectedIndex = index
-        self.topCombobox.SelectionChanged += self.on_change_top_part
-        self.change_document(index, 0)
+        index = self.bottomComboBoxPart.SelectedIndex
+        self.unhook_events()
+        self.topComboBoxPart.SelectedIndex = index
         self.change_pages()
+        self.change_document(index, 0)
+        self.hook_events()
     
     
     def change_pages(self):
-        part = self.topCombobox.SelectedIndex
+        self.unhook_events()
+        part = self.topComboBoxPart.SelectedIndex
         
-        self.topComboBoxPage.SelectionChanged -= self.on_change_top_page
-        self.bottomComboBoxPage.SelectionChanged -= self.on_change_bottom_page
+        self.unhook_events()
         self.topComboBoxPage.Items.Clear()
         self.bottomComboBoxPage.Items.Clear()
         if part == 0:
@@ -97,52 +134,78 @@ class NavigationController(object):
             items = handle.readlines()
 
         topCombobox = self.topComboBoxPage
-        bottomCombobox = self.bottomComboBoxPage
+        bottomComboBox = self.bottomComboBoxPage
         
         items = ['Index'] + items
-        for combobox in topCombobox, bottomCombobox:
+        for combobox in topCombobox, bottomComboBox:
             for item in items:
                 boxitem = ComboBoxItem()
                 boxitem.Content = item
                 boxitem.Height = 25
                 combobox.Items.Add(boxitem)
         
-        self.topComboBoxPage.SelectionChanged += self.on_change_top_page
-        self.bottomComboBoxPage.SelectionChanged += self.on_change_bottom_page
+        self.topComboBoxPage.SelectedIndex = 0
+        self.bottomComboBoxPage.SelectedIndex = 0
+        self.hook_events()
         
-
     
     def on_change_top_page(self, sender, event):
-        pass
+        _debug('change_top')
+        part = self.topComboBoxPart.SelectedIndex
+        page = self.topComboBoxPage.SelectedIndex
+        
+        self.unhook_events()
+        self.bottomComboBoxPage.SelectedIndex = page
+        self.change_document(part, page)
+        self.hook_events()
+
     
     def on_change_bottom_page(self, sender, event):
-        pass
+        _debug('change_bottom')
+        part = self.bottomComboBoxPart.SelectedIndex
+        page = self.bottomComboBoxPage.SelectedIndex
+        
+        self.unhook_events()
+        self.topComboBoxPage.SelectedIndex = page
+        self.change_document(part, page)
+        self.hook_events()
+    
+    
+    def next(self, sender, event):
+        part = self.topComboBoxPart.SelectedIndex
+        page = self.topComboBoxPage.SelectedIndex
+        
+        if page < len(self.topComboBoxPage.Items) - 1:
+            self.topComboBoxPage.SelectedIndex += 1
+        elif part < len(self.topComboBoxPart.Items) - 1:
+            self.topComboBoxPart.SelectedIndex += 1
+    
+    
+    def prev(self, sender, event):
+        part = self.topComboBoxPart.SelectedIndex
+        page = self.topComboBoxPage.SelectedIndex
+        
+        if page > 0:
+            self.topComboBoxPage.SelectedIndex -= 1
+        elif part > 0:
+            self.topComboBoxPart.SelectedIndex -= 1
+            if part > 1:
+                with open('docs/part%s/list.txt' % part) as handle:
+                    index = len(handle.readlines()) - 1
+                self.topComboBoxPage.SelectedIndex = index
+    
+    
+    def first(self, sender, event):
+        if self.topComboBoxPart.SelectedIndex > 0:
+            self.topComboBoxPage.SelectedIndex = 0
+    
+    
+    def last(self, sender, event):
+        if self.topComboBoxPart.SelectedIndex > 0:
+            self.topComboBoxPage.SelectedIndex = len(self.topComboBoxPage.Items) - 1
 
 
 """
-
-def first(sender, event):
-    topCombobox.SelectedIndex = 0
-def last(sender, event):
-    topCombobox.SelectedIndex = len(combobox.Items) - 1
-def next(sender, event):
-    current = combobox.SelectedIndex
-    topCombobox.SelectedIndex = min(current + 1, len(combobox.Items) - 1)
-def prev(sender, event):
-    current = combobox.SelectedIndex
-    topCombobox.SelectedIndex = max(current - 1, 0)
-    
-    
-root.topFirst.Click += first
-root.bottomFirst.Click += first
-root.topLast.Click += last
-root.bottomLast.Click += last
-root.topNext.Click += next
-root.bottomNext.Click += next
-root.topPrev.Click += prev
-root.bottomPrev.Click += prev
-
-
 page = 0
 bookmark = HtmlPage.Window.CurrentBookmark.lower()
 if bookmark.startswith('page'):
