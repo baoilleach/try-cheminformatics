@@ -23,13 +23,17 @@ def invoke(function):
 
 
 @invoke
-def _debug(data):
-    if not isinstance(data, str):
-        data = str(data)
+def _debug(*args):
+    def _str(arg):
+        if isinstance(arg, str):
+            return arg
+        return str(arg)
+    
+    data = ' '.join(_str(arg) for arg in args)
     if not data.endswith('\n'):
         data += '\n'
     # Comment / uncomment this line to output debug info
-    HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
+    #HtmlPage.Document.debugging.innerHTML += data.replace('\n', '<br />')
 
     
 def empty_or_comment_only(contents):

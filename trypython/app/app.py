@@ -78,7 +78,6 @@ sys.stderr = console_textbox
 # setup navigationbars
 controller = NavigationController(root, focus_text_box)
 controller.setup_parts()
-controller.change_document(1, 3)
 
 # setup mouse wheel handling
 scrollers = [root.documentScroller, scroller]

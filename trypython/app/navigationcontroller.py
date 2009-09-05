@@ -12,8 +12,13 @@ _xaml_cache = {}
 class NavigationController(object):
     
     def __init__(self, root, focus_text_box):
-        self.root = root
         self.focus_text_box = focus_text_box
+        
+        self.topComboBoxPage = root.topComboBoxPage
+        self.bottomComboBoxPage = root.bottomComboBoxPage
+        self.topCombobox = root.topComboBoxPart
+        self.bottomCombobox = root.bottomComboBoxPart
+        self.document = root.document
 
     
     
@@ -35,8 +40,8 @@ class NavigationController(object):
             document = XamlReader.Load(xaml)
             _xaml_cache[path] = document
         
-        self.root.document.Child.Content = document
-        self.root.document.Child.ScrollToVerticalOffset(0)
+        self.document.Child.Content = document
+        self.document.Child.ScrollToVerticalOffset(0)
         self.focus_text_box()
 
     
@@ -44,9 +49,10 @@ class NavigationController(object):
         with open('docs/list.txt') as handle:
             items = handle.readlines()
 
+        topCombobox = self.topCombobox
+        bottomCombobox = self.bottomCombobox
+        
         items = ['Index'] + items
-        self.topCombobox = topCombobox = self.root.topComboBoxPart
-        self.bottomCombobox = bottomCombobox = self.root.bottomComboBoxPart
         for combobox in topCombobox, bottomCombobox:
             for item in items:
                 boxitem = ComboBoxItem()
@@ -56,8 +62,8 @@ class NavigationController(object):
             
         topCombobox.SelectionChanged += self.on_change_top_part
         bottomCombobox.SelectionChanged += self.on_change_bottom_part
+        topCombobox.SelectedIndex = bottomCombobox.SelectedIndex = 0
         
-            
 
     def on_change_top_part(self, sender, event):
         index = self.topCombobox.SelectedIndex
@@ -65,6 +71,8 @@ class NavigationController(object):
         self.bottomCombobox.SelectedIndex = index
         self.bottomCombobox.SelectionChanged += self.on_change_bottom_part
         self.change_document(index, 0)
+        self.change_pages()
+
         
     def on_change_bottom_part(self, sender, event):
         index = self.bottomCombobox.SelectedIndex
@@ -72,6 +80,36 @@ class NavigationController(object):
         self.topCombobox.SelectedIndex = index
         self.topCombobox.SelectionChanged += self.on_change_top_part
         self.change_document(index, 0)
+        self.change_pages()
+    
+    
+    def change_pages(self):
+        part = self.topCombobox.SelectedIndex
+        
+        self.topComboBoxPage.SelectionChanged -= self.on_change_top_page
+        self.bottomComboBoxPage.SelectionChanged -= self.on_change_bottom_page
+        self.topComboBoxPage.Items.Clear()
+        self.bottomComboBoxPage.Items.Clear()
+        if part == 0:
+            return
+        
+        with open('docs/part%s/list.txt' % part) as handle:
+            items = handle.readlines()
+
+        topCombobox = self.topComboBoxPage
+        bottomCombobox = self.bottomComboBoxPage
+        
+        items = ['Index'] + items
+        for combobox in topCombobox, bottomCombobox:
+            for item in items:
+                boxitem = ComboBoxItem()
+                boxitem.Content = item
+                boxitem.Height = 25
+                combobox.Items.Add(boxitem)
+        
+        self.topComboBoxPage.SelectionChanged += self.on_change_top_page
+        self.bottomComboBoxPage.SelectionChanged += self.on_change_bottom_page
+        
 
     
     def on_change_top_page(self, sender, event):
