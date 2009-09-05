@@ -89,12 +89,12 @@ top_index_dest = os.path.join(doc_dir, 'index.xaml')
 read_and_write(top_index_src, top_index_dest)
 
 parts = []
-for path in os.listdir(tut_dir):
+for i, path in enumerate(os.listdir(tut_dir)):
     folder = os.path.join(tut_dir, path)
     if not os.path.isdir(folder) or path == '.svn':
         continue
     parts.append(path)
-    out_folder = os.path.join(doc_dir, path)
+    out_folder = os.path.join(doc_dir, 'part%s' % i)
     os.mkdir(out_folder)
     
     process_directory(folder, out_folder)
@@ -102,7 +102,7 @@ for path in os.listdir(tut_dir):
 print 'Writing list file'
 parts = sorted(parts, key=name_index)
 # Write in binary mode to only write '\n' on Windows
-handle = open(os.path.join(app_dir, 'list.txt'), 'wb')
+handle = open(os.path.join(doc_dir, 'list.txt'), 'wb')
 for name in parts:
-    handle.write(os.path.splitext(name)[0] + '\n')
+    handle.write(name + '\n')
 handle.close()

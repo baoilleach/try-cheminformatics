@@ -14,7 +14,8 @@
             <Button Margin="5" FontSize="15"  Height="25" Content="Prev" x:Name="topPrev" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="topNext" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Last" x:Name="topLast" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
-            <ComboBox Margin="5" FontSize="15" x:Name="topComboBox" Height="25" Width="500" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
+            <ComboBox Margin="5" FontSize="15" x:Name="topComboBoxPart" Height="25" Width="200" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
+            <ComboBox Margin="5" FontSize="15" x:Name="topComboBoxPage" Height="25" Width="400" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <HyperlinkButton Content="Report a Bug" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
              NavigateUri="mailto:michael@voidspace.org.uk" />
         </StackPanel>
@@ -153,7 +154,8 @@
         <Button Margin="5" FontSize="15"  Height="25" Content="Prev" x:Name="bottomPrev" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
         <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="bottomNext" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
         <Button Margin="5" FontSize="15"  Height="25" Content="Last" x:Name="bottomLast" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
-        <ComboBox Margin="5" FontSize="15" x:Name="bottomComboBox" Height="25" Width="500" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
+        <ComboBox Margin="5" FontSize="15" x:Name="bottomComboBoxPart" Height="25" Width="200" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
+        <ComboBox Margin="5" FontSize="15" x:Name="bottomComboBoxPage" Height="25" Width="400" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
         <HyperlinkButton Content="Source Code" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
          NavigateUri="http://code.google.com/p/trypython/" />
     </StackPanel>
