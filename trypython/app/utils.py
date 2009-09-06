@@ -3,6 +3,7 @@ from System.Threading import Thread
 from System.Windows import Application
 from System.Windows.Browser import HtmlPage
 
+debug = False
 
 _main_id = Thread.CurrentThread.ManagedThreadId
 
@@ -32,6 +33,8 @@ line = 0
 
 @invoke
 def _debug(*args):
+    if not debug:
+        return
     global line
     line += 1
     def _str(arg):
@@ -44,8 +47,7 @@ def _debug(*args):
         data += '\n'
     current = HtmlPage.Document.debugging.innerHTML
     lineno = '%s. ' % line
-    # Comment / uncomment this line to output debug info
-    #HtmlPage.Document.debugging.innerHTML = lineno + data.replace('\n', '<br />') + current
+    HtmlPage.Document.debugging.innerHTML = lineno + data.replace('\n', '<br />') + current
 
     
 def empty_or_comment_only(contents):

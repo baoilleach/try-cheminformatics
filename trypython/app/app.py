@@ -23,6 +23,9 @@ from mousehandler import MouseHandler
 from printer import StatefulPrinter
 from utils import always_invoke, _debug, SetInvokeRoot
 
+import utils
+# Comment / uncomment this line to output debug info
+#utils.debug = True
 
 root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 SetInvokeRoot(root)

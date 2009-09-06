@@ -1,3 +1,4 @@
+import re
 import sys
 
 import clr
@@ -25,6 +26,12 @@ from utils import (
     magic_function, invoke, blow_up, _debug
 )
 
+FF3_RE = r'(Firefox/3\.0\.\d)'
+FF3_MESSAGE = """
+IMPORTANT: You are using browser %r.
+There is a bug with the Firefox 3.0 and Silverlight integration.
+Unfortunately the '=' won't work if you have a US English keyboard. The
+best solution is to upgrade your version of Firefox. Sorry."""
 
 # Magic flag from the codeop module
 PyCF_DONT_IMPLY_DEDENT = 0x200
@@ -38,6 +45,7 @@ class ConsoleTextBox(TextBox):
         self.printer = printer
         self.prompt = root.prompt
         self.root = root
+        self.done_first_run = False
         
         self.FontSize = 15
         self.Margin = Thickness(0)
@@ -92,6 +100,17 @@ class ConsoleTextBox(TextBox):
         self.context = self.original_context.copy()
         self.history = ConsoleHistory()
         self.printer.print_new(banner)
+        if not self.done_first_run:
+            self.done_first_run = True
+            self.browser_sniff()
+
+            
+    def browser_sniff(self):
+        useragent = HtmlPage.BrowserInformation.UserAgent
+        match = re.search(FF3_RE, useragent)
+        if match is not None:
+            browser = match.groups()[0]
+            self.printer.print_new(FF3_MESSAGE % browser)
         
         
     def OnKeyDown(self, event):
