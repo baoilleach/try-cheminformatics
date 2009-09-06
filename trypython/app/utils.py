@@ -22,6 +22,12 @@ def invoke(function):
         return function(*args, **kwargs)
     return inner
 
+def always_invoke(function):
+    def inner(*args, **kwargs):
+        return root.Dispatcher.BeginInvoke(lambda: function(*args, **kwargs))
+    return inner
+    
+
 line = 0
 
 @invoke
@@ -36,10 +42,10 @@ def _debug(*args):
     data = ' '.join(_str(arg) for arg in args)
     if not data.endswith('\n'):
         data += '\n'
-    # Comment / uncomment this line to output debug info
     current = HtmlPage.Document.debugging.innerHTML
     lineno = '%s. ' % line
-    HtmlPage.Document.debugging.innerHTML = lineno + data.replace('\n', '<br />') + current
+    # Comment / uncomment this line to output debug info
+    #HtmlPage.Document.debugging.innerHTML = lineno + data.replace('\n', '<br />') + current
 
     
 def empty_or_comment_only(contents):

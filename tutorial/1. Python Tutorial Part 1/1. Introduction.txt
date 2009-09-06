@@ -1,17 +1,8 @@
-=============================
- Interactive Python Tutorial
-=============================
-------------------------------------
- Made with rst2xaml for Silverlight
-------------------------------------
+=====================
+ The Python Tutorial
+=====================
 
-**Try Python** is an interactive Python tutorial created for Silverlight and Moonlight by Michael Foord. 
-
-Select a page from the dropdown list use the navigation bar to browse the tutorial.
-
-This tutorial is based on the Python tutorial that is part of the Python documentation
-
-By the way, the language is named after the BBC show "Monty Python's Flying Circus" and has nothing to do with nasty reptiles. Making references to Monty Python skits in documentation is not only allowed, it is encouraged!
+The Python programming language is named after the BBC show "Monty Python's Flying Circus" and has nothing to do with nasty reptiles. Making references to Monty Python skits in documentation is not only allowed, it is encouraged!
 
 This tutorial introduces various features of the Python language and system through examples, beginning with simple expressions, statements and data types, through functions and modules, and finally touching upon advanced concepts like exceptions and user-defined classes.
 

@@ -31,6 +31,13 @@ class NavigationController(object):
         root.topPrev.Click += self.prev
         root.bottomPrev.Click += self.prev
     
+        self.event_pairs = [
+            (self.bottomComboBoxPart.SelectionChanged, self.on_change_bottom_part),
+            (self.topComboBoxPart.SelectionChanged, self.on_change_top_part),
+            (self.topComboBoxPage.SelectionChanged, self.on_change_top_page),
+            (self.bottomComboBoxPage.SelectionChanged, self.on_change_bottom_page)
+        ]
+    
     
     def invoke(self, function):
         self.root.Dispatcher.BeginInvoke(function)
@@ -55,22 +62,16 @@ class NavigationController(object):
         bottomComboBox.SelectionChanged += self.on_change_bottom_part
         
         topCombobox.SelectedIndex = bottomComboBox.SelectedIndex = 0
-    
+        
     
     def unhook_events(self):
-        self.bottomComboBoxPart.SelectionChanged -= self.on_change_bottom_part
-        self.topComboBoxPart.SelectionChanged -= self.on_change_top_part
+        for event, method in self.event_pairs:
+            event += method
         
-        self.topComboBoxPage.SelectionChanged -= self.on_change_top_page
-        self.bottomComboBoxPage.SelectionChanged -= self.on_change_bottom_page
-
-    
+            
     def hook_events(self):
-        self.bottomComboBoxPart.SelectionChanged += self.on_change_bottom_part
-        self.topComboBoxPart.SelectionChanged += self.on_change_top_part
-        
-        self.topComboBoxPage.SelectionChanged += self.on_change_top_page
-        self.bottomComboBoxPage.SelectionChanged += self.on_change_bottom_page
+        for event, method in self.event_pairs:
+            event -= method
         
     
     def change_document(self, part, page):

@@ -5,4 +5,9 @@
  Made with rst2xaml for Silverlight
 ------------------------------------
 
-**Try Python** is an interactive Python tutorial created for Silverlight and Moonlight by Michael Foord. 
+**Try Python** is an interactive Python tutorial created for Silverlight and Moonlight by Michael Foord.
+
+The Python console to the right behaves like the Python interactive interpreter. It runs IronPython 2.0, which is the equivalent of Python 2.5. The code you enter in the console runs in the browser.
+
+Choose a section of the tutorial to start on from this page, or use the navigation bar at the top.
+

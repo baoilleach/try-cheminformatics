@@ -248,7 +248,7 @@ class ConsoleTextBox(TextBox):
         self._thread.Name = "executing"
         self._thread.Start()
         self.prompt.Visibility = Visibility.Collapsed
-        if self._original_caret is not None:
+        if hasattr(self, 'CaretBrush'):
             self.CaretBrush = self._disabled
         started.WaitOne()
         
@@ -259,7 +259,7 @@ class ConsoleTextBox(TextBox):
             self._temp_context = None
         self._thread = None
         self.prompt.Visibility = Visibility.Visible
-        if self._original_caret is not None:
+        if hasattr(self, 'CaretBrush'):
             self.CaretBrush = self._original_caret
         if self._reset_needed:
             self.reset()

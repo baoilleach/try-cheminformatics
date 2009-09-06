@@ -1,7 +1,7 @@
 
 from consoletextbox import get_console_block
 from context import ps1, ps2
-from utils import invoke
+from utils import always_invoke, invoke
 
 class StatefulPrinter(object):
     def __init__(self, parent, scroller):
@@ -39,7 +39,7 @@ class StatefulPrinter(object):
         lines[1:] = [ps2 + line for line in lines[1:]]
         self.print_new('\n'.join(lines))
     
-    @invoke
+    @always_invoke
     def scroll(self):
         scroller = self.scroller
         if scroller.ScrollableHeight > 0:
