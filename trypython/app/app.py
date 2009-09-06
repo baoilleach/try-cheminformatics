@@ -317,7 +317,7 @@ def prev(sender, event):
     elif part > 0:
         topComboBoxPart.SelectedIndex -= 1
         if part > 1:
-            index = len(get_list('docs/part%s/list.txt' % part)) - 1
+            index = len(get_list('docs/part%s/list.txt' % part))
             topComboBoxPage.SelectedIndex = index
 
 
