@@ -5,7 +5,7 @@ Besides the ``while`` statement just introduced, Python knows the usual control 
 
 Perhaps the most well-known statement type is the ``if`` statement. For example:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> x = int(raw_input("Please enter an integer: "))
     Please enter an integer: 42

@@ -11,7 +11,7 @@ The ``keys()`` method of a dictionary object returns a list of all the keys used
 
 Here is a small example using a dictionary:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> tel = {'jack': 4098, 'sape': 4139}
     >>> tel['guido'] = 4127
@@ -30,7 +30,7 @@ Here is a small example using a dictionary:
 
 The ``dict()`` constructor builds dictionaries directly from lists of key-value pairs stored as tuples. When the pairs form a pattern, list comprehensions can compactly specify the key-value list.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> dict([('sape', 4139), ('guido', 4127), ('jack', 4098)])
     {'sape': 4139, 'jack': 4098, 'guido': 4127}
@@ -41,7 +41,7 @@ Later in the tutorial, we will learn about Generator Expressions which are even 
 
 When the keys are simple strings, it is sometimes easier to specify pairs using keyword arguments:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> dict(sape=4139, guido=4127, jack=4098)
     {'sape': 4139, 'jack': 4098, 'guido': 4127}

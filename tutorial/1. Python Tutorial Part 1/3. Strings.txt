@@ -3,7 +3,7 @@ Strings
 
 Besides numbers, Python can also manipulate strings, which can be expressed in several ways. They can be enclosed in single quotes or double quotes:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> 'spam eggs'
     'spam eggs'
@@ -69,7 +69,7 @@ The interpreter prints the result of string operations in the same way as they a
 
 Strings can be concatenated (glued together) with the ``+`` operator, and repeated with ``*``:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word = 'Help' + 'A'
     >>> word
@@ -79,7 +79,7 @@ Strings can be concatenated (glued together) with the ``+`` operator, and repeat
 
 Two string literals next to each other are automatically concatenated; the first line above could also have been written "``word = 'Help' 'A'``"; this only works with two literals, not with arbitrary string expressions:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> 'str' 'ing'                   #  <-  This is ok
     'string'
@@ -93,7 +93,7 @@ Two string literals next to each other are automatically concatenated; the first
 
 Strings can be subscripted (indexed); like in C, the first character of a string has subscript (index) 0. There is no separate character type; a character is simply a string of size one. Like in Icon, substrings can be specified with the *slice notation*: two indices separated by a colon.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[4]
     'A'
@@ -104,7 +104,7 @@ Strings can be subscripted (indexed); like in C, the first character of a string
 
 Slice indices have useful defaults; an omitted first index defaults to zero, an omitted second index defaults to the size of the string being sliced.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[:2]    # The first two characters
     'He'
@@ -113,7 +113,7 @@ Slice indices have useful defaults; an omitted first index defaults to zero, an 
 
 Unlike a C string, Python strings cannot be changed. Assigning to an indexed position in the string results in an error:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[0] = 'x'
     Traceback (most recent call last):
@@ -126,7 +126,7 @@ Unlike a C string, Python strings cannot be changed. Assigning to an indexed pos
 
 However, creating a new string with the combined content is easy and efficient:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> 'x' + word[1:]
     'xelpA'
@@ -135,7 +135,7 @@ However, creating a new string with the combined content is easy and efficient:
 
 Here's a useful invariant of slice operations: ``s[:i] + s[i:]`` equals s.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[:2] + word[2:]
     'HelpA'
@@ -144,7 +144,7 @@ Here's a useful invariant of slice operations: ``s[:i] + s[i:]`` equals s.
 
 Degenerate slice indices are handled gracefully: an index that is too large is replaced by the string size, an upper bound smaller than the lower bound returns an empty string.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[1:100]
     'elpA'
@@ -155,7 +155,7 @@ Degenerate slice indices are handled gracefully: an index that is too large is r
 
 Indices may be negative numbers, to start counting from the right. For example:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[-1]     # The last character
     'A'
@@ -168,14 +168,14 @@ Indices may be negative numbers, to start counting from the right. For example:
 
 But note that -0 is really the same as 0, so it does not count from the right!
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[-0]     # (since -0 equals 0)
     'H'
 
 Out-of-range negative slice indices are truncated, but don't try this for single-element (non-slice) indices:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> word[-100:]
     'HelpA'
@@ -198,7 +198,7 @@ For non-negative indices, the length of a slice is the difference of the indices
 
 The built-in function ``len()`` returns the length of a string:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> s = 'supercalifragilisticexpialidocious'
     >>> len(s)

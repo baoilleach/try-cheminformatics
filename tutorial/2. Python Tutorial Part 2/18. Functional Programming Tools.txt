@@ -5,7 +5,7 @@ There are three built-in functions that are very useful when used with lists: ``
 
 ``filter(function, sequence)`` returns a sequence consisting of those items from the sequence for which ``function(item)`` is true. If *sequence* is a string or tuple, the result will be of the same type; otherwise, it is always a list. For example, to compute some primes:
 
-.. code-block:: python 
+.. code-block:: pycon 
 
     >>> def f(x): return x % 2 != 0 and x % 3 != 0
     ...
@@ -14,7 +14,7 @@ There are three built-in functions that are very useful when used with lists: ``
 
 ``map(function, sequence)`` calls ``function(item)`` for each of the sequence’s items and returns a list of the return values. For example, to compute some cubes:
 
-.. code-block:: python 
+.. code-block:: pycon 
 
     >>> def cube(x): return x*x*x
     ...
@@ -23,7 +23,7 @@ There are three built-in functions that are very useful when used with lists: ``
 
 More than one sequence may be passed; the function must then have as many arguments as there are sequences and is called with the corresponding item from each sequence (or ``None`` if some sequence is shorter than another). For example:
 
-.. code-block:: python 
+.. code-block:: pycon 
 
     >>> seq = range(8)
     >>> def add(x, y): return x+y
@@ -33,7 +33,7 @@ More than one sequence may be passed; the function must then have as many argume
 
 ``reduce(function, sequence)`` returns a single value constructed by calling the binary function *function* on the first two items of the sequence, then on the result and the next item, and so on. For example, to compute the sum of the numbers 1 through 10:
 
-.. code-block:: python 
+.. code-block:: pycon 
 
     >>> def add(x,y): return x+y
     ...
@@ -44,7 +44,7 @@ If there’s only one item in the sequence, its value is returned; if the sequen
 
 A third argument can be passed to indicate the starting value. In this case the starting value is returned for an empty sequence, and the function is first applied to the starting value and the first sequence item, then to the result and the next item, and so on. For example,
 
-.. code-block:: python 
+.. code-block:: pycon 
 
     >>> def sum(seq):
     ...     def add(x,y): return x+y

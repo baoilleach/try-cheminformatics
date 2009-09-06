@@ -3,7 +3,7 @@ Lists
 
 Python knows a number of *compound* data types, used to group together other values. The most versatile is the *list*, which can be written as a list of comma-separated values (items) between square brackets. List items need not all have the same type.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> a = ['spam', 'eggs', 100, 1234]
     >>> a
@@ -11,7 +11,7 @@ Python knows a number of *compound* data types, used to group together other val
 
 Like string indices, list indices start at 0, and lists can be sliced, concatenated and so on:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> a[0]
     'spam'
@@ -28,7 +28,7 @@ Like string indices, list indices start at 0, and lists can be sliced, concatena
 
 Unlike strings, which are immutable, it is possible to change individual elements of a list:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> a
     ['spam', 'eggs', 100, 1234]
@@ -38,7 +38,7 @@ Unlike strings, which are immutable, it is possible to change individual element
 
 Assignment to slices is also possible, and this can even change the size of the list or clear it entirely:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> # Replace some items:
     ... a[0:2] = [1, 12]
@@ -63,7 +63,7 @@ Assignment to slices is also possible, and this can even change the size of the 
 
 The built-in function ``len()`` also applies to lists:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> a = ['a', 'b', 'c', 'd']
     >>> len(a)
@@ -71,7 +71,7 @@ The built-in function ``len()`` also applies to lists:
 
 It is possible to nest lists (create lists containing other lists), for example:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> q = [2, 3]
     >>> p = [1, q, 4]

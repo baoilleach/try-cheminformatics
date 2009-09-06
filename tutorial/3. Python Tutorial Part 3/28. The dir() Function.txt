@@ -3,7 +3,7 @@ The dir() Function
 
 The built-in function ``dir()`` is used to find out which names a module defines. It returns a sorted list of strings:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> import fibo, sys
     >>> dir(fibo)
@@ -22,7 +22,7 @@ The built-in function ``dir()`` is used to find out which names a module defines
 
 Without arguments, ``dir()`` lists the names you have defined currently:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> a = [1, 2, 3, 4, 5]
     >>> import fibo
@@ -34,7 +34,7 @@ Note that it lists all types of names: variables, modules, functions, etc.
 
 ``dir()`` does not list the names of built-in functions and variables. If you want a list of those, they are defined in the standard module ``__builtin__``:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> import __builtin__
     >>> dir(__builtin__)

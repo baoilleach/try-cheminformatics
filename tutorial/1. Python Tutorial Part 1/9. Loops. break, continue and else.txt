@@ -7,7 +7,7 @@ The ``continue`` statement, also borrowed from C, continues with the next iterat
 
 Loop statements may have an ``else`` clause; it is executed when the loop terminates through exhaustion of the list (with ``for``) or when the condition becomes false (with ``while``), but not when the loop is terminated by a ``break`` statement. This is exemplified by the following loop, which searches for prime numbers:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> for n in range(2, 10):
     ...     for x in range(2, n):

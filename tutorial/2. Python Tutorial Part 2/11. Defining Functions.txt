@@ -3,7 +3,7 @@ Defining Functions
 
 We can create a function that writes the Fibonacci series to an arbitrary boundary:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> def fib(n):    # write Fibonacci series up to n
     ...     """Print a Fibonacci series up to n."""
@@ -26,7 +26,7 @@ The actual parameters (arguments) to a function call are introduced in the local
 
 A function definition introduces the function name in the current symbol table. The value of the function name has a type that is recognized by the interpreter as a user-defined function. This value can be assigned to another name which can then also be used as a function. This serves as a general renaming mechanism:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> fib
     <function fib at 10042ed0>
@@ -36,7 +36,7 @@ A function definition introduces the function name in the current symbol table. 
 
 Coming from other languages, you might object that ``fib`` is not a function but a procedure since it doesn’t return a value. In fact, even functions without a ``return`` statement do return a value, albeit a rather boring one. This value is called ``None`` (it’s a built-in name). Writing the value ``None`` is normally suppressed by the interpreter if it would be the only value written. You can see it if you really want to using ``print``:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> fib(0)
     >>> print fib(0)
@@ -44,7 +44,7 @@ Coming from other languages, you might object that ``fib`` is not a function but
 
 It is simple to write a function that returns a list of the numbers of the Fibonacci series, instead of printing it:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> def fib2(n): # return Fibonacci series up to n
     ...     """Return a list containing the Fibonacci series up to n."""

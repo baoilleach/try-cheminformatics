@@ -29,13 +29,13 @@ A module is a file containing Python definitions and statements. The file name i
 
 Now enter the Python interpreter and import this module with the following command:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> import fibo
 
 This does not enter the names of the functions defined in ``fibo`` directly in the current symbol table; it only enters the module name ``fibo`` there. Using the module name you can access the functions:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> fibo.fib(1000)
     1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987
@@ -46,7 +46,7 @@ This does not enter the names of the functions defined in ``fibo`` directly in t
 
 If you intend to use a function often you can assign it to a local name:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> fib = fibo.fib
     >>> fib(500)

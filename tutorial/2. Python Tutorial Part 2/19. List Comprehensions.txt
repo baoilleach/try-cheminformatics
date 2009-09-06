@@ -4,7 +4,7 @@
 
 List comprehensions provide a concise way to create lists without resorting to use of ``map()``, ``filter()`` and/or ``lambda``. The resulting list definition tends often to be clearer than lists built using those constructs. Each list comprehension consists of an expression followed by a ``for`` clause, then zero or more ``for`` or ``if`` clauses. The result will be a list resulting from evaluating the expression in the context of the for and if clauses which follow it. If the expression would evaluate to a tuple, it must be parenthesized.
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> freshfruit = ['  banana', '  loganberry ', 'passion fruit  ']
     >>> [weapon.strip() for weapon in freshfruit]
@@ -36,7 +36,7 @@ List comprehensions provide a concise way to create lists without resorting to u
 
 List comprehensions are much more flexible than ``map()`` and can be applied to complex expressions and nested functions:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> [str(round(355/113.0, i)) for i in range(1,6)]
     ['3.1', '3.14', '3.142', '3.1416', '3.14159']
@@ -49,7 +49,7 @@ If you’ve got the stomach for it, list comprehensions can be nested. They are 
 
 Consider the following example of a 3x3 matrix held as a list containing three lists, one list per row:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> mat = [
     ...        [1, 2, 3],
@@ -59,7 +59,7 @@ Consider the following example of a 3x3 matrix held as a list containing three l
 
 Now, if you wanted to swap rows and columns, you could use a list comprehension:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> print [[row[i] for row in mat] for i in [0, 1, 2]]
     [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
@@ -79,7 +79,7 @@ A more verbose version of this snippet shows the flow explicitly:
 
 In real world, you should prefer built-in functions to complex flow statements. The ``zip()`` function would do a great job for this use case:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> zip(*mat)
     [(1, 4, 7), (2, 5, 8), (3, 6, 9)]

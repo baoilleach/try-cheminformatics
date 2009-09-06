@@ -10,7 +10,7 @@ Modules can import other modules. It is customary but not required to place all 
 
 There is a variant of the ``import`` statement that imports names from a module directly into the importing module’s symbol table. For example:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> from fibo import fib, fib2
     >>> fib(500)
@@ -20,7 +20,7 @@ This does not introduce the module name from which the imports are taken in the 
 
 There is even a variant to import all names that a module defines:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> from fibo import *
     >>> fib(500)
@@ -53,7 +53,7 @@ you can make the file usable as a script as well as an importable module, becaus
 
 If the module is imported, the code is not run:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> import fibo
     >>>

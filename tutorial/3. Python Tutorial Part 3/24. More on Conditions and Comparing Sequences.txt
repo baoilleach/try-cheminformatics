@@ -14,7 +14,7 @@ The Boolean operators and and or are so-called *short-circuit* operators: their 
 
 It is possible to assign the result of a comparison or other Boolean expression to a variable. For example,
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> string1, string2, string3 = '', 'Trondheim', 'Hammer Dance'
     >>> non_null = string1 or string2 or string3

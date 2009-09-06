@@ -31,7 +31,7 @@ but the following calls would all be invalid:
 
 In general, an argument list must have any positional arguments followed by any keyword arguments, where the keywords must be chosen from the formal parameter names. It’s not important whether a formal parameter has a default value or not. No argument may receive a value more than once — formal parameter names corresponding to positional arguments cannot be used as keywords in the same calls. Here’s an example that fails due to this restriction:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> def function(a):
     ...     pass

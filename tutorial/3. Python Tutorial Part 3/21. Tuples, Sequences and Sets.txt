@@ -6,7 +6,7 @@ We saw that lists and strings have many common properties, such as indexing and 
 
 A tuple consists of a number of values separated by commas, for instance:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> t = 12345, 54321, 'hello!'
     >>> t[0]
@@ -24,7 +24,7 @@ Tuples have many uses. For example: (x, y) coordinate pairs, employee records fr
 
 A special problem is the construction of tuples containing 0 or 1 items: the syntax has some extra quirks to accommodate these. Empty tuples are constructed by an empty pair of parentheses; a tuple with one item is constructed by following a value with a comma (it is not sufficient to enclose a single value in parentheses). Ugly, but effective. For example:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> empty = ()
     >>> singleton = 'hello',    # <-- note trailing comma
@@ -37,7 +37,7 @@ A special problem is the construction of tuples containing 0 or 1 items: the syn
 
 The statement ``t = 12345, 54321, 'hello!'`` is an example of *tuple packing*: the values ``12345``, ``54321`` and ``'hello!'`` are packed together in a tuple. The reverse operation is also possible:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> x, y, z = t
 
@@ -53,7 +53,7 @@ Python also includes a data type for *sets*. A set is an unordered collection wi
 
 Here is a brief demonstration:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> basket = ['apple', 'orange', 'apple', 'pear', 'orange', 'banana']
     >>> fruit = set(basket)               # create a set without duplicates
@@ -64,7 +64,7 @@ Here is a brief demonstration:
     >>> 'crabgrass' in fruit
     False
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> # Demonstrate set operations on unique letters from two words
     ...

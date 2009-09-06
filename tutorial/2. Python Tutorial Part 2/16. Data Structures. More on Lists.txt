@@ -41,7 +41,7 @@ The list data type has some more methods. Here are all of the methods of list ob
 
 An example that uses most of the list methods:
 
-.. code-block:: python
+.. code-block:: pycon
  
     >>> a = [66.25, 333, 333, 1, 1234.5]
     >>> print a.count(333), a.count(66.25), a.count('x')

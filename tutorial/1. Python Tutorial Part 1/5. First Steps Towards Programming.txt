@@ -3,7 +3,7 @@ First Steps Towards Programming
 
 Of course, we can use Python for more complicated tasks than adding two and two together. For instance, we can write an initial sub-sequence of the *Fibonacci* series as follows:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> # Fibonacci series:
     ... # the sum of two elements defines the next
@@ -29,7 +29,7 @@ This example introduces several new features.
     
     * The ``print`` statement writes the value of the expression(s) it is given. It differs from just writing the expression you want to write (as we did earlier in the calculator examples) in the way it handles multiple expressions and strings. Strings are printed without quotes, and a space is inserted between items, so you can format things nicely, like this:
     
-      .. code-block:: python
+      .. code-block:: pycon
 
         >>> i = 256*256
         >>> print 'The value of i is', i
@@ -38,7 +38,7 @@ This example introduces several new features.
 
       A trailing comma avoids the newline after the output:
 
-      .. code-block:: python
+      .. code-block:: pycon
 
           >>> a, b = 0, 1
           >>> while b < 1000:
