@@ -50,6 +50,7 @@ def content_resized(sender=None, event=None):
     # XXXX Why do we need to specify this precisely?
     scroller.Width = root.rightSide.Width - 30
     documentContainer.Width = root.document.Width - 20
+    documentContainer.Content.Width = root.document.Width - 50
 
 Application.Current.Host.Content.Resized += content_resized
     

@@ -25,7 +25,7 @@ A module is a file containing Python definitions and statements. The file name i
             a, b = b, a+b
         return result
 
-NOTE: You can't create new files in the **Try Python** tutorial (yet!), so I've created ``fibo.py`` containing the code above.
+**NOTE:** You can't create new files in the **Try Python** tutorial (yet!), so I've created ``fibo.py`` containing the code above.
 
 Now enter the Python interpreter and import this module with the following command:
 
