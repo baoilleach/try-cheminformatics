@@ -67,9 +67,9 @@ def focus_text_box(sender=None, event=None):
     console_textbox.Focus()
 
 
-printer = StatefulPrinter(console_output, scroller)
+printer = StatefulPrinter(console_output, scroller, root.prompt)
 
-console_textbox = ConsoleTextBox(scroller.Width - 75, printer, context, root)
+console_textbox = ConsoleTextBox(printer, context, root)
 textbox_parent.Child = console_textbox
 console_textbox.reset()
 
@@ -350,6 +350,9 @@ root.topPrev.Click += prev
 root.bottomPrev.Click += prev
 
 ###########################################
+# needed for one of the tutorial examples
+import fibo
+
 
 page = 0
 part = 0
@@ -372,6 +375,7 @@ sys.setrecursionlimit(500)
 
 setup_parts()
 content_resized()
+console_textbox.Width = scroller.Width - 75
 if part > 0:
     try:
         set_page(part, page)

@@ -19,7 +19,7 @@ from Microsoft.Scripting import ScriptCodeParseResult, SourceCodeKind
 import traceback
 
 from consolehistory import ConsoleHistory
-from context import banner, home
+from context import banner, home, ps1, ps2
 
 from utils import (
     empty_or_comment_only, get_indent, is_terminator,
@@ -37,10 +37,10 @@ best solution is to upgrade your version of Firefox. Sorry."""
 PyCF_DONT_IMPLY_DEDENT = 0x200
 
 class ConsoleTextBox(TextBox):
-    def __new__(cls, width, printer, context, root):
+    def __new__(cls, printer, context, root):
         return TextBox.__new__(cls)
     
-    def __init__(self, width, printer, context, root):
+    def __init__(self, printer, context, root):
         self.original_context = context
         self.printer = printer
         self.prompt = root.prompt
@@ -53,8 +53,7 @@ class ConsoleTextBox(TextBox):
         self.AcceptsReturn = True
         self.BorderThickness = Thickness(0)
         self.VerticalScrollBarVisibility = ScrollBarVisibility.Auto
-        self.MinWidth = 200
-        self.Width = width
+        self.MinWidth = 300
         
         def reset():
             "Clear the console, its history and the execution context."
@@ -94,6 +93,8 @@ class ConsoleTextBox(TextBox):
 
     
     def reset(self):
+        sys.ps1 = ps1
+        sys.ps2 = ps2
         self.printer.clear()
         self._reset_needed = False
         self.context.clear()
@@ -283,6 +284,7 @@ class ConsoleTextBox(TextBox):
         if self._reset_needed:
             self.reset()
         else:
+            self.printer.set_prompt()
             self.printer.scroll()
 
 

@@ -18,5 +18,5 @@ banner = ("Python %s on Silverlight\nTry Python %s by Michael Foord\n"
           % (python_version, __version__))
 home = 'http://code.google.com/p/trypython/'
 
-ps1 = '>>> '
-ps2 = '... '
+ps1 = sys.ps1
+ps2 = sys.ps2
