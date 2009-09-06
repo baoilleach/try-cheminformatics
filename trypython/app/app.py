@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import clr
+import re
 import sys
 clr.AddReferenceToFile('System.Windows.Controls.dll')
 clr.AddReferenceToFile('System.Windows.Controls.Toolkit.dll')
@@ -205,7 +206,6 @@ def change_document(part, page):
         
     
     path = loc + item
-    HtmlPage.Window.CurrentBookmark = fragment
     
     if path in _xaml_cache:
         document = _xaml_cache[path]
@@ -217,6 +217,8 @@ def change_document(part, page):
         
         if page < 1:
             add_stackpanel(document, get_list(loc + 'list.txt'))
+    
+    HtmlPage.Window.CurrentBookmark = fragment
     
     documentContainer.Content = document 
     document.Width = documentContainer.Width - 30
@@ -330,6 +332,11 @@ def last(sender, event):
     if topComboBoxPart.SelectedIndex > 0:
         topComboBoxPage.SelectedIndex = len(topComboBoxPage.Items) - 1
 
+def set_page(part, page):
+    topComboBoxPart.SelectedIndex = part
+    if page is not None:
+        topComboBoxPage.SelectedIndex = page
+    
 root.topFirst.Click += first
 root.bottomFirst.Click += first
 root.topLast.Click += last
@@ -339,26 +346,19 @@ root.bottomNext.Click += next
 root.topPrev.Click += prev
 root.bottomPrev.Click += prev
 
-
-"""
-page = 0
-bookmark = HtmlPage.Window.CurrentBookmark.lower()
-if bookmark.startswith('page'):
-    try:
-        page = int(bookmark[4:])
-    except ValueError:
-        pass
-    else:
-        page = min((page - 1), len(combobox.Items) - 1)
-        page = max(page, 0)
-        
-topCombobox.SelectedIndex = page
-"""
-
-
-
-
 ###########################################
+
+page = 0
+part = 0
+bookmark = HtmlPage.Window.CurrentBookmark.lower()
+page_re = r'page(\d+)'
+part_re = r'part(\d+)'
+match = re.match(part_re, bookmark)
+if match:
+    part = int(match.groups()[0])
+match = re.search(page_re, bookmark)
+if match:
+    page = int(match.groups()[0])
 
 
 # Handle infinite recursion gracefully
@@ -369,4 +369,11 @@ sys.setrecursionlimit(500)
 
 setup_parts()
 content_resized()
+if part > 0:
+    try:
+        set_page(part, page)
+    except ValueError:
+        HtmlPage.Window.CurrentBookmark = ''
+        set_page(0, None)
+
 focus_text_box()
