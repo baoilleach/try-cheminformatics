@@ -10,3 +10,5 @@ readable code. It supports many programming styles including procedural,
 functional and object orientated. These features, combined with a large
 and powerful standard library, make it an excellent first language for
 beginners *and* a great general purpose programming language for experienced developers.
+
+To use Python on your own computer visit *www.python.org/*.
