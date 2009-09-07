@@ -227,6 +227,7 @@ class ConsoleTextBox(TextBox):
 
 
     def execute(self, contents):
+        _debug('execute')
         self.printer.print_lines(contents)
         self.Text = ''
         self.history.append(contents)
@@ -286,6 +287,7 @@ class ConsoleTextBox(TextBox):
             self._temp_context = None
         self._thread = None
         self.prompt.Visibility = Visibility.Visible
+        self._thread_reset = None
         if hasattr(self, 'CaretBrush'):
             self.CaretBrush = self._original_caret
         if self._reset_needed:
