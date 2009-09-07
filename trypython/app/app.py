@@ -21,11 +21,11 @@ from consoletextbox import ConsoleTextBox
 from context import context, title
 from mousehandler import MouseHandler
 from printer import StatefulPrinter
-from utils import always_invoke, _debug, SetInvokeRoot
+from utils import always_invoke, _debug, SetInvokeRoot, load_document
 
 import utils
 # Comment / uncomment this line to output debug info
-#utils.debug = True
+utils.debug = True
 
 root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 SetInvokeRoot(root)
@@ -214,11 +214,8 @@ def change_document(part, page):
     if path in _xaml_cache:
         document = _xaml_cache[path]
     else:
-        with open(path) as handle:
-            xaml = handle.read().decode('utf-8')
-        document = XamlReader.Load(xaml)
+        document = load_document(path, page, console_textbox)
         _xaml_cache[path] = document
-        
         if page < 1:
             add_stackpanel(document, get_list(loc + 'list.txt'))
     
@@ -283,7 +280,6 @@ def change_pages():
     
 
 def on_change_top_page(sender, event):
-    _debug('change_top')
     part = topComboBoxPart.SelectedIndex
     page = topComboBoxPage.SelectedIndex
     
@@ -294,7 +290,6 @@ def on_change_top_page(sender, event):
 
 
 def on_change_bottom_page(sender, event):
-    _debug('change_bottom')
     part = bottomComboBoxPart.SelectedIndex
     page = bottomComboBoxPage.SelectedIndex
     

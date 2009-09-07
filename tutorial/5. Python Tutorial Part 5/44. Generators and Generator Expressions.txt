@@ -56,7 +56,7 @@ Examples:
 
 .. code-block:: pycon
 
-    >>> unique_words = set(word  for line in page  for word in line.split())
+    >>> unique_words = set(word for line in page  for word in line.split())
 
 .. code-block:: pycon
 

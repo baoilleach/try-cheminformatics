@@ -7,6 +7,7 @@ import sys
 # This installs the pygments directive
 import xamlwriter.register_directive
 xamlwriter.register_directive.flowdocument = False
+xamlwriter.register_directive.store_code_blocks = True
 
 from xamlwriter.writer import publish_xaml
 
@@ -33,13 +34,28 @@ if os.path.isdir(doc_dir):
     
 os.mkdir(doc_dir)
 
-def read_and_write(input_path, output_path):
+def read_and_write(input_path, output_path, i=-1):
+    xamlwriter.register_directive.code_blocks = []
+    
     source = open(input_path).read().decode('utf-8')
     xaml = publish_xaml(source, flowdocument=False, xclass=False)
     handle = open(output_path, 'w')
     handle.write(xaml.encode('utf-8'))
     handle.close()
     
+    code_blocks = xamlwriter.register_directive.code_blocks
+
+    if code_blocks:
+        output_folder = os.path.dirname(output_path)
+        code_folder = os.path.join(output_folder, 'code%s' % (i + 1))
+        os.mkdir(code_folder)
+        for j, code_list in enumerate(code_blocks):
+            this_code = os.path.join(code_folder, 'example%s.txt' % j)
+            handle = open(this_code, 'wb')
+            handle.write('\n'.join(code_list).encode('utf-8'))
+            handle.close()
+                
+
 
 def process_directory(folder, out_folder):
     file_list = os.listdir(folder)
@@ -65,18 +81,11 @@ def process_directory(folder, out_folder):
     for i, name in enumerate(input_files):
         print 'Processing', name
         path = os.path.join(folder, name)
-        input_data = open(path).read().decode('utf-8')
-    
-        output = publish_xaml(input_data, flowdocument=False, xclass=False)
-        
         out_name = 'item%s.xaml' % (i + 1)
         out_path = os.path.join(out_folder, out_name)
-        
-        handle = open(out_path, 'w')
-        handle.write(output.encode('utf-8'))
-        handle.close()
-    
-    
+        read_and_write(path, out_path, i)
+
+
 print 'Processing doc page'
 doc_src = os.path.join(this_dir, 'docs.txt')
 doc_dest = os.path.join(app_dir, 'docs.xaml')

@@ -26,6 +26,7 @@ from utils import (
     magic_function, invoke, blow_up, _debug
 )
 
+
 FF3_RE = r'(Firefox/3\.0\.\d)'
 FF3_MESSAGE = """
 IMPORTANT: You are using browser %r.
@@ -41,11 +42,13 @@ class ConsoleTextBox(TextBox):
         return TextBox.__new__(cls)
     
     def __init__(self, printer, context, root):
+        self._input_data = []
         self.original_context = context
         self.printer = printer
         self.prompt = root.prompt
         self.root = root
         self.done_first_run = False
+        self._sync = ManualResetEvent(False)
         
         self.FontSize = 15
         self.Margin = Thickness(0)
@@ -133,6 +136,8 @@ class ConsoleTextBox(TextBox):
     
     def is_complete(self, text, pos):
         if len(text.splitlines()) > 1 and pos < len(text.rstrip()):
+            return False
+        if text.endswith('\\'):
             return False
         
         source = self.engine.CreateScriptSourceFromString(text, '<stdin>', SourceCodeKind.InteractiveCode)
@@ -226,6 +231,7 @@ class ConsoleTextBox(TextBox):
         self.Text = ''
         self.history.append(contents)
         
+        self._sync.Reset()
         started = ManualResetEvent(False)
         if self._temp_context is not None:
             self.context.update(self._temp_context)
@@ -255,12 +261,13 @@ class ConsoleTextBox(TextBox):
                     message.insert(0, "Traceback (most recent call last):\n")
                 message.extend(traceback.format_exception_only(exc_type, value))
                 self.printer.print_new(''.join(message))
-                
+            
             # access through closure not on self as we may be an orphaned
             # thread - with a new reset_event on self
             result = reset_event.WaitOne(0)
             if not reset_event.WaitOne(0):
                 self.completed()
+            self._sync.Set()
             
         self._thread_reset = reset_event = ManualResetEvent(False)
         self._thread = Thread(ThreadStart(_execute))
@@ -373,8 +380,61 @@ class ConsoleTextBox(TextBox):
         self.input_event.WaitOne()
         self.remove_input_box()
         return self._raw_input_text
+
+
+    def _handle_lines(self, lines):
+        try:
+            self._input_data = []
+            for line in lines:
+                self.handle_line(line)
+            
+            if self._input_data:
+                self.handle_line('')
+            self.Dispatcher.BeginInvoke(self.Focus)
+        except Exception, e:
+            _debug('Handle lines', e)
+
     
+    def handle_lines(self, lines):
+        t = Thread(ThreadStart(lambda: self._handle_lines(lines)))
+        t.Start()
+    
+    def do_synchronously(self, function, wait_sync=False):
+        event = ManualResetEvent(False)
+        def do_operation():
+            function()
+            event.Set()
+        self.Dispatcher.BeginInvoke(do_operation)
+        event.WaitOne()
+        if wait_sync:
+            # wait for execution to complete
+            self._sync.WaitOne()
+    
+    
+    def handle_line(self, line):
+        self._input_data.append(line)
         
+        code = '\n'.join(self._input_data)
+    
+        if len(self._input_data) == 1 and empty_or_comment_only(code):
+            _debug('empty or comment')
+            # needed or we get a SyntaxError
+            self._input_data = []
+            def enter_comment():
+                self.Text = ''
+                self.printer.print_lines(code)
+                self.printer.scroll()
+            return self.do_synchronously(enter_comment)
+        
+        if not self.is_complete(code, len(code)):
+            return
+        else:
+            self._input_data = []
+            def execute():
+                self.execute(code)
+                
+            return self.do_synchronously(execute, wait_sync=True)
+
 
 
 def get_console_block():

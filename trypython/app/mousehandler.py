@@ -21,7 +21,6 @@ class MouseHandler(object):
         elif e.GetProperty("wheelDelta"):
             delta = -e.GetProperty("wheelDelta")
         delta = Math.Sign(delta) * 40
-        _debug(delta)
         
         try:
             for scroller in self.scrollers:
@@ -36,7 +35,7 @@ class MouseHandler(object):
                     scroller.ScrollToVerticalOffset(scroller.VerticalOffset + delta)
                     return
         except Exception, e:
-            _debug(e)
+            _debug('Error in mouse wheel handler', e)
 
 
     def mouse_over(self, scroller):
