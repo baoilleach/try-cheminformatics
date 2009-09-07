@@ -26,6 +26,12 @@ Not much of the Python standard library is included. I intend to expand the tuto
 Some of the console history code was contributed by Resolver Systems.
 
 
+Bug with Firefox 3.0
+====================
+
+There is a known issue for users of Firefox 3.0 with US English keyboards. Unfortunately the '=' key doesn't work, which appears to be a bug in the Silverlight integration. This problem *isn't* there for Firefox 3.5, so the best solution (currently) is to upgrade Firefox or use a different browser. Sorry about that. Another workaround, which is horrible and terrible, is to copy the '=' onto the clipboard and paste it rather than type it.
+
+
 Keyboard Interrupt
 ==================
 
@@ -34,3 +40,4 @@ Like the Python interpreter at the console Try Python allows you to interrupt ex
 There is a problem with the way that keyboard interrupts are handled in Try Python and the details are a bit technical. To enable execution to be interrupted they are run on a background thread. Silverlight doesn't allow us to abort running threads, so when execution is interrupted it is moved aside *but left running*...
 
 A slight trick is employed to 'encourage' it to error out quickly (the context it executes in is cleared out), so if it accesses any local variables then it will die and the error message won't be displayed. If it *doesn't* access any local variables then it will continue, and if it prints any messages then these will be displayed in the interpreter. This doesn't stop you entering and running new code, but it can have some slightly odd results.
+ 
