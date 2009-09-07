@@ -39,8 +39,8 @@ The last except clause may omit the exception name(s), to serve as a wildcard. U
         f = open('myfile.txt')
         s = f.readline()
         i = int(s.strip())
-    except IOError, (errno, strerror):
-        print "I/O error(%s): %s" % (errno, strerror)
+    except IOError, e:
+        print "I/O error(%s): %s" % (e.errno, str(e))
     except ValueError:
         print "Could not convert data to an integer."
     except:
@@ -97,7 +97,7 @@ Exception handlers don’t just handle exceptions if they occur immediately in t
     ...
     >>> try:
     ...     this_fails()
-    ... except ZeroDivisionError as detail:
+    ... except ZeroDivisionError, detail:
     ...     print 'Handling run-time error:', detail
     ...
     Handling run-time error: integer division or modulo by zero

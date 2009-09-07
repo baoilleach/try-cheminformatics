@@ -59,8 +59,10 @@ A class in an except clause is compatible with an exception if it is the same cl
 
     class B:
         pass
+        
     class C(B):
         pass
+        
     class D(C):
         pass
 

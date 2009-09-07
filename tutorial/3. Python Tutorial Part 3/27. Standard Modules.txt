@@ -15,6 +15,8 @@ Python comes with a library of standard modules, described in a separate documen
     Yuck!
     C>
 
+(You can restore the console to its normal state by typing ``reset``.)
+
 These two variables are only defined if the interpreter is in interactive mode.
 
 The variable ``sys.path`` is a list of strings that determines the interpreter’s search path for modules. It is initialized to a default path taken from the environment variable **PYTHONPATH**, or from a built-in default if **PYTHONPATH** is not set. You can modify it using standard list operations:

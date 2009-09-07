@@ -25,7 +25,7 @@ from utils import always_invoke, _debug, SetInvokeRoot, load_document
 
 import utils
 # Comment / uncomment this line to output debug info
-utils.debug = True
+#utils.debug = True
 
 root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 SetInvokeRoot(root)
@@ -223,9 +223,12 @@ def change_document(part, page):
     
     documentContainer.Content = document 
     document.Width = documentContainer.Width - 30
-    documentContainer.ScrollToVerticalOffset(0)
-    focus_text_box()
-
+    
+    @always_invoke
+    def scroll_and_focus():
+        documentContainer.ScrollToVerticalOffset(0)
+        focus_text_box()
+    scroll_and_focus()
 
 def on_change_top_part(sender, event):
     index = topComboBoxPart.SelectedIndex

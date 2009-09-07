@@ -47,7 +47,7 @@ Programs may name their own exceptions by creating a new exception class. Except
     ...
     >>> try:
     ...     raise MyError(2*2)
-    ... except MyError as e:
+    ... except MyError, e:
     ...     print 'My exception occurred, value:', e.value
     ...
     My exception occurred, value: 4
@@ -73,7 +73,6 @@ Exception classes can be defined which do anything any other class can do, but a
             expression -- input expression in which the error occurred
             details -- explanation of the error
         """
-
         def __init__(self, expression, details):
             self.expression = expression
             self.details = details
@@ -87,7 +86,6 @@ Exception classes can be defined which do anything any other class can do, but a
             next -- attempted new state
             details -- explanation of why the specific transition is not allowed
         """
-
         def __init__(self, previous, next, details):
             self.previous = previous
             self.next = next

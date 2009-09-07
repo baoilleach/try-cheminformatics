@@ -396,6 +396,7 @@ class ConsoleTextBox(TextBox):
 
     
     def handle_lines(self, lines):
+        self.Focus()
         t = Thread(ThreadStart(lambda: self._handle_lines(lines)))
         t.Start()
     
