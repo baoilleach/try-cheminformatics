@@ -10,6 +10,8 @@
          FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
          >Try Python: Interactive Python Tutorial</TextBlock>
         <StackPanel x:Name="topNavbar" Orientation="Horizontal">
+            <HyperlinkButton Content="Voidspace" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
+             NavigateUri="http://www.voidspace.org.uk/" />
             <Button Margin="5" FontSize="15"  Height="25" Content="First" x:Name="topFirst" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Prev" x:Name="topPrev" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="topNext" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
@@ -150,6 +152,8 @@
         </Border>
     </StackPanel>
     <StackPanel HorizontalAlignment="Center" x:Name="bottomNavbar" Orientation="Horizontal">
+        <HyperlinkButton Content="Python" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
+         NavigateUri="http://www.python.org/" />
         <Button Margin="5" FontSize="15"  Height="25" Content="First" x:Name="bottomFirst" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
         <Button Margin="5" FontSize="15"  Height="25" Content="Prev" x:Name="bottomPrev" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
         <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="bottomNext" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
