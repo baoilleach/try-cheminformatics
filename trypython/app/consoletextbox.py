@@ -28,11 +28,12 @@ from utils import (
 
 
 FF3_RE = r'(Firefox/3\.0\.\d)'
-FF3_MESSAGE = """
-IMPORTANT: You are using browser %r.
-There is a bug with the Firefox 3.0 and Silverlight integration.
-Unfortunately the '=' won't work if you have a US English keyboard. The
-best solution is to upgrade your version of Firefox. Sorry."""
+FF3_MESSAGE = (
+    "\nIMPORTANT: You are using browser %r.\n"
+    "There is a bug with the Firefox 3.0 and Silverlight integration. "
+    "Unfortunately the '=' won't work if you have a US English keyboard. The "
+    "best solution is to upgrade your version of Firefox. Sorry.\n"
+)
 
 # Magic flag from the codeop module
 PyCF_DONT_IMPLY_DEDENT = 0x200
@@ -208,7 +209,7 @@ class ConsoleTextBox(TextBox):
                 self.Text = self.Text[:start] + '    ' + self.Text[end:]
                 self.SelectionStart = start + 4
                 return
-                
+            
             TextBox.OnKeyDown(self, event)
             return
         
