@@ -126,6 +126,18 @@ bottomComboBoxPage = root.bottomComboBoxPage
 topComboBoxPart = root.topComboBoxPart
 bottomComboBoxPart = root.bottomComboBoxPart
 
+title = 'Try Python: %s'
+
+@always_invoke
+def change_title():
+    if topComboBoxPart.SelectedIndex == 0:
+        fragment = 'Interactive Python Tutorial in the Browser'
+    else:
+        fragment = topComboBoxPart.SelectedItem.Content
+        if topComboBoxPage.SelectedIndex != 0:
+            fragment = topComboBoxPage.SelectedItem.Content
+    HtmlPage.Document.SetProperty('title', title % fragment)
+    
 def _get_text_block(text):
     block = TextBlock()
     block.FontSize = 15
@@ -229,6 +241,7 @@ def change_document(part, page):
         documentContainer.ScrollToVerticalOffset(0)
         focus_text_box()
     scroll_and_focus()
+    change_title()
 
 def on_change_top_part(sender, event):
     index = topComboBoxPart.SelectedIndex
