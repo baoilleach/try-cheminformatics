@@ -13,7 +13,9 @@ released version...
 With this in place run:
 
     ``python maketutorial.py``
-    
+
+See the Installing_ section below for more details on getting this to work.
+
 Once the tutorial files are in place you should start Chiron which will serve
 the application locally on port 2060. This works under both Mono and .NET.
 Run either silverlight.bat or silverlight.sh. This should automatically open a
