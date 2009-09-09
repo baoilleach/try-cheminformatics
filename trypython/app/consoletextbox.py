@@ -237,7 +237,6 @@ class ConsoleTextBox(TextBox):
 
 
     def execute(self, contents):
-        _debug('execute')
         self.printer.print_lines(contents)
         self.Text = ''
         self.history.append(contents)

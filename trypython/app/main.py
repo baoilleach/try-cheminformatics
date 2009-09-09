@@ -1,10 +1,7 @@
 from __future__ import with_statement
 
-import clr
 import re
 import sys
-clr.AddReferenceToFile('System.Windows.Controls.dll')
-clr.AddReferenceToFile('System.Windows.Controls.Toolkit.dll')
 
 from System import EventHandler, Math, Uri
 from System.Windows import Application, Thickness

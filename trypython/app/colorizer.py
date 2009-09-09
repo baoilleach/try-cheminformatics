@@ -1,23 +1,26 @@
-import clr
-clr.AddReference('IronPython')
-clr.AddReference('Microsoft.Scripting')
 
 from IronPython.Hosting import Python
 from IronPython.Compiler import Tokenizer
 from Microsoft.Scripting.Hosting.Providers import HostingHelpers
 from Microsoft.Scripting import SourceCodeKind, TokenCategory
 
+from System.Windows.Documents import Run
+from System.Windows.Media import Color, SolidColorBrush
+
+from utils import _debug
+
+
 styles = {
-    TokenCategory.NumericLiteral: "#FFEE98",
-    TokenCategory.Keyword: "#FF6600",
-    TokenCategory.Identifier: "#FFCC00",
-    TokenCategory.StringLiteral: "#66FF00",
-    TokenCategory.Comment: "#9933CC",
-    TokenCategory.Error: "#FF0000",
-    TokenCategory.None: "#FFFFFF"
+    TokenCategory.NumericLiteral: SolidColorBrush(Color.FromArgb(255, 255, 238, 152)), #"#FFEE98",
+    TokenCategory.Keyword: SolidColorBrush(Color.FromArgb(255, 255, 102, 0)), #"#FF6600",
+    TokenCategory.Identifier: SolidColorBrush(Color.FromArgb(255, 255, 204, 0)), #"#FFCC00",
+    TokenCategory.StringLiteral: SolidColorBrush(Color.FromArgb(255, 102, 255, 0)), #"#66FF00",
+    TokenCategory.Comment: SolidColorBrush(Color.FromArgb(255, 153, 51, 204)), #"#9933CC",
+    TokenCategory.Error: SolidColorBrush(Color.FromArgb(255, 255, 0, 0)), #"#FF0000",
+    TokenCategory.None: SolidColorBrush(Color.FromArgb(255, 255, 255, 255)), #"#FFFFFF"
 }
 
-default_style = styles[TokenCategory.None]
+default_style = SolidColorBrush(Color.FromArgb(255, 0, 0, 0))
 
 engine = Python.CreateEngine()
 context = HostingHelpers.GetLanguageContext(engine)
@@ -31,52 +34,45 @@ def tokenize(code):
     return list(t.ReadTokens(len(code)))
 
 def create_text_run(code, token):
-    run = Run()
     start = token.SourceSpan.Start.Index
     end = start + token.SourceSpan.Length
     text = code[start:end]
-    run.Text = code
+    if not text:
+        return
+    text = text.replace('\n', '\n... ')
+    run = Run()
+    run.Text = text
     style = styles.get(token.Category, default_style)
+    run.Foreground = style
+    #_debug('text run', repr(text), repr(style))
+    
+    return run
 
-"""
-        private static Run CreateTextRun(string code, TokenInfo token) {
-            var text = code.Substring();
-            
-            var result = new Run(text);
-            var style = _colorizationStyles.ContainsKey(token.Category) ? _colorizationStyles[token.Category] : _colorizationStyles[TokenCategory.None];
-            result.Style = Application.Current.FindResource(style) as Style;
-            return result;
+def create_leading_whitespace_run(code, position, token):
+    length = token.SourceSpan.Start.Index - position
+    whitespace = code[position:position + length] # may need escaping
+    if not whitespace:
+        return
+    run = Run()
+    run.Text = whitespace
+    return run
 
-        }
+def colorize(code):
+    results = []
+    position = 0
+    for token in tokenize(code):
+        _debug(token.Category)
+        space = create_leading_whitespace_run(code, position, token)
+        if space is not None:
+            results.append(space)
+        if token.Category == TokenCategory.WhiteSpace:
+            continue
+        text_run = create_text_run(code, token)
+        if text_run is not None:
+            results.append(text_run)
+        position = token.SourceSpan.Start.Index + token.SourceSpan.Length
+    return results
 
-        private static Run CreateLeadingWhitespaceRun(string code, int position, TokenInfo token) {
-            var text = code.Substring(position, token.SourceSpan.Start.Index - position);
-            return new Run(text);
-        }
 
-        public static List<Run> Colorize(DlrEngine engine, string code, Action<Run, TokenInfo> proc) {
-            var result = new List<Run>();
-            int position = 0;
-            foreach (TokenInfo token in engine.GetTokenInfos(code)) {
-                result.Add(CreateLeadingWhitespaceRun(code, position, token));
-                var run = CreateTextRun(code, token);
-                if (proc != null)
-                    proc(run, token);
-                result.Add(run);
-                position = token.SourceSpan.Start.Index + token.SourceSpan.Length;
-            }
-            return result;
-        }
-
-        public static List<Run> ColorizeErrors(string error) {
-            var result = new List<Run>();
-            var run = new Run(error);
-            run.Style = Application.Current.FindResource("Error") as Style;
-            result.Add(run);
-            return result;
-        }
-    }
-}
-"""
 if __name__ == '__main__':
     print tokenize('print foo')
