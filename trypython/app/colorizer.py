@@ -21,56 +21,74 @@ styles = {
 }
 
 default_style = SolidColorBrush(Color.FromArgb(255, 0, 0, 0))
+blue = SolidColorBrush(Color.FromArgb(255, 0, 0, 255))
 
 engine = Python.CreateEngine()
 context = HostingHelpers.GetLanguageContext(engine)
+
+
+def get_prompt(prompt):
+    run = Run()
+    run.Text = prompt
+    run.Foreground = blue
+    return run
+
+def get_run(text, foreground):
+    run = Run()
+    run.Text = text
+    if foreground is not None:
+        run.Foreground = foreground
+    return run
+
+def runs_from_lines(text, ps2, foreground=None):
+    lines = text.split('\n')
+    runs = []
+
+    if lines[0]:
+        runs.append(get_run(lines[0], foreground))
+    for line in lines[1:]:
+        runs.append(get_run('\n' + ps2, blue))
+        if line:
+            runs.append(get_run(line, foreground))
+    
+    return runs
+                
 
 def get_source_unit(code):
     return context.CreateSnippet(code, SourceCodeKind.InteractiveCode)
 
 def tokenize(code):
-    t = Tokenizer()
-    t.Initialize(get_source_unit(code))
-    return list(t.ReadTokens(len(code)))
+    tokenizer = Tokenizer()
+    tokenizer.Initialize(get_source_unit(code))
+    return list(tokenizer.ReadTokens(len(code)))
 
-def create_text_run(code, token):
+def create_text_run(code, token, ps2):
     start = token.SourceSpan.Start.Index
     end = start + token.SourceSpan.Length
     text = code[start:end]
     if not text:
-        return
-    text = text.replace('\n', '\n... ')
-    run = Run()
-    run.Text = text
-    style = styles.get(token.Category, default_style)
-    run.Foreground = style
-    #_debug('text run', repr(text), repr(style))
+        return []
     
-    return run
+    style = styles.get(token.Category, default_style)
+    return runs_from_lines(text, ps2, style)
 
-def create_leading_whitespace_run(code, position, token):
+
+def create_leading_whitespace_run(code, position, token, ps2):
     length = token.SourceSpan.Start.Index - position
-    whitespace = code[position:position + length] # may need escaping
+    whitespace = code[position:position + length]
     if not whitespace:
-        return
-    run = Run()
-    run.Text = whitespace
-    return run
+        return []
+    return runs_from_lines(whitespace, ps2)
 
-def colorize(code):
-    results = []
+def colorize(code, ps1, ps2):
+    results = [get_prompt(ps1)]
     position = 0
     for token in tokenize(code):
-        _debug(token.Category)
-        space = create_leading_whitespace_run(code, position, token)
-        if space is not None:
-            results.append(space)
+        results.extend(create_leading_whitespace_run(code, position, token, ps2))
+        position = token.SourceSpan.Start.Index + token.SourceSpan.Length
         if token.Category == TokenCategory.WhiteSpace:
             continue
-        text_run = create_text_run(code, token)
-        if text_run is not None:
-            results.append(text_run)
-        position = token.SourceSpan.Start.Index + token.SourceSpan.Length
+        results.extend(create_text_run(code, token, ps2))
     return results
 
 

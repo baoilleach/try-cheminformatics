@@ -1,15 +1,11 @@
 import sys
 
-from System.Windows.Documents import Run
-from System.Windows.Media import Color, SolidColorBrush
-
-from colorizer import colorize
+from colorizer import colorize, blue
 from consoletextbox import get_console_block
 from utils import always_invoke, invoke
 
 from utils import _debug
 
-blue = SolidColorBrush(Color.FromArgb(255, 0, 0, 255))
 
 
 class StatefulPrinter(object):
@@ -18,6 +14,8 @@ class StatefulPrinter(object):
         self.parent = parent
         self.scroller = scroller
         self.prompt = prompt
+        self.prompt.Foreground = blue
+        
     
     @invoke
     def clear(self):
@@ -56,15 +54,16 @@ class StatefulPrinter(object):
 
         self.block = get_console_block()
         self.parent.Children.Add(self.block)
-        prompt = Run()
-        prompt.Text = '>>> '
-        prompt.Foreground = blue
-        self.block.Inlines.Add(prompt)
-        for run in colorize(code):
+        ps1 = sys.ps1
+        ps2 = sys.ps2
+        if not isinstance(ps1, str):
+            ps1 = str(ps1)
+            ps2 = str(ps2)
+        for run in colorize(code, ps1, ps2):
             self.block.Inlines.Add(run)
             color = run.Foreground.Color
-            _debug("Printing run", repr(run.Text), color.R, color.G, color.B)
-        _debug(repr(self.block.Text))
+            #_debug("Printing run", repr(run.Text), color.R, color.G, color.B)
+        #_debug(repr(self.block.Text))
         self.block = None
         
     def print_lines_old(self, data):
