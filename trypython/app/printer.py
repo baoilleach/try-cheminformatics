@@ -65,12 +65,6 @@ class StatefulPrinter(object):
             #_debug("Printing run", repr(run.Text), color.R, color.G, color.B)
         #_debug(repr(self.block.Text))
         self.block = None
-        
-    def print_lines_old(self, data):
-        lines = data.replace('\r\n', '\n').replace('\r', '\n').split('\n')
-        lines[0] = sys.ps1 + lines[0]
-        lines[1:] = [sys.ps2 + line for line in lines[1:]]
-        self.print_new('\n'.join(lines))
 
 
     @always_invoke
