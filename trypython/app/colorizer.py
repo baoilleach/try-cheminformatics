@@ -11,17 +11,18 @@ from utils import _debug
 
 
 styles = {
-    TokenCategory.NumericLiteral: SolidColorBrush(Color.FromArgb(255, 255, 238, 152)), #"#FFEE98",
-    TokenCategory.Keyword: SolidColorBrush(Color.FromArgb(255, 255, 102, 0)), #"#FF6600",
-    TokenCategory.Identifier: SolidColorBrush(Color.FromArgb(255, 255, 204, 0)), #"#FFCC00",
-    TokenCategory.StringLiteral: SolidColorBrush(Color.FromArgb(255, 102, 255, 0)), #"#66FF00",
-    TokenCategory.Comment: SolidColorBrush(Color.FromArgb(255, 153, 51, 204)), #"#9933CC",
-    TokenCategory.Error: SolidColorBrush(Color.FromArgb(255, 255, 0, 0)), #"#FF0000",
-    TokenCategory.None: SolidColorBrush(Color.FromArgb(255, 255, 255, 255)), #"#FFFFFF"
+    TokenCategory.NumericLiteral: SolidColorBrush(Color.FromArgb(255, 102, 102, 102)), 
+    TokenCategory.Operator: SolidColorBrush(Color.FromArgb(255, 102, 102, 102)), 
+    TokenCategory.Keyword: SolidColorBrush(Color.FromArgb(255, 0, 128, 0)), 
+    TokenCategory.Identifier: SolidColorBrush(Color.FromArgb(255, 25, 23, 124)), 
+    TokenCategory.StringLiteral: SolidColorBrush(Color.FromArgb(255, 186, 33, 33)),
+    TokenCategory.Comment: SolidColorBrush(Color.FromArgb(255, 64, 128, 128)),
+    TokenCategory.Error: SolidColorBrush(Color.FromArgb(255, 255, 0, 0)), 
+    TokenCategory.None: SolidColorBrush(Color.FromArgb(255, 255, 255, 255)), 
 }
 
 default_style = SolidColorBrush(Color.FromArgb(255, 0, 0, 0))
-blue = SolidColorBrush(Color.FromArgb(255, 0, 0, 255))
+blue = SolidColorBrush(Color.FromArgb(255, 0, 0, 128))
 
 engine = Python.CreateEngine()
 context = HostingHelpers.GetLanguageContext(engine)
@@ -57,15 +58,21 @@ def runs_from_lines(text, ps2, foreground=None):
 def get_source_unit(code):
     return context.CreateSnippet(code, SourceCodeKind.InteractiveCode)
 
+
 def tokenize(code):
     tokenizer = Tokenizer()
     tokenizer.Initialize(get_source_unit(code))
     return list(tokenizer.ReadTokens(len(code)))
 
-def create_text_run(code, token, ps2):
+
+def text_from_token(code, token):
     start = token.SourceSpan.Start.Index
     end = start + token.SourceSpan.Length
-    text = code[start:end]
+    return code[start:end]
+
+
+def create_text_run(code, token, ps2):
+    text = text_from_token(code, token)
     if not text:
         return []
     
@@ -80,17 +87,37 @@ def create_leading_whitespace_run(code, position, token, ps2):
         return []
     return runs_from_lines(whitespace, ps2)
 
+
+def extra_newline(token, previous_token, code):
+    # should only be true at the end of a class definition
+    # HACK!!
+    if previous_token is None:
+        return False
+    if (token.Category != TokenCategory.Operator) or (previous_token.Category != TokenCategory.Operator):
+        return False
+    current = text_from_token(code, token).rstrip(' ')
+    previous = text_from_token(code, previous_token).rstrip(' ')
+    if (current, previous) == ('\n', '\n'):
+        return True
+    return False
+
+
 def colorize(code, ps1, ps2):
     results = [get_prompt(ps1)]
     position = 0
+    count_newlines = 0
+    previous_token = None
     for token in tokenize(code):
+        _debug(token.Category)
+        if extra_newline(token, previous_token, code):
+            position = token.SourceSpan.Start.Index + token.SourceSpan.Length
+            continue
+                
         results.extend(create_leading_whitespace_run(code, position, token, ps2))
-        position = token.SourceSpan.Start.Index + token.SourceSpan.Length
         if token.Category == TokenCategory.WhiteSpace:
             continue
+        position = token.SourceSpan.Start.Index + token.SourceSpan.Length
         results.extend(create_text_run(code, token, ps2))
+        previous_token = token
     return results
 
-
-if __name__ == '__main__':
-    print tokenize('print foo')
