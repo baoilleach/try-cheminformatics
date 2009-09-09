@@ -1,6 +1,6 @@
 import sys
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 
 doc = "Try Python: version %s" % __version__
 title = "Try Python %s: An Interactive Python Tutorial" % __version__

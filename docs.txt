@@ -19,7 +19,9 @@ The online interpreter has the following features:
     * ``raw_input`` and ``input`` functions work in the interpreter
     * Basic auto-indent and auto-dedent in the console
     * Console history, including multiline history
-    * ``reset`` command to clear the console 
+    * Syntax highlighting in the console
+    * ``reset`` command to clear the console
+    * Assign to ``sys.ps1`` and ``sys.ps2`` from the console
 
 Not much of the Python standard library is included. I intend to expand the tutorial adding new modules as they are needed (the whole standard library is about 5mb and would make Try Python take much longer to load).
 
@@ -29,8 +31,7 @@ Some of the console history code was contributed by Resolver Systems.
 Bug with Firefox 3.0
 ====================
 
-There is a known issue for users of Firefox 3.0 with US English keyboards. Unfortunately the '=' key doesn't work, which appears to be a bug in the Silverlight integration. This problem *isn't* there for Firefox 3.5, so the best solution (currently) is to upgrade Firefox or use a different browser. Sorry about that. Another workaround, which is horrible and terrible, is to copy the '=' onto the clipboard and paste it rather than type it.
-
+There is a problem with the Silverlight integration and Firefox 3.0. The '=' key gets sent as a '+'. I have a workaround in place but a better solution is to upgrade your version of Firefox!
 
 Keyboard Interrupt
 ==================

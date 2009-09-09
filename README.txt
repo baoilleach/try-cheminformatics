@@ -26,20 +26,4 @@ and run maketutorial.py then new xaml files will be generated for the new
 source documents.
 
 
-CHANGELOG
-=========
-
-4/9/2009
---------
-
-Fix to only use ``TextBox.CaretBrush`` on Silverlight 3.
-
-
-
-
-Known Issues
-============
-
-* Firefox 3.0 with a US English keyboard sends a '+' when '=' is typed. This
-  works fine on Firefox 3.5!?
 
