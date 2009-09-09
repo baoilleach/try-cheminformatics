@@ -26,4 +26,31 @@ and run maketutorial.py then new xaml files will be generated for the new
 source documents.
 
 
+Installing
+==========
 
+To run the maketutorial script you should use Python 2.5 or Python 2.6
+(I haven't tried running it under IronPython).
+
+Most of the time you'll need to use the latest development of rst2xaml I'm afraid,
+as it tends to be developed in parallel with Try Python.
+
+Once you have a checkout you can run the following to install it into your
+site-packages folder:
+
+    ``python setup.py install``
+
+You will also need `Pygments <http://pygments.org/>`_ and `docutils <http://docutils.sourceforge.net/>`_
+installed. The easiest way of doing this is to install the `distribute <http://pypi.python.org/pypi/distribute>`_
+Python package management tool.
+
+Once you have ``distribute`` installed, assuming you are using Python 2.6 on
+Windows, you should then be able to run the following from the command line::
+
+    C:\Python26\Scripts\easy_install docutils
+    C:\Python26\Scripts\easy_install pygments
+    
+(If you're using a Mac or Linux then ``easy_install`` should be on your path as
+soon as you have successfully installed ``distribute``. If you're on Windows
+then you should add the Python scripts directory to your path to make using
+``easy_install`` simpler.)
