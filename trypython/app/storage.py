@@ -1,21 +1,50 @@
 import __builtin__
 
 original_file = __builtin__.file
+original_open = __builtin__.open
 open_doc = open.__doc__
 file_doc = file.__doc__
 
+
+from System.IO.IsolatedStorage import (
+    IsolatedStorageFile, IsolatedStorageFileStream
+)
+
+from System.IO import (
+    FileMode, StreamReader, StreamWriter
+)
+
+
 class file(object):
-    pass
+    def __init__(self, name, mode='r'):
+        self.name = name
+        self.mode = mode
+        if mode == 'r':
+            self._mode = FileMode.Read
+        elif mode == 'w':
+            self._mode = FileMode.Create
+        else:
+            raise ValueError("The only supported modes are currently r and w, not %r" % mode)
+        self._store = IsolatedStorageFile.GetUserStoreForApplication()
+        
+    def read(self):
+        return
+    
+    def write(self, data):
+        return
+    
+    def close(self):
+        pass
 
-
-def open(name, mode='r', buffering=None):
-    pass
+def open(name, mode='r'):
+    return file(name, mode)
 
 open.__doc__ = open_doc
 file.__doc__ = file_doc
     
 __builtin__.file =  file
 __builtin__.open = open
+
 
 ################################
 
