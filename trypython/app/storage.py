@@ -16,25 +16,50 @@ from System.IO import (
 
 
 class file(object):
+    mode = None
+    name = None
+    
     def __init__(self, name, mode='r'):
         self.name = name
         self.mode = mode
+        self._data = ''
         if mode == 'r':
-            self._mode = FileMode.Read
+            self._mode = FileMode.Open
+            self._open_read()
         elif mode == 'w':
             self._mode = FileMode.Create
+            self._open_write()
         else:
-            raise ValueError("The only supported modes are currently r and w, not %r" % mode)
-        self._store = IsolatedStorageFile.GetUserStoreForApplication()
+            raise ValueError("The only supported modes are r and w, not %r" % mode)
+    
+    
+    def _open_read(self):
+        if not CheckForFile(self.name):
+            raise IOError('No such file or directory: %r' % self.name)
+    
+    def _open_write(self):
+        pass
+    
         
     def read(self):
-        return
+        return LoadFile(self.name)
     
     def write(self, data):
-        return
+        self._data += data
     
     def close(self):
-        pass
+        if self.mode.startswith('w'):
+            SaveFile(self.name, self._data)
+
+    def __dir__(self):
+        originals = set(dir(original_file))
+        print '\n\nREPR'
+        print '\n    '.join(originals)
+        return [name for name in dir(file) if name in originals]
+                
+    def __repr__(self):
+        return '<open file %r mode %r>' % (self.name, self.mode)
+
 
 def open(name, mode='r'):
     return file(name, mode)
@@ -42,9 +67,15 @@ def open(name, mode='r'):
 open.__doc__ = open_doc
 file.__doc__ = file_doc
     
-__builtin__.file =  file
-__builtin__.open = open
 
+def replace_builtins():
+    __builtin__.file =  file
+    __builtin__.open = open
+
+def restore_builtins():
+    __builtin__.file =  original_file
+    __builtin__.open = original_open
+    
 
 ################################
 
