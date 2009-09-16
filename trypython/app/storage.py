@@ -18,11 +18,13 @@ from System.IO import (
 class file(object):
     mode = None
     name = None
+    closed = False
     
     def __init__(self, name, mode='r'):
         self.name = name
         self.mode = mode
         self._data = ''
+        self.closed = False
         if mode == 'r':
             self._mode = FileMode.Open
             self._open_read()
@@ -38,7 +40,7 @@ class file(object):
             raise IOError('No such file or directory: %r' % self.name)
     
     def _open_write(self):
-        pass
+        SaveFile(self.name, '')
     
         
     def read(self):
@@ -48,17 +50,17 @@ class file(object):
         self._data += data
     
     def close(self):
+        if self.closed:
+            return
+        self.closed = True
         if self.mode.startswith('w'):
             SaveFile(self.name, self._data)
-
-    def __dir__(self):
-        originals = set(dir(original_file))
-        print '\n\nREPR'
-        print '\n    '.join(originals)
-        return [name for name in dir(file) if name in originals]
                 
     def __repr__(self):
         return '<open file %r mode %r>' % (self.name, self.mode)
+        
+    def __del__(self):
+        self.close()
 
 
 def open(name, mode='r'):
@@ -91,10 +93,7 @@ from System.IO import (
 
 def CheckForFile(filename):
     store = IsolatedStorageFile.GetUserStoreForApplication()
-    files = store.GetFileNames('.')
-    if filename not in files:
-        return False
-    return True
+    return store.FileExists(filename)
 
 
 def DeleteFile(filename):
@@ -125,25 +124,4 @@ def LoadFile(filename):
 
     return data
 
-#########################################
-# Public API
-
-filename = 'twitter_data.txt'
-
-def GetStored():
-    data = LoadFile(filename)
-    return data.split('\n', 1)
-    
-    
-def PutStored(username, password):
-    data = username + '\n' + password
-    SaveFile(filename, data)
-
-
-def DeleteStored():
-    DeleteFile(filename)
-    
-
-def CheckStored():
-    return CheckForFile(filename)
     
