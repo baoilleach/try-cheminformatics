@@ -46,19 +46,33 @@ class file(object):
     
         
     def read(self, nbytes=None):
+        if self.mode != 'r':
+            raise IOError('Bad file descriptor')
         if self.closed:
             raise ValueError('I/O operation on closed file')
+        pos = self._position
+        if pos == 0:
+            self._open_read()
         if nbytes is None:
             nbytes = len(self._data)
-        pos = self._position
         data = self._data[pos: pos + nbytes]
         self._position += len(data)
         return data
     
     def write(self, data):
+        if self.mode != 'w':
+            raise IOError('Bad file descriptor')
         if self.closed:
             raise ValueError('I/O operation on closed file')
-        self._data += data
+        if not data:
+            return
+        
+        position = self._position
+        start = self._data[:position]
+        padding = (position - len(start)) * '\x00'
+        end = self._data[position + len(data):]
+        self._data = start + padding + data + end
+        self._position = position + len(data)
     
     def close(self):
         if self.closed:
@@ -81,9 +95,17 @@ class file(object):
         if position < 0:
             raise IOError('Invalid Argument')
         self._position = position
-    
+
     def tell(self):
         return self._position
+
+
+    def flush(self):
+        if self.mode != 'w':
+            raise IOError('Bad file descriptor')
+        SaveFile(self.name, self._data)
+
+
 
 def open(name, mode='r'):
     return file(name, mode)

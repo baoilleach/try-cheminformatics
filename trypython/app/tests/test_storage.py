@@ -78,6 +78,20 @@ class TestFileType(miniunit.TestCase):
         self.assertEqual(data, source_data)
     
     
+    def test_read_to_write(self):
+        handle = storage.file(FILE, 'w')
+        handle.write('some new data')
+        handle.close()
+        
+        h = storage.file(FILE)
+        self.assertRaises(IOError, h.write, 'foobar')
+
+        
+    def test_write_to_read(self):
+        h = storage.file(FILE, 'w')
+        self.assertRaises(IOError, h.read)
+    
+    
     def test_multiple_writes(self):
         handle = storage.file(FILE, 'w')
         handle.write('foo')
@@ -140,7 +154,6 @@ class TestFileType(miniunit.TestCase):
         self.assertRaises(ValueError, handle.read)
         
         
-    
     def test_read_seek_tell(self):
         h = storage.file(FILE, 'w')
         h.write('foobar')
@@ -170,3 +183,52 @@ class TestFileType(miniunit.TestCase):
         self.assertRaises(TypeError, h.seek, None)
         
         # test deprecation warning for float value?
+
+
+    def test_write_seek_tell(self):
+        h = storage.file(FILE, 'w')
+        self.assertEqual(h.tell(), 0)
+        
+        h.write('f')
+        self.assertEqual(h.tell(), 1)
+        h.seek(2)
+        self.assertEqual(h.tell(), 2)
+        h.write('g')
+        h.close()
+        self.assertEqual(storage.file(FILE).read(), 'f\x00g')
+        
+        h = storage.file(FILE, 'w')
+        h.write('f')
+        h.seek(0)
+        h.write('g')
+        h.close()
+        self.assertEqual(storage.file(FILE).read(), 'g')
+        
+        h = storage.file(FILE, 'w')
+        h.seek(1000)
+        h.write('g')
+        h.close()
+        
+        expected = '\x00' * 1000 + 'g'
+        self.assertEqual(storage.file(FILE).read(), expected)
+        
+        self.assertRaises(IOError, h.seek, -1)
+        self.assertRaises(TypeError, h.seek, None)
+
+    
+    def test_flush(self):
+        h = storage.file(FILE, 'w')
+        h.write('foo')
+        
+        read_handle = storage.file(FILE)
+        self.assertEqual(read_handle.read(), '')
+        
+        h.flush()
+        self.assertEqual(read_handle.read(), 'foo')
+        h.close()
+        
+        self.assertRaises(IOError, read_handle.flush)
+        read_handle.close()
+        
+    
+        
