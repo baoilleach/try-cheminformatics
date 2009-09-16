@@ -121,18 +121,9 @@ def replace_builtins():
 def restore_builtins():
     __builtin__.file =  original_file
     __builtin__.open = original_open
-    
+
 
 ################################
-
-
-from System.IO.IsolatedStorage import (
-    IsolatedStorageFile, IsolatedStorageFileStream
-)
-
-from System.IO import (
-    FileMode, StreamReader, StreamWriter
-)
 
 
 def CheckForFile(filename):
