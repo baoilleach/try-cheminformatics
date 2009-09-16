@@ -13,7 +13,7 @@ class TestFileType(miniunit.TestCase):
         gc.collect()
         if storage.CheckForFile(FILE):
             storage.DeleteFile(FILE)
-    
+
     def test_patching(self):
         storage.replace_builtins()
         try:
@@ -128,3 +128,45 @@ class TestFileType(miniunit.TestCase):
         
         handle.close()
         self.assertTrue(handle.closed)
+        
+        self.assertRaises(ValueError, handle.write, 'foo')
+        
+        handle = storage.file(FILE)
+        self.assertFalse(handle.closed)
+        
+        handle.close()
+        self.assertTrue(handle.closed)
+        
+        self.assertRaises(ValueError, handle.read)
+        
+        
+    
+    def test_read_seek_tell(self):
+        h = storage.file(FILE, 'w')
+        h.write('foobar')
+        h.close()
+        
+        h = storage.file(FILE)
+        self.assertEqual(h.tell(), 0)
+        
+        self.assertEqual(h.read(0), '')
+        self.assertEqual(h.read(1), 'f')
+        self.assertEqual(h.tell(), 1)
+        h.seek(0)
+        self.assertEqual(h.tell(), 0)
+        self.assertEqual(h.read(1), 'f')
+        
+        self.assertEqual(h.read(), 'oobar')
+        self.assertEqual(h.read(), '')
+        
+        h.seek(0)
+        self.assertEqual(h.read(100), 'foobar')
+        
+        h.seek(1000)
+        self.assertEqual(h.tell(), 1000)
+        self.assertEqual(h.read(100), '')
+        
+        self.assertRaises(IOError, h.seek, -1)
+        self.assertRaises(TypeError, h.seek, None)
+        
+        # test deprecation warning for float value?

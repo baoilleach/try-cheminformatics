@@ -23,6 +23,7 @@ class file(object):
     def __init__(self, name, mode='r'):
         self.name = name
         self.mode = mode
+        self._position = 0
         self._data = ''
         self.closed = False
         if mode == 'r':
@@ -38,15 +39,25 @@ class file(object):
     def _open_read(self):
         if not CheckForFile(self.name):
             raise IOError('No such file or directory: %r' % self.name)
+        self._data = LoadFile(self.name)
     
     def _open_write(self):
         SaveFile(self.name, '')
     
         
-    def read(self):
-        return LoadFile(self.name)
+    def read(self, nbytes=None):
+        if self.closed:
+            raise ValueError('I/O operation on closed file')
+        if nbytes is None:
+            nbytes = len(self._data)
+        pos = self._position
+        data = self._data[pos: pos + nbytes]
+        self._position += len(data)
+        return data
     
     def write(self, data):
+        if self.closed:
+            raise ValueError('I/O operation on closed file')
         self._data += data
     
     def close(self):
@@ -62,6 +73,17 @@ class file(object):
     def __del__(self):
         self.close()
 
+    def seek(self, position):
+        try:
+            position = int(position)
+        except:
+            raise TypeError('%s cannot be used as an index' % type(position))
+        if position < 0:
+            raise IOError('Invalid Argument')
+        self._position = position
+    
+    def tell(self):
+        return self._position
 
 def open(name, mode='r'):
     return file(name, mode)
