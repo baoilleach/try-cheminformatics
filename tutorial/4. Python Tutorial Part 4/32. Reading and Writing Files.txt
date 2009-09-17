@@ -112,7 +112,7 @@ Rather than have users be constantly writing and debugging code to save complica
 
 If you have an object ``x``, and a file object ``f`` that’s been opened for writing, the simplest way to pickle the object takes only one line of code:
 
-.. code-block:: pycthon
+.. code-block:: pycon
 
     >>> import pickle
     >>> x = {'name': 'Fred', 'age': 32}
@@ -122,7 +122,7 @@ If you have an object ``x``, and a file object ``f`` that’s been opened for wr
 
 To unpickle the object again, if f is a file object which has been opened for reading:
 
-.. code-block:: python
+.. code-block:: pycon
 
     >>> f = open('something.pickle', 'rb')
     >>> x = pickle.load(f)
