@@ -231,4 +231,128 @@ class TestFileType(miniunit.TestCase):
         read_handle.close()
         
     
+    def test_read_write_binary(self):
+        h = storage.file(FILE, 'w')
+        h.write('foo\nbar\n')
+        h.close()
+    
+        h = storage.file(FILE)
+        self.assertEqual(h.read(), 'foo\nbar\n')
+        h.close()
         
+        h = storage.file(FILE, 'rb')
+        self.assertEqual(h.read(), 'foo\r\nbar\r\n')
+        h.close()
+        
+        h = storage.file(FILE, 'wb')
+        h.write('foo\nbar\n')
+        h.close()
+        
+        h = storage.file(FILE, 'rb')
+        self.assertEqual(h.read(), 'foo\nbar\n')
+        h.close()
+        
+        h = storage.file(FILE, 'w')
+        h.write('foo\nbar\n')
+        h.close()
+        
+        h = storage.file(FILE, 'rb')
+        self.assertEqual(h.read(), 'foo\r\nbar\r\n')
+        h.close()
+
+    
+    def test_assorted_members(self):
+        h = storage.file(FILE, 'w')
+        self.assertEquals(h.encoding, None)
+        self.assertEqual(h.errors, None)
+        self.assertEqual(h.newlines, None)
+        self.assertFalse(h.isatty())
+        h.close()
+        
+        h = storage.file(FILE)
+        self.assertEquals(h.encoding, None)
+        self.assertEqual(h.errors, None)
+        self.assertEqual(h.newlines, None)
+        self.assertFalse(h.isatty())
+        h.close()
+    
+    
+    def test_fileno(self):
+        h = storage.file(FILE, 'w')
+        h2 = storage.file(FILE)
+        fileno1 = h.fileno()
+        fileno2 = h2.fileno()
+        
+        self.assertTrue(isinstance(fileno1, int))
+        self.assertTrue(isinstance(fileno2, int))
+        
+        self.assertTrue(fileno1 > 2)
+        self.assertTrue(fileno2 > 2)
+        
+        self.assertNotEqual(fileno1, fileno2)
+        
+        h.close()
+        h2.close()
+        
+    
+    def test__iter__(self):
+        # not as hard as you might think
+        h = storage.file(FILE, 'w')
+        i = h.__iter__()
+        self.assertTrue(h is i)
+        h.close()
+    
+    
+    def test_next(self):
+        h = storage.file(FILE, 'w')
+        h.write('foo\nbar\nbaz\n')
+        self.assertRaises(IOError, h.next)
+        h.close()
+        
+        h = storage.file(FILE)
+        self.assertEqual(h.next(), 'foo\n')
+        
+        self.assertRaises(ValueError, h.read)
+        
+        self.assertEqual(h.next(), 'bar\n')
+        self.assertEqual(h.next(), 'baz\n')
+        self.assertRaises(StopIteration, h.next)
+        h.close()
+        
+        h = storage.file(FILE)
+        self.assertEqual(h.next(), 'foo\n')
+        h.seek(1)
+        self.assertEqual(h.next(), 'oo\n')
+        
+        h.seek(3)
+        self.assertEqual(h.read(4), '\nbar')
+        self.assertEqual(h.next(), '\n')
+        
+"""
+TODO:
+
+* Deprecation warning for passing a float value to seek
+* We currently accept a string argument to seek if it can be successfully
+  converted to an int!
+* 'whence' argument to seek not implemented
+* Copy docstrings for all methods (and property descriptors)
+* Missing members:
+
+    - readinto
+    - readline
+    - readlines
+    - softspace
+    - truncate
+    - writelines
+    - xreadlines
+
+* Only supported modes are r, rb, w, wb (universal mode and append modes, plus
+  read and write modes missing)
+* Missing protocol methods needed when we move to 2.6:
+
+    - __enter__ and __exit__
+    - __format__
+
+* Implementations of os and os.path that work with IsolatedStorage and this
+  version of file.
+"""
