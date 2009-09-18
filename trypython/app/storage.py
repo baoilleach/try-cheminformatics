@@ -65,7 +65,7 @@ class file(object):
         SaveFile(self.name, '')
     
         
-    def read(self, nbytes=None):
+    def read(self, size=None):
         if self.mode not in READ_MODES:
             raise IOError('Bad file descriptor')
         if self.closed:
@@ -76,9 +76,9 @@ class file(object):
         if pos == 0:
             # could do this on every read?
             self._open_read()
-        if nbytes is None:
-            nbytes = len(self._data)
-        data = self._data[pos: pos + nbytes]
+        if size is None:
+            size = len(self._data)
+        data = self._data[pos: pos + size]
         self._position += len(data)
         return data
     
@@ -161,23 +161,43 @@ class file(object):
         return self.readline()
     
     
-    def readline(self):
+    def readline(self, size=-1):
         if self.mode in WRITE_MODES:
             raise IOError('Bad file descriptor')
         
         if self._position >= len(self._data):
             return ''
         
+        try:
+            # this works on strings when it shouldn't...
+            size = int(size)
+        except:
+            raise TypeError('an integer is required')
+        
         position = self._position
         remaining = self._data[position:]
         poz = remaining.find('\n')
+        
         if poz == -1:
-            self._position = len(self._data)
-            return remaining
-        self._position = position + poz + 1
-        return remaining[:poz + 1]
+            if size == -1 or size > len(remaining):
+                self._position = len(self._data)
+                return remaining
+            actual = remaining[:size]
+            self._position += len(actual)
+            return actual
+        
+        if size == -1:
+            self._position = position + poz + 1
+            return remaining[:poz + 1]
+        
+        actual = remaining[:poz + 1]
+        if len(actual) <= size:
+            self._position += len(actual)
+            return actual
+        self._position += size
+        return actual[:size]
 
-
+    
 def open(name, mode='r'):
     return file(name, mode)
 

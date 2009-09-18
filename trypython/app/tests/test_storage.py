@@ -327,13 +327,41 @@ class TestFileType(miniunit.TestCase):
         h.seek(3)
         self.assertEqual(h.read(4), '\nbar')
         self.assertEqual(h.next(), '\n')
+    
+    
+    def test_readline(self):
+        h = storage.file(FILE, 'w')
+        h.write('foo\nbar\nbaz\n')
+        self.assertRaises(IOError, h.readline)
+        h.close()
+        
+        h = storage.file(FILE)
+        self.assertEqual(h.readline(), 'foo\n')
+        self.assertEqual(h.tell(), 4)
+        h.seek(0)
+        self.assertEqual(h.readline(), 'foo\n')
+        
+        self.assertRaises(TypeError, h.readline, None)
+        self.assertEqual(h.readline(0), '')
+        self.assertEqual(h.readline(1), 'b')
+        self.assertEqual(h.readline(100), 'ar\n')
+        self.assertEqual(h.tell(), 8)
+        self.assertEqual(h.readline(-1), 'baz\n')
+        self.assertEqual(h.tell(), 12)
+        self.assertEqual(h.readline(), '')
+        self.assertEqual(h.tell(), 12)
+        h.close()
+        
+        
         
 """
 TODO:
 
-* Deprecation warning for passing a float value to seek
-* We currently accept a string argument to seek if it can be successfully
-  converted to an int!
+* Deprecation warning for passing a float value to seek and readline
+* We currently accept a string argument to seek and readline if it can be
+  successfully converted to an int!
+* Passing a non-integer value to read is not handled properly. (Should be a
+  TypeError as with seek and readline.)
 * 'whence' argument to seek not implemented
 * Copy docstrings for all methods (and property descriptors)
 * Missing members:
@@ -346,7 +374,7 @@ TODO:
     - writelines
     - xreadlines
 
-* Only supported modes are r, rb, w, wb (universal mode and append modes, plus
+* Only supported modes are r, rb, w, wb (universal mode / append modes /
   read and write modes missing)
 * Missing protocol methods needed when we move to 2.6:
 
