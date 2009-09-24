@@ -23,9 +23,15 @@ from context import banner, home, ps1, ps2
 
 from utils import (
     empty_or_comment_only, get_indent, is_terminator,
-    magic_function, invoke, blow_up, _debug
+    invoke, blow_up, _debug
 )
 
+
+@invoke
+def gohome():
+    "Take me away from it all."
+    HtmlPage.Window.Navigate(Uri(home))
+    return 'Leaving...'
 
 FF3_RE = r'(Firefox/3\.0\.\d)'
 FF3_MESSAGE = (
@@ -37,6 +43,7 @@ FF3_MESSAGE = (
 
 # Magic flag from the codeop module
 PyCF_DONT_IMPLY_DEDENT = 0x200
+
 
 class ConsoleTextBox(TextBox):
     def __new__(cls, printer, context, root):
@@ -63,13 +70,13 @@ class ConsoleTextBox(TextBox):
         def reset():
             "Clear the console, its history and the execution context."
             self._reset_needed = True
+            return 'resetting'
         def input(prompt='Input:'):
             'input([prompt]) -> value\n\nEquivalent to eval(raw_input(prompt)).'
             return eval(self.context['raw_input'](prompt), self.context, self.context)
-        gohome = invoke(lambda: HtmlPage.Window.Navigate(Uri(home)))
         
-        self.original_context['reset'] = magic_function(reset, 'resetting')
-        self.original_context['gohome'] = magic_function(gohome,'Leaving...')
+        self.original_context['reset'] = reset
+        self.original_context['gohome'] = gohome
         self.original_context['exit'] = 'There is no escape...'
         self.original_context['raw_input'] = self.raw_input
         self.original_context['input'] = input
@@ -227,6 +234,26 @@ class ConsoleTextBox(TextBox):
             # needed or we get a SyntaxError
             self.Text = ''
             self.printer.print_lines(contents)
+            self.printer.scroll()
+            return
+        
+        # manual handling unfortunately
+        # means things like trailing comments break
+        # these functions; so not ideal
+        stripped = contents.rstrip()
+        if stripped == 'gohome':
+            gohome()
+        elif stripped == 'reset':
+            contents = 'reset()'
+        elif stripped == 'import this':
+            # import hook so that importing *worked*
+            # would be a better solution...
+            self.printer.print_lines(stripped)
+            self.Text = ''
+            self.history.append(contents)
+            import this
+            self.context['this'] = this
+            self.printer.set_prompt()
             self.printer.scroll()
             return
         

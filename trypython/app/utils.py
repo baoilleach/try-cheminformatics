@@ -82,21 +82,6 @@ def is_terminator(line):
     return False
 
 
-class magic_function(object):
-    def __init__(self, function, string):
-        self.function = function
-        self.string = string
-        self.__doc__ = function.__doc__
-        
-    def __call__(self):
-        self.function()
-        return self.string
-        
-    def __repr__(self):
-        self.function()
-        return self.string
-
-
 def blow_up():
     raise Exception('boom')
 
