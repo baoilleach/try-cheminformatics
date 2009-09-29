@@ -1,1 +1,1 @@
-Chiron\Chiron.exe /w /b:trypython/index.html
+Chiron\Chiron.exe /w 
