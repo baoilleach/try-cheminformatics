@@ -5,6 +5,7 @@ original_open = __builtin__.open
 open_doc = open.__doc__
 file_doc = file.__doc__
 
+from warnings import warn
 
 from System.IO.IsolatedStorage import (
     IsolatedStorageFile, IsolatedStorageFileStream
@@ -64,7 +65,16 @@ class file(object):
     def _open_write(self):
         SaveFile(self.name, '')
     
-        
+    
+    def _check_int_argument(self, arg):
+        if isinstance(arg, float):
+            arg = int(arg)
+            warn(DeprecationWarning('integer argument expected got float'))
+        elif not isinstance(arg, (int, long)):
+            raise TypeError('%s cannot be used as an index' % type(arg))
+        return arg
+
+
     def read(self, size=None):
         if self.mode not in READ_MODES:
             raise IOError('Bad file descriptor')
@@ -72,12 +82,17 @@ class file(object):
             raise ValueError('I/O operation on closed file')
         if self._in_iter:
             raise ValueError('Mixing iteration and read methods would lose data')
+        
         pos = self._position
         if pos == 0:
             # could do this on every read?
             self._open_read()
+        
         if size is None:
             size = len(self._data)
+        else:
+            size = self._check_int_argument(size)
+        
         data = self._data[pos: pos + size]
         self._position += len(data)
         return data
@@ -107,8 +122,8 @@ class file(object):
         self.closed = True
         if self.mode.startswith('w'):
             SaveFile(self.name, self._data)
-                
-            
+
+
     def __repr__(self):
         return '<open file %r mode %r>' % (self.name, self.mode)
         
@@ -119,11 +134,7 @@ class file(object):
         
     def seek(self, position):
         # 'whence' argument to seek not yet supported
-        try:
-            # this will work for some strings :-o
-            position = int(position)
-        except:
-            raise TypeError('%s cannot be used as an index' % type(position))
+        position = self._check_int_argument(position)
         if position < 0:
             raise IOError('Invalid Argument')
         self._in_iter = False
@@ -139,7 +150,7 @@ class file(object):
             raise IOError('Bad file descriptor')
         SaveFile(self.name, self._data)
 
-    
+
     def isatty(self):
         return False
 
@@ -168,11 +179,7 @@ class file(object):
         if self._position >= len(self._data):
             return ''
         
-        try:
-            # this works on strings when it shouldn't...
-            size = int(size)
-        except:
-            raise TypeError('an integer is required')
+        size = self._check_int_argument(size)
         
         position = self._position
         remaining = self._data[position:]
@@ -197,7 +204,23 @@ class file(object):
         self._position += size
         return actual[:size]
 
+
+    def readlines(self, size=-1):
+        if self.mode in WRITE_MODES:
+            raise IOError('Bad file descriptor')
+        
+        # argument actually ignored
+        self._check_int_argument(size)
+
+        result = list(self)
+        self._in_iter = False
+        return result
     
+    
+    def xreadlines(self):
+        return self
+
+        
 def open(name, mode='r'):
     return file(name, mode)
 

@@ -229,8 +229,8 @@ class TestFileType(miniunit.TestCase):
         
         self.assertRaises(IOError, read_handle.flush)
         read_handle.close()
-        
-    
+
+
     def test_read_write_binary(self):
         h = storage.file(FILE, 'w')
         h.write('foo\nbar\n')
@@ -351,6 +351,27 @@ class TestFileType(miniunit.TestCase):
         self.assertEqual(h.readline(), '')
         self.assertEqual(h.tell(), 12)
         h.close()
+    
+    
+    def test_readlines(self):
+        h = storage.file(FILE, 'w')
+        h.write('foo\nbar\nbaz\n')
+        self.assertRaises(IOError, h.readlines)
+        h.close()
+        
+        h = storage.file(FILE)
+        self.assertEqual(h.readlines(), ['foo\n', 'bar\n', 'baz\n'])
+        self.assertEqual(h.readlines(), [])
+        h.seek(0)
+        
+        self.assertRaises(TypeError, h.readline, None)
+        self.assertEqual(h.readlines(0), ['foo\n', 'bar\n', 'baz\n'])
+        h.close()
+    
+    
+    def test_xreadlines(self):
+        h = storage.file(FILE, 'w')
+        self.assertTrue(h.xreadlines() is h)
         
         
         
@@ -366,9 +387,7 @@ TODO:
 * Copy docstrings for all methods (and property descriptors)
 * Missing members:
 
-    - readinto
-    - readline
-    - readlines
+    - readinto  (deprecated)
     - softspace
     - truncate
     - writelines
