@@ -42,6 +42,7 @@ class file(object):
         self._binary = mode.endswith('b')
         self._fileno = get_new_fileno()
         self._in_iter = False
+        self._softspace = 0
         
         if mode in READ_MODES:
             self._mode = FileMode.Open
@@ -71,7 +72,7 @@ class file(object):
             arg = int(arg)
             warn(DeprecationWarning('integer argument expected got float'))
         elif not isinstance(arg, (int, long)):
-            raise TypeError('%s cannot be used as an index' % type(arg))
+            raise TypeError('Integer argument expected. Got %s' % type(arg))
         return arg
 
 
@@ -103,6 +104,9 @@ class file(object):
             raise IOError('Bad file descriptor')
         if self.closed:
             raise ValueError('I/O operation on closed file')
+
+        self._softspace = 0
+        
         if not data:
             return
         if not self._binary:
@@ -220,7 +224,25 @@ class file(object):
     def xreadlines(self):
         return self
 
-        
+    
+    def _set_softspace(self, value):
+        self._softspace = self._check_int_argument(value)
+    
+    def _get_softspace(self):
+        return self._softspace
+    
+    softspace = property(_get_softspace, _set_softspace)
+    
+    
+    def truncate(self, size=None):
+        if self.mode in READ_MODES:
+            raise IOError('Bad file descriptor')
+        if size is not None:
+            size = self._check_int_argument(size)
+            if size < 0:
+                raise IOError('INvalid argument')
+    
+    
 def open(name, mode='r'):
     return file(name, mode)
 

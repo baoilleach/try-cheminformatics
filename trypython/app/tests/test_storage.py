@@ -372,26 +372,55 @@ class TestFileType(miniunit.TestCase):
     def test_xreadlines(self):
         h = storage.file(FILE, 'w')
         self.assertTrue(h.xreadlines() is h)
+        h.close()
         
         
+    def test_softspace(self):
+        h = storage.file(FILE, 'w')
+        h.softspace = 1
+        h.write('blam')
+        self.assertEqual(h.softspace, 0)
         
+        def set_softspace():
+            h.softspace = 'kablooie'
+        self.assertRaises(TypeError, set_softspace)
+        
+        h.close()
+    
+    
+    def test_truncate(self):
+        h = storage.file(FILE, 'w')
+        h.write('kabloooie')
+        
+        self.assertRaises(IOError, storage.file(FILE).truncate)
+        self.assertRaises(TypeError, h.truncate, 'foo')
+        self.assertRaises(IOError, h.truncate, -1)
+        
+        h.seek(3)
+        h.truncate()
+        h.flush()
+        self.assertEqual(storage.file(FILE).read(), 'kab')
+        
+        h.truncate(10)
+        h.flush()
+        self.assertEqual(storage.file(FILE).read(), 'kab\x00\x00\x00\x00\x00\x00\x00')
+        self.assertEqual(h.tell(), 3)
+        
+        h.truncate(2)
+        self.assertEqual(h.tell(), 3)
+        
+    
 """
 TODO:
 
-* Deprecation warning for passing a float value to seek and readline
-* We currently accept a string argument to seek and readline if it can be
-  successfully converted to an int!
-* Passing a non-integer value to read is not handled properly. (Should be a
-  TypeError as with seek and readline.)
+* repr for a closed file should be different
 * 'whence' argument to seek not implemented
 * Copy docstrings for all methods (and property descriptors)
 * Missing members:
 
     - readinto  (deprecated)
-    - softspace
     - truncate
     - writelines
-    - xreadlines
 
 * Only supported modes are r, rb, w, wb (universal mode / append modes /
   read and write modes missing)
