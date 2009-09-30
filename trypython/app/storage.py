@@ -15,6 +15,9 @@ from System.IO import (
     FileMode, StreamReader, StreamWriter
 )
 
+# bad for introspection?
+DEFAULT = object()
+
 READ_MODES = ('r', 'rb')
 WRITE_MODES = ('w', 'wb')
 
@@ -76,7 +79,7 @@ class file(object):
         return arg
 
 
-    def read(self, size=None):
+    def read(self, size=DEFAULT):
         if self.mode not in READ_MODES:
             raise IOError('Bad file descriptor')
         if self.closed:
@@ -89,7 +92,7 @@ class file(object):
             # could do this on every read?
             self._open_read()
         
-        if size is None:
+        if size is DEFAULT:
             size = len(self._data)
         else:
             size = self._check_int_argument(size)
@@ -129,7 +132,10 @@ class file(object):
 
 
     def __repr__(self):
-        return '<open file %r mode %r>' % (self.name, self.mode)
+        state = 'open'
+        if self.closed:
+            state = 'closed'
+        return '<%s file %r mode %r>' % (state, self.name, self.mode)
         
     
     def __del__(self):
@@ -176,28 +182,32 @@ class file(object):
         return self.readline()
     
     
-    def readline(self, size=-1):
+    def readline(self, size=DEFAULT):
         if self.mode in WRITE_MODES:
             raise IOError('Bad file descriptor')
         
+        if size is not DEFAULT:
+            size = self._check_int_argument(size)
+            if size < 0:
+                # treat negative integers the same as DEFAULT
+                size = DEFAULT
+        
         if self._position >= len(self._data):
             return ''
-        
-        size = self._check_int_argument(size)
         
         position = self._position
         remaining = self._data[position:]
         poz = remaining.find('\n')
         
         if poz == -1:
-            if size == -1 or size > len(remaining):
+            if size is DEFAULT or size > len(remaining):
                 self._position = len(self._data)
                 return remaining
             actual = remaining[:size]
             self._position += len(actual)
             return actual
         
-        if size == -1:
+        if size is DEFAULT:
             self._position = position + poz + 1
             return remaining[:poz + 1]
         
@@ -209,12 +219,13 @@ class file(object):
         return actual[:size]
 
 
-    def readlines(self, size=-1):
+    def readlines(self, size=DEFAULT):
         if self.mode in WRITE_MODES:
             raise IOError('Bad file descriptor')
         
         # argument actually ignored
-        self._check_int_argument(size)
+        if size is not DEFAULT:
+            self._check_int_argument(size)
 
         result = list(self)
         self._in_iter = False
@@ -234,14 +245,29 @@ class file(object):
     softspace = property(_get_softspace, _set_softspace)
     
     
-    def truncate(self, size=None):
+    def truncate(self, size=DEFAULT):
         if self.mode in READ_MODES:
             raise IOError('Bad file descriptor')
-        if size is not None:
+        if size is not DEFAULT:
             size = self._check_int_argument(size)
             if size < 0:
                 raise IOError('INvalid argument')
+        else:
+            size = self._position
+        data = self._data[:size]
+        self._data = data + (size - len(data)) * '\x00'
+        self.flush()
+        
     
+    def writelines(self, sequence):
+        if self.mode not in WRITE_MODES:
+            raise IOError('Bad file descriptor')
+        
+        if getattr(sequence, '__iter__', None) is None:
+            raise TypeError('writelines() requires an iterable argument')
+        
+        for line in sequence:
+            self.write(line)
     
 def open(name, mode='r'):
     return file(name, mode)

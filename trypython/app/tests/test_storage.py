@@ -107,6 +107,12 @@ class TestFileType(miniunit.TestCase):
         string = '<open file %r mode %r>'
         self.assertEqual(repr(read), string % (FILE, 'r'))
         self.assertEqual(repr(write), string % (FILE, 'w'))
+        
+        string = '<closed file %r mode %r>'
+        write.close()
+        read.close()
+        self.assertEqual(repr(read), string % (FILE, 'r'))
+        self.assertEqual(repr(write), string % (FILE, 'w'))
     
     
     def test_invalid_file_mode(self):
@@ -398,16 +404,32 @@ class TestFileType(miniunit.TestCase):
         
         h.seek(3)
         h.truncate()
-        h.flush()
         self.assertEqual(storage.file(FILE).read(), 'kab')
         
         h.truncate(10)
-        h.flush()
         self.assertEqual(storage.file(FILE).read(), 'kab\x00\x00\x00\x00\x00\x00\x00')
         self.assertEqual(h.tell(), 3)
         
         h.truncate(2)
         self.assertEqual(h.tell(), 3)
+        h.close()
+
+
+    def test_writelines(self):
+        h = storage.file(FILE, 'w')
+        
+        
+        self.assertRaises(IOError, storage.file(FILE).writelines, [])
+        self.assertRaises(TypeError, h.writelines, object())
+        
+        h.write('blah')
+        h.writelines(['\n','q', 'w', 'e'])
+        h.close()
+        
+        f = storage.file(FILE)
+        data = f.read()
+        f.close()
+        self.assertEqual(data, 'blah\nqwe')
         
     
 """
@@ -419,8 +441,6 @@ TODO:
 * Missing members:
 
     - readinto  (deprecated)
-    - truncate
-    - writelines
 
 * Only supported modes are r, rb, w, wb (universal mode / append modes /
   read and write modes missing)
