@@ -430,6 +430,31 @@ class TestFileType(miniunit.TestCase):
         data = f.read()
         f.close()
         self.assertEqual(data, 'blah\nqwe')
+    
+    def test_append_mode(self):
+        source_data = 'Some text\nwith newlines\n'
+        
+        handle = storage.open(FILE, 'ab')
+        
+        f = storage.open(FILE)
+        self.assertEqual(f.read(), '')
+        f.close()
+        
+        handle.write(source_data)
+        handle.close()
+        
+        handle = storage.open(FILE, 'rb')
+        self.assertEqual(handle.read(), source_data)
+        handle.close()
+        
+        handle = storage.open(FILE, 'a')
+        self.assertEqual(handle.tell(), len(source_data))
+        handle.write(source_data[::-1])
+        handle.close()
+        
+        handle = storage.open(FILE)
+        self.assertEqual(handle.read(), source_data + source_data[::-1])
+        handle.close()
         
     
 """
@@ -442,8 +467,10 @@ TODO:
 
     - readinto  (deprecated)
 
-* Only supported modes are r, rb, w, wb (universal mode / append modes /
-  read and write modes missing)
+* Behavior of tell() and seek() for text mode files may not be correct (it
+  should treat '\n' as '\r\n').
+* Only supported modes are r, rb, w, wb, a, ab (universal mode / read and write
+  modes missing)
 * Missing protocol methods needed when we move to 2.6:
 
     - __enter__ and __exit__

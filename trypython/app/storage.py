@@ -19,7 +19,7 @@ from System.IO import (
 DEFAULT = object()
 
 READ_MODES = ('r', 'rb')
-WRITE_MODES = ('w', 'wb')
+WRITE_MODES = ('w', 'wb', 'a', 'ab')
 
 _fileno_counter = 2
 def get_new_fileno():
@@ -48,13 +48,14 @@ class file(object):
         self._softspace = 0
         
         if mode in READ_MODES:
-            self._mode = FileMode.Open
             self._open_read()
         elif mode in WRITE_MODES:
-            self._mode = FileMode.Create
-            self._open_write()
+            if mode.startswith('a'):
+                self._open_append()
+            else:
+                self._open_write()
         else:
-            raise ValueError("The only supported modes are r(b) and w(b), not %r" % mode)
+            raise ValueError("The only supported modes are r(b), w(b) and a(b), not %r" % mode)
     
     
     def _open_read(self):
@@ -68,6 +69,14 @@ class file(object):
         
     def _open_write(self):
         SaveFile(self.name, '')
+        
+    
+    def _open_append(self):
+        if CheckForFile(self.name):
+            self._open_read()
+            self._position = len(self._data)
+        else:
+            self._open_write()
     
     
     def _check_int_argument(self, arg):
@@ -127,7 +136,7 @@ class file(object):
         if self.closed:
             return
         self.closed = True
-        if self.mode.startswith('w'):
+        if self.mode in WRITE_MODES:
             SaveFile(self.name, self._data)
 
 
@@ -268,7 +277,8 @@ class file(object):
         
         for line in sequence:
             self.write(line)
-    
+
+
 def open(name, mode='r'):
     return file(name, mode)
 
