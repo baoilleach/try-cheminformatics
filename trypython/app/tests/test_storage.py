@@ -221,7 +221,16 @@ class TestFileType(miniunit.TestCase):
         self.assertRaises(IOError, h.seek, -1)
         self.assertRaises(TypeError, h.seek, None)
 
-    
+    def test_seek_with_whence(self):
+        h = storage.file(FILE, 'w')
+        h.write('foo bar baz')
+        h.close()
+        
+        h = storage.file(FILE)
+        self.assertRaises(IOError, h.seek, 0, 3)
+        self.assertRaises(TypeError, h.seek, 0, None)
+        
+        
     def test_flush(self):
         h = storage.file(FILE, 'w')
         h.write('foo')
@@ -460,9 +469,10 @@ class TestFileType(miniunit.TestCase):
 """
 TODO:
 
-* repr for a closed file should be different
 * 'whence' argument to seek not implemented
 * Copy docstrings for all methods (and property descriptors)
+* Members like 'mode' should be read only
+* The IOError exceptions raised don't have an associated errno
 * Missing members:
 
     - readinto  (deprecated)
@@ -476,6 +486,7 @@ TODO:
     - __enter__ and __exit__
     - __format__
 
-* Implementations of os and os.path that work with IsolatedStorage and this
-  version of file.
+* Separate out the IsolatedStorage parts into a separate backend module and
+  make the backend pluggable.
+* Implementations of os and os.path that work with storage
 """

@@ -82,7 +82,7 @@ class file(object):
     def _check_int_argument(self, arg):
         if isinstance(arg, float):
             arg = int(arg)
-            warn(DeprecationWarning('integer argument expected got float'))
+            warn(DeprecationWarning('Integer argument expected got float'))
         elif not isinstance(arg, (int, long)):
             raise TypeError('Integer argument expected. Got %s' % type(arg))
         return arg
@@ -151,11 +151,14 @@ class file(object):
         self.close()
 
         
-    def seek(self, position):
-        # 'whence' argument to seek not yet supported
+    def seek(self, position, whence=0):
         position = self._check_int_argument(position)
+        whence = self._check_int_argument(whence)
         if position < 0:
             raise IOError('Invalid Argument')
+        if not 0 <= whence <= 2:
+            raise IOError('Invalid Argument')
+
         self._in_iter = False
         self._position = position
 
@@ -260,7 +263,7 @@ class file(object):
         if size is not DEFAULT:
             size = self._check_int_argument(size)
             if size < 0:
-                raise IOError('INvalid argument')
+                raise IOError('Invalid argument')
         else:
             size = self._position
         data = self._data[:size]
