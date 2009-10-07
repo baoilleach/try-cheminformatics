@@ -1,3 +1,5 @@
+from __future__ import with_statement
+
 import gc
 import miniunit
 import __builtin__
@@ -25,12 +27,7 @@ class TestFileType(miniunit.TestCase):
         self.assertEqual(__builtin__.file, storage.original_file)
         self.assertNotEqual(storage.original_file, storage.file)
         self.assertEqual(__builtin__.open, storage.original_open)
-        self.assertNotEqual(storage.original_open, storage.open)        
-
-
-    def test_docstrings(self):
-        self.assertEqual(storage.file.__doc__, storage.original_file.__doc__)
-        self.assertEqual(storage.open.__doc__, storage.original_open.__doc__)
+        self.assertNotEqual(storage.original_open, storage.open)
 
 
     def test_file_simple_read_and_write(self):
@@ -382,7 +379,26 @@ class TestFileType(miniunit.TestCase):
         self.assertRaises(TypeError, h.readline, None)
         self.assertEqual(h.readlines(0), ['foo\n', 'bar\n', 'baz\n'])
         h.close()
-    
+
+
+    def test_with(self):
+        with storage.file(FILE, 'w') as h:
+            h.write('foo\nbar\nbaz\n')
+        self.assertTrue(h.closed)
+            
+        with storage.file(FILE) as h:
+            self.assertEqual(h.readline(), 'foo\n')
+            self.assertEqual(h.tell(), 4)
+        self.assertTrue(h.closed)
+        
+        try:
+            with storage.file(FILE) as h:
+                raise IOError
+        except IOError:
+            self.assertTrue(h.closed)
+        else:
+            self.fail('IOError in with statement swallowed')
+        
     
     def test_xreadlines(self):
         h = storage.file(FILE, 'w')
@@ -466,7 +482,34 @@ class TestFileType(miniunit.TestCase):
         handle.close()
         
     
+    def test_read_write_mode(self):
+        self.assertRaises(IOError, storage.file, FILE, 'r+')
+        h = storage.file(FILE, 'w')
+        h.write('foo')
+        h.close()
+        
+        h = storage.file(FILE, 'r+')
+        self.assertEqual(h.read(), 'foo')
+        
+        
+    def test_write_read_mode(self):
+        self.assertRaises(IOError, storage.file, FILE, 'r+')
+        h = storage.file(FILE, 'w')
+        h.write('foo')
+        h.close()
+        
+        h = storage.file(FILE, 'r+')
+        self.assertEqual(h.read(), 'foo')
+        
+    
 """
+Differences from standard file type:
+
+* Strict about modes. Unrecognised modes raise exceptions.
+
+(NOTE: The exception method that the standard file type does throw is:
+ "ValueError: mode string must begin with one of 'r', 'w', 'a' or 'U', not 'z'")
+
 TODO:
 
 * 'whence' argument to seek not implemented
@@ -479,13 +522,9 @@ TODO:
 
 * Behavior of tell() and seek() for text mode files may not be correct (it
   should treat '\n' as '\r\n').
-* Only supported modes are r, rb, w, wb, a, ab (universal mode / read and write
-  modes missing)
-* Missing protocol methods needed when we move to 2.6:
-
-    - __enter__ and __exit__
-    - __format__
-
+* Only supported modes are r, rb, w, wb, a, ab (universal modes / r+(b) / w+(b)
+  / a+(b) modes missing)
+* Missing __format__ method needed when we move to 2.6
 * Separate out the IsolatedStorage parts into a separate backend module and
   make the backend pluggable.
 * Implementations of os and os.path that work with storage

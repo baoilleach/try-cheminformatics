@@ -2,8 +2,6 @@ import __builtin__
 
 original_file = __builtin__.file
 original_open = __builtin__.open
-open_doc = open.__doc__
-file_doc = file.__doc__
 
 from warnings import warn
 
@@ -18,8 +16,8 @@ from System.IO import (
 # bad for introspection?
 DEFAULT = object()
 
-READ_MODES = ('r', 'rb')
-WRITE_MODES = ('w', 'wb', 'a', 'ab')
+READ_MODES = ('r', 'rb', 'r+', 'r+b')
+WRITE_MODES = ('w', 'wb', 'a', 'ab', 'r+', 'r+b')
 
 _fileno_counter = 2
 def get_new_fileno():
@@ -55,7 +53,7 @@ class file(object):
             else:
                 self._open_write()
         else:
-            raise ValueError("The only supported modes are r(b), w(b) and a(b), not %r" % mode)
+            raise ValueError("The only supported modes are r(+)(b), w(+)(b) and a(b), not %r" % mode)
     
     
     def _open_read(self):
@@ -280,14 +278,18 @@ class file(object):
         
         for line in sequence:
             self.write(line)
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, *excinfo):
+        self.close()
+        return False
 
 
 def open(name, mode='r'):
     return file(name, mode)
 
-open.__doc__ = open_doc
-file.__doc__ = file_doc
-    
 
 def replace_builtins():
     __builtin__.file =  file
