@@ -5,19 +5,19 @@ original_open = __builtin__.open
 
 from warnings import warn
 
-from System.IO.IsolatedStorage import (
-    IsolatedStorageFile, IsolatedStorageFileStream
-)
-
-from System.IO import (
-    FileMode, StreamReader, StreamWriter
-)
+# must be set before use
+backend = None
 
 # bad for introspection?
 DEFAULT = object()
 
-READ_MODES = ('r', 'rb', 'r+', 'r+b')
-WRITE_MODES = ('w', 'wb', 'a', 'ab', 'r+', 'r+b')
+# switch to a regex?
+READ_MODES = ('r', 'rb')
+WRITE_MODES = ('w', 'wb', 'a', 'ab')
+
+MIXED_MODES = ('r+', 'r+b', 'w+', 'w+b', 'a+', 'a+b')
+READ_MODES += MIXED_MODES
+WRITE_MODES += MIXED_MODES
 
 _fileno_counter = 2
 def get_new_fileno():
@@ -35,6 +35,9 @@ class file(object):
     newlines = None
     
     def __init__(self, name, mode='r'):
+        if backend is None:
+            raise RuntimeError('storage backend must be set before files can be opened')
+        
         self.name = name
         self.mode = mode
         self._position = 0
@@ -45,7 +48,10 @@ class file(object):
         self._in_iter = False
         self._softspace = 0
         
-        if mode in READ_MODES:
+        if mode not in READ_MODES + WRITE_MODES:
+            raise ValueError("The only supported modes are r(+)(b), w(+)(b) and a(+)(b), not %r" % mode)
+        
+        if mode in READ_MODES and mode[0] not in ('a', 'w'):
             self._open_read()
         elif mode in WRITE_MODES:
             if mode.startswith('a'):
@@ -53,24 +59,25 @@ class file(object):
             else:
                 self._open_write()
         else:
-            raise ValueError("The only supported modes are r(+)(b), w(+)(b) and a(b), not %r" % mode)
+            # double check and remove this branch!
+            raise AssertionError('whoops - not possible, surely??')
     
     
     def _open_read(self):
-        if not CheckForFile(self.name):
+        if not backend.CheckForFile(self.name):
             raise IOError('No such file or directory: %r' % self.name)
-        data = LoadFile(self.name)
+        data = backend.LoadFile(self.name)
         if not self._binary:
             data = data.replace('\r\n', '\n')
         self._data = data
     
         
     def _open_write(self):
-        SaveFile(self.name, '')
+        backend.SaveFile(self.name, '')
         
     
     def _open_append(self):
-        if CheckForFile(self.name):
+        if backend.CheckForFile(self.name):
             self._open_read()
             self._position = len(self._data)
         else:
@@ -95,8 +102,9 @@ class file(object):
             raise ValueError('Mixing iteration and read methods would lose data')
         
         pos = self._position
-        if pos == 0:
-            # could do this on every read?
+        if pos == 0 and self.mode not in WRITE_MODES:
+            # can't do this when we are in a mixed read / write mode like r+
+            # could do this on every read, not just when pos is 0?
             self._open_read()
         
         if size is DEFAULT:
@@ -135,7 +143,7 @@ class file(object):
             return
         self.closed = True
         if self.mode in WRITE_MODES:
-            SaveFile(self.name, self._data)
+            backend.SaveFile(self.name, self._data)
 
 
     def __repr__(self):
@@ -168,7 +176,7 @@ class file(object):
     def flush(self):
         if self.mode not in WRITE_MODES:
             raise IOError('Bad file descriptor')
-        SaveFile(self.name, self._data)
+        backend.SaveFile(self.name, self._data)
 
 
     def isatty(self):
@@ -279,13 +287,15 @@ class file(object):
         for line in sequence:
             self.write(line)
     
+            
     def __enter__(self):
         return self
     
+
     def __exit__(self, *excinfo):
         self.close()
-        return False
 
+    
 
 def open(name, mode='r'):
     return file(name, mode)
@@ -299,41 +309,3 @@ def restore_builtins():
     __builtin__.file =  original_file
     __builtin__.open = original_open
 
-
-################################
-
-
-def CheckForFile(filename):
-    store = IsolatedStorageFile.GetUserStoreForApplication()
-    return store.FileExists(filename)
-
-
-def DeleteFile(filename):
-    store = IsolatedStorageFile.GetUserStoreForApplication()
-    store.DeleteFile(filename)
-    
-
-def SaveFile(filename, data):
-    store = IsolatedStorageFile.GetUserStoreForApplication()
-    isolatedStream = IsolatedStorageFileStream(filename, FileMode.Create, store)
-
-    writer = StreamWriter(isolatedStream)
-    writer.Write(data)
-
-    writer.Close()
-    isolatedStream.Close()
-
-
-def LoadFile(filename):
-    store = IsolatedStorageFile.GetUserStoreForApplication()
-    isolatedStream = IsolatedStorageFileStream(filename, FileMode.Open, store)
-
-    reader = StreamReader(isolatedStream)
-    data = reader.ReadToEnd()
-
-    reader.Close()
-    isolatedStream.Close()
-
-    return data
-
-    

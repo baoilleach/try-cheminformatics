@@ -5,16 +5,25 @@ import miniunit
 import __builtin__
 
 import storage
+import storage_backend
+
 
 FILE = '/myfile.txt'
 
 
 class TestFileType(miniunit.TestCase):
     def setUp(self):
+        storage.backend = storage_backend
         gc.collect()
         gc.collect()
-        if storage.CheckForFile(FILE):
-            storage.DeleteFile(FILE)
+        if storage_backend.CheckForFile(FILE):
+            storage_backend.DeleteFile(FILE)
+            
+    
+    def test_backend(self):
+        storage.backend = None
+        self.assertRaises(RuntimeError, storage.file, FILE)
+
 
     def test_patching(self):
         storage.replace_builtins()
@@ -114,6 +123,7 @@ class TestFileType(miniunit.TestCase):
     
     def test_invalid_file_mode(self):
         self.assertRaises(ValueError, storage.file, 'filename', 'q')
+        self.assertRaises(ValueError, storage.file, 'filename', '')
     
         
     def test_open_nonexistent_file(self):
@@ -459,49 +469,88 @@ class TestFileType(miniunit.TestCase):
     def test_append_mode(self):
         source_data = 'Some text\nwith newlines\n'
         
-        handle = storage.open(FILE, 'ab')
+        with storage.open(FILE, 'ab') as handle:
+            with storage.open(FILE) as f:
+                self.assertEqual(f.read(), '')
+            
+            handle.write(source_data)
         
-        f = storage.open(FILE)
-        self.assertEqual(f.read(), '')
-        f.close()
+        with storage.open(FILE, 'rb') as handle:
+            self.assertEqual(handle.read(), source_data)
         
-        handle.write(source_data)
-        handle.close()
+        with storage.open(FILE, 'a') as handle:
+            self.assertEqual(handle.tell(), len(source_data))
+            handle.write(source_data[::-1])
         
-        handle = storage.open(FILE, 'rb')
-        self.assertEqual(handle.read(), source_data)
-        handle.close()
-        
-        handle = storage.open(FILE, 'a')
-        self.assertEqual(handle.tell(), len(source_data))
-        handle.write(source_data[::-1])
-        handle.close()
-        
-        handle = storage.open(FILE)
-        self.assertEqual(handle.read(), source_data + source_data[::-1])
-        handle.close()
+        with storage.open(FILE) as handle:
+            self.assertEqual(handle.read(), source_data + source_data[::-1])
         
     
     def test_read_write_mode(self):
         self.assertRaises(IOError, storage.file, FILE, 'r+')
-        h = storage.file(FILE, 'w')
-        h.write('foo')
-        h.close()
+
+        with storage.file(FILE, 'w') as h:
+            h.write('foo')
         
-        h = storage.file(FILE, 'r+')
-        self.assertEqual(h.read(), 'foo')
+        with storage.file(FILE, 'r+') as h:
+            self.assertEqual(h.tell(), 0)
+            self.assertEqual(h.read(), 'foo')
+            self.assertEqual(h.tell(), 3)
+            h.write('bar')
+            self.assertEqual(h.tell(), 6)
+            h.seek(0)
+            self.assertEqual(h.read(), 'foobar')
         
         
     def test_write_read_mode(self):
-        self.assertRaises(IOError, storage.file, FILE, 'r+')
-        h = storage.file(FILE, 'w')
-        h.write('foo')
-        h.close()
+        with storage.file(FILE, 'w') as f:
+            f.write('foo')
         
-        h = storage.file(FILE, 'r+')
-        self.assertEqual(h.read(), 'foo')
-        
+        with storage.file(FILE, 'w+') as h:
+            with storage.file(FILE) as f:
+                self.assertEqual(f.read(), '')
+            
+            self.assertEqual(h.read(), '')
+            self.assertEqual(h.tell(), 0)
+            h.write('foo')
+            self.assertEqual(h.tell(), 3)
+            self.assertEqual(h.read(), '')
+            
+            h.seek(0)
+            self.assertEqual(h.read(), 'foo')
     
+    
+    def test_append_read_mode(self):
+        with storage.file(FILE, 'w') as f:
+            f.write('foo')
+        
+        with storage.file(FILE, 'a+') as h:
+            with storage.file(FILE) as f:
+                self.assertEqual(f.read(), 'foo')
+            
+            self.assertEqual(h.tell(), 3)
+            self.assertEqual(h.read(), '')
+            h.write('bar')
+            self.assertEqual(h.tell(), 6)
+            self.assertEqual(h.read(), '')
+            
+            h.seek(0)
+            self.assertEqual(h.read(), 'foobar')
+
+
+    def test_seek_with_whence(self):
+        pass
+
+"""
+0 (offset from start of file, offset should be >= 0); other values are 1
+(move relative to current position, positive or negative), and 2 (move
+relative to end of file, usually negative, although many platforms allow
+seeking beyond the end of a file).  If the file is opened in text mode,
+only offsets returned by tell() are legal.  Use of other offsets causes
+undefined behavior.
+Note that not all file objects are seekable.
+"""
+
 """
 Differences from standard file type:
 
@@ -521,11 +570,10 @@ TODO:
     - readinto  (deprecated)
 
 * Behavior of tell() and seek() for text mode files may not be correct (it
-  should treat '\n' as '\r\n').
-* Only supported modes are r, rb, w, wb, a, ab (universal modes / r+(b) / w+(b)
-  / a+(b) modes missing)
+  should treat '\n' as '\r\n')
+* Behaves like Windows, writes '\n' as '\r\n' unless in binary mode. A global
+  flag to control this?
+* Universal modes not supported
 * Missing __format__ method needed when we move to 2.6
-* Separate out the IsolatedStorage parts into a separate backend module and
-  make the backend pluggable.
-* Implementations of os and os.path that work with storage
+* Implementations of os and os.path that work with storage_backend
 """
