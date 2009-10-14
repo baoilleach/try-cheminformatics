@@ -227,15 +227,6 @@ class TestFileType(miniunit.TestCase):
         
         self.assertRaises(IOError, h.seek, -1)
         self.assertRaises(TypeError, h.seek, None)
-
-    def test_seek_with_whence(self):
-        h = storage.file(FILE, 'w')
-        h.write('foo bar baz')
-        h.close()
-        
-        h = storage.file(FILE)
-        self.assertRaises(IOError, h.seek, 0, 3)
-        self.assertRaises(TypeError, h.seek, 0, None)
         
         
     def test_flush(self):
@@ -539,17 +530,37 @@ class TestFileType(miniunit.TestCase):
 
 
     def test_seek_with_whence(self):
-        pass
+        data = 'foo bar baz'
+        with storage.file(FILE, 'w') as h:
+            h.write(data)
+        
+        h = storage.file(FILE)
+        self.assertRaises(IOError, h.seek, 0, 3)
+        self.assertRaises(IOError, h.seek, -1, 0)
+        self.assertRaises(IOError, h.seek, 0, -1)
+        self.assertRaises(TypeError, h.seek, 0, None)
+        
+        h.seek(3, 0)
+        self.assertEqual(h.tell(), 3)
+        
+        h.seek(-3, 1)
+        self.assertEqual(h.tell(), 0)
+        self.assertRaises(IOError, h.seek, -1, 1)
+        
+        h.seek(3, 1)
+        self.assertEqual(h.tell(), 3)
+        
+        h.seek(0, 2)
+        self.assertEqual(h.tell(), len(data))
+        
+        h.seek(-2, 2)
+        self.assertEqual(h.tell(), len(data) - 2)
+        
+        h.seek(2, 2)
+        self.assertEqual(h.tell(), len(data) + 2)
+        self.assertRaises(IOError, h.seek, -(len(data) + 1), 2)
+        
 
-"""
-0 (offset from start of file, offset should be >= 0); other values are 1
-(move relative to current position, positive or negative), and 2 (move
-relative to end of file, usually negative, although many platforms allow
-seeking beyond the end of a file).  If the file is opened in text mode,
-only offsets returned by tell() are legal.  Use of other offsets causes
-undefined behavior.
-Note that not all file objects are seekable.
-"""
 
 """
 Differences from standard file type:
@@ -561,7 +572,6 @@ Differences from standard file type:
 
 TODO:
 
-* 'whence' argument to seek not implemented
 * Copy docstrings for all methods (and property descriptors)
 * Members like 'mode' should be read only
 * The IOError exceptions raised don't have an associated errno
@@ -569,7 +579,7 @@ TODO:
 
     - readinto  (deprecated)
 
-* Behavior of tell() and seek() for text mode files may not be correct (it
+* Behavior of tell() and seek() for text mode files may be incorrect (it
   should treat '\n' as '\r\n')
 * Behaves like Windows, writes '\n' as '\r\n' unless in binary mode. A global
   flag to control this?

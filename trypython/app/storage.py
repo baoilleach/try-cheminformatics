@@ -160,11 +160,16 @@ class file(object):
     def seek(self, position, whence=0):
         position = self._check_int_argument(position)
         whence = self._check_int_argument(whence)
-        if position < 0:
-            raise IOError('Invalid Argument')
         if not 0 <= whence <= 2:
             raise IOError('Invalid Argument')
-
+        
+        if whence == 1:
+            position = self._position + position
+        elif whence == 2:
+            position = len(self._data) + position
+            
+        if position < 0:
+            raise IOError('Invalid Argument')
         self._in_iter = False
         self._position = position
 
