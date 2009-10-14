@@ -560,11 +560,43 @@ class TestFileType(miniunit.TestCase):
         self.assertEqual(h.tell(), len(data) + 2)
         self.assertRaises(IOError, h.seek, -(len(data) + 1), 2)
         
+    
+    def test_read_only_attributes(self):
+        def setter(attribute, value):
+            return lambda: setattr(h, attribute, value)
+            
+        with storage.file(FILE, 'w') as h:
+            self.assertRaises(AttributeError, setter('mode', 'w'))
+            self.assertRaises(AttributeError, setter('name', 'foo2'))
+            self.assertRaises(AttributeError, setter('closed', True))
+            self.assertRaises(AttributeError, setter('encoding', 'ascii'))
+            self.assertRaises(AttributeError, setter('errors', None))
+            self.assertRaises(AttributeError, setter('newlines', 'foo'))
 
+
+    def test_read_negative(self):
+        with storage.file(FILE, 'w') as h:
+            h.write('foo bar baz')
+        
+        with storage.file(FILE) as h:
+            self.assertEqual(h.read(-3), 'foo bar baz')
+        
+        
+"""
+
+    mode = None
+    name = None
+    closed = False
+    encoding = None
+    errors = None
+    newlines = None
+"""
 
 """
 Differences from standard file type:
 
+* Attempting to set the read-only attributes (like mode, name etc) raises an AttributeError
+  rather than a TypeError.
 * Strict about modes. Unrecognised modes raise exceptions.
 
 (NOTE: The exception method that the standard file type does throw is:
@@ -572,9 +604,11 @@ Differences from standard file type:
 
 TODO:
 
+* The buffering argument to the constructor is not implemented
 * Copy docstrings for all methods (and property descriptors)
 * Members like 'mode' should be read only
 * The IOError exceptions raised don't have an associated errno
+* encoding, errors and newlines do nothing
 * Missing members:
 
     - readinto  (deprecated)

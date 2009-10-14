@@ -26,6 +26,9 @@ from utils import (
     invoke, blow_up, _debug
 )
 
+import storage
+import storage_backend
+storage.backend = storage_backend
 
 @invoke
 def gohome():
