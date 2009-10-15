@@ -121,9 +121,11 @@ class TestFileType(miniunit.TestCase):
         self.assertEqual(repr(write), string % (FILE, 'w'))
     
     
-    def test_invalid_file_mode(self):
+    def test_invalid_mode(self):
         self.assertRaises(ValueError, storage.file, 'filename', 'q')
         self.assertRaises(ValueError, storage.file, 'filename', '')
+        self.assertRaises(TypeError, storage.file, 'filename', None)
+        self.assertRaises(TypeError, storage.file, 'filename', 3)
     
         
     def test_open_nonexistent_file(self):
@@ -580,39 +582,33 @@ class TestFileType(miniunit.TestCase):
         
         with storage.file(FILE) as h:
             self.assertEqual(h.read(-3), 'foo bar baz')
-        
-        
-"""
-
-    mode = None
-    name = None
-    closed = False
-    encoding = None
-    errors = None
-    newlines = None
-"""
+    
+    
+    def test_invalid_name(self):
+        self.assertRaises(IOError, storage.file, '')
+        self.assertRaises(IOError, storage.file, '', 'w')
+        self.assertRaises(TypeError, storage.file, None)
+        self.assertRaises(TypeError, storage.file, None, 'w')
+        self.assertRaises(TypeError, storage.file, 3)
 
 """
 Differences from standard file type:
 
 * Attempting to set the read-only attributes (like mode, name etc) raises an AttributeError
-  rather than a TypeError.
-* Strict about modes. Unrecognised modes raise exceptions.
+  rather than a TypeError
+* The exception messages are not all identical (some are better!)
+* Strict about modes. Unrecognised modes always raise an exception
 
-(NOTE: The exception method that the standard file type does throw is:
- "ValueError: mode string must begin with one of 'r', 'w', 'a' or 'U', not 'z'")
+  (NOTE: The exception method that the standard file type does throw is:
+   "ValueError: mode string must begin with one of 'r', 'w', 'a' or 'U', not 'z'")
+   
+* The deprecated readinto is not implemented
 
 TODO:
 
 * The buffering argument to the constructor is not implemented
-* Copy docstrings for all methods (and property descriptors)
-* Members like 'mode' should be read only
 * The IOError exceptions raised don't have an associated errno
 * encoding, errors and newlines do nothing
-* Missing members:
-
-    - readinto  (deprecated)
-
 * Behavior of tell() and seek() for text mode files may be incorrect (it
   should treat '\n' as '\r\n')
 * Behaves like Windows, writes '\n' as '\r\n' unless in binary mode. A global

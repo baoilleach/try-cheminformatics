@@ -6,6 +6,8 @@ from System.Windows import Application
 from System.Windows.Browser import HtmlPage
 from System.Windows.Markup import XamlReader
 
+from storage import original_open as open
+
 debug = False
 
 _main_id = Thread.CurrentThread.ManagedThreadId

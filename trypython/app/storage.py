@@ -1,9 +1,15 @@
 import __builtin__
 
-original_file = __builtin__.file
-original_open = __builtin__.open
+__all__ = (
+    'file', 'open',
+    'replace_builtins', 'restore_builtins',
+    'original_file', 'original_open'
+)
 
 from warnings import warn
+
+original_file = __builtin__.file
+original_open = __builtin__.open
 
 # must be set before use
 backend = None
@@ -73,6 +79,11 @@ The preferred way to open a file is with the builtin open() function."""
         if backend is None:
             raise RuntimeError('storage backend must be set before files can be opened')
         
+        if not isinstance(name, basestring):
+            raise TypeError('File name argument must be str got: %s' % type(name))
+        if not isinstance(mode, basestring):
+            raise TypeError('File mode argument must be str got: %s' % type(mode))
+            
         self._name = name
         self._mode = mode
         self._position = 0
@@ -85,6 +96,8 @@ The preferred way to open a file is with the builtin open() function."""
         
         if mode not in READ_MODES + WRITE_MODES:
             raise ValueError("The only supported modes are r(+)(b), w(+)(b) and a(+)(b), not %r" % mode)
+        if name == '':
+            raise IOError("No such file or directory: ''")
         
         if mode in READ_MODES and mode[0] not in ('a', 'w'):
             self._open_read()

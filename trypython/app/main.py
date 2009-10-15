@@ -20,6 +20,30 @@ from mousehandler import MouseHandler
 from printer import StatefulPrinter
 from utils import always_invoke, _debug, SetInvokeRoot, load_document
 
+import storage
+import storage_backend
+from storage import original_open as open
+storage.backend = storage_backend
+storage.replace_builtins()
+
+# create the example files
+if not storage_backend.CheckForFile('myfile.txt'):
+    h = storage.open('myfile.txt', 'w')
+    h.write("""This is a text file.
+    You can read it.
+    It exists.
+    """)
+    h.close()
+if not storage_backend.CheckForFile('workfile'):
+    h = storage.open('workfile', 'w')
+    h.write('This is the entire file.\n')
+    h.close()
+if not storage_backend.CheckForFile('workfile2'):
+    h = storage.open('workfile2', 'w')
+    h.write('This is the first line of the file.\nSecond line of the file\n')
+    h.close()
+    
+
 root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
 SetInvokeRoot(root)
 
