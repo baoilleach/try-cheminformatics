@@ -16,6 +16,7 @@ The online interpreter has the following features:
     * Individual pages are bookmarkable and the URL fragment auto-updates as you change page
     * Mouse scroll wheel supported over the tutorial and console scroll viewers
     * Control-C interrupts the running code with a keyboard interrupt
+    * File I/O works (the file type and open function) using local browser storage to store files 
     * ``raw_input`` and ``input`` functions work in the interpreter
     * Basic auto-indent and auto-dedent in the console
     * Console history, including multiline history

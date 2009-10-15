@@ -11,8 +11,6 @@ from warnings import warn
 original_file = __builtin__.file
 original_open = __builtin__.open
 
-# must be set before use
-backend = None
 
 # bad for introspection?
 DEFAULT = object()
@@ -22,8 +20,10 @@ READ_MODES = ('r', 'rb')
 WRITE_MODES = ('w', 'wb', 'a', 'ab')
 
 MIXED_MODES = ('r+', 'r+b', 'w+', 'w+b', 'a+', 'a+b')
+ALL_MODES = READ_MODES + WRITE_MODES + MIXED_MODES
 READ_MODES += MIXED_MODES
 WRITE_MODES += MIXED_MODES
+
 
 # would need something a little less basic if os.read
 # is implemented...
@@ -76,9 +76,6 @@ The preferred way to open a file is with the builtin open() function."""
     
     def __init__(self, name, mode='r'):
         "x.__init__(...) initializes x; see x.__class__.__doc__ for signature"
-        if backend is None:
-            raise RuntimeError('storage backend must be set before files can be opened')
-        
         if not isinstance(name, basestring):
             raise TypeError('File name argument must be str got: %s' % type(name))
         if not isinstance(mode, basestring):
@@ -94,7 +91,7 @@ The preferred way to open a file is with the builtin open() function."""
         self._in_iter = False
         self._softspace = 0
         
-        if mode not in READ_MODES + WRITE_MODES:
+        if mode not in ALL_MODES:
             raise ValueError("The only supported modes are r(+)(b), w(+)(b) and a(+)(b), not %r" % mode)
         if name == '':
             raise IOError("No such file or directory: ''")
@@ -429,3 +426,24 @@ def restore_builtins():
     __builtin__.file =  original_file
     __builtin__.open = original_open
 
+    
+_store = {}
+
+class backend(object):
+    "Example backend."
+    
+    @staticmethod
+    def CheckForFile(filename):
+        return filename in _store
+    
+    @staticmethod
+    def DeleteFile(filename):
+        del _store[filename]
+    
+    @staticmethod
+    def LoadFile(filename):
+        return _store[filename]
+    
+    @staticmethod
+    def SaveFile(filename, data):
+        _store[filename] = data

@@ -7,7 +7,7 @@ import __builtin__
 import storage
 import storage_backend
 
-
+dict_backend = storage.backend
 FILE = '/myfile.txt'
 
 
@@ -18,11 +18,6 @@ class TestFileType(miniunit.TestCase):
         gc.collect()
         if storage_backend.CheckForFile(FILE):
             storage_backend.DeleteFile(FILE)
-            
-    
-    def test_backend(self):
-        storage.backend = None
-        self.assertRaises(RuntimeError, storage.file, FILE)
 
 
     def test_patching(self):
@@ -590,6 +585,19 @@ class TestFileType(miniunit.TestCase):
         self.assertRaises(TypeError, storage.file, None)
         self.assertRaises(TypeError, storage.file, None, 'w')
         self.assertRaises(TypeError, storage.file, 3)
+
+        
+    def test_default_backend(self):
+        storage.backend = dict_backend
+        
+        self.assertRaises(IOError, storage.file, FILE)
+        
+        with storage.file(FILE, 'w') as h:
+            h.write('foo')
+        
+        with storage.file(FILE) as h:
+            self.assertEqual(h.read(), 'foo')
+
 
 """
 Differences from standard file type:
