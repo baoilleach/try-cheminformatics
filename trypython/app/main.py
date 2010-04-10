@@ -43,8 +43,8 @@ if not storage_backend.CheckForFile('workfile2'):
     h.write('This is the first line of the file.\nSecond line of the file\n')
     h.close()
     
-
-root = Application.Current.LoadRootVisual(StackPanel(), "app.xaml")
+# Should be loaded automatically
+root = Application.Current.RootVisual
 SetInvokeRoot(root)
 
 console_output = root.consoleOutput

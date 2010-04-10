@@ -7,6 +7,17 @@ from System.IO import (
 )
 
 
+############
+# hack for IronPython 2.6.1 RC1
+
+for i in xrange(200):
+   try:
+       store = IsolatedStorageFile.GetUserStoreForApplication()
+       store.FileExists('goo')
+   except: 
+       pass
+#######################
+
 def CheckForFile(filename):
     store = IsolatedStorageFile.GetUserStoreForApplication()
     return store.FileExists(filename)
