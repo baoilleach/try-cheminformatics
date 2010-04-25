@@ -150,7 +150,7 @@ class ConsoleTextBox(TextBox):
         if text.endswith('\\'):
             return False
         
-        source = self.engine.CreateScriptSourceFromString(text, '<stdin>', SourceCodeKind.InteractiveCode)
+        source = self.engine.CreateScriptSourceFromString(text, 'stdin', SourceCodeKind.InteractiveCode)
         
         result = source.GetCodeProperties()
         if result == ScriptCodeParseResult.IncompleteToken:
@@ -428,7 +428,7 @@ class ConsoleTextBox(TextBox):
             
             if self._input_data:
                 self.handle_line('')
-            self.Dispatcher.BeginInvoke(self.Focus)
+            self.Dispatcher.BeginInvoke(lambda: self.Focus())
         except Exception, e:
             _debug('Handle lines', e)
 
