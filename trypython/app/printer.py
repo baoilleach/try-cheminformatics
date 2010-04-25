@@ -48,8 +48,7 @@ class StatefulPrinter(object):
 
     @invoke
     def print_lines(self, data):
-        code = data.repl
-        ace('\r\n', '\n').replace('\r', '\n')
+        code = data.replace('\r\n', '\n').replace('\r', '\n')
         _debug('code', repr(code))
 
         self.block = get_console_block()
