@@ -1,10 +1,7 @@
-import sys
-sys.path.append('app')
-
 import clr
 
-clr.AddReferenceToFile('app\\System.Windows.Controls.dll')
-clr.AddReferenceToFile('app\\System.Windows.Controls.Toolkit.dll')
+clr.AddReferenceToFile('System.Windows.Controls.dll')
+clr.AddReferenceToFile('System.Windows.Controls.Toolkit.dll')
 clr.AddReference('IronPython')
 clr.AddReference('Microsoft.Scripting')
 
