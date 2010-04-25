@@ -14,6 +14,7 @@ _main_id = Thread.CurrentThread.ManagedThreadId
 
 root = None
 
+
 def SetInvokeRoot(element):
     global root
     root = element

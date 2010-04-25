@@ -7,7 +7,6 @@ from utils import always_invoke, invoke
 from utils import _debug
 
 
-
 class StatefulPrinter(object):
     def __init__(self, parent, scroller, prompt):
         self.block = None
@@ -49,7 +48,8 @@ class StatefulPrinter(object):
 
     @invoke
     def print_lines(self, data):
-        code = data.replace('\r\n', '\n').replace('\r', '\n')
+        code = data.repl
+        ace('\r\n', '\n').replace('\r', '\n')
         _debug('code', repr(code))
 
         self.block = get_console_block()

@@ -9,13 +9,20 @@
    :format: xaml
 
 
-**Try Python** is an interactive Python tutorial created for Silverlight and Moonlight by Michael Foord.
+**Try Python** is an interactive Python tutorial created for Silverlight and
+Moonlight by Michael Foord.
 
-The Python console to the right behaves like the Python interactive interpreter. It runs IronPython 2.0, which is the equivalent of Python 2.5. The code you enter in the console runs in the browser.
+The Python console to the right behaves like the Python interactive interpreter.
+It runs IronPython 2.6.1, which is the equivalent of Python 2.6. The code you 
+enter in the console runs in the browser.
 
-Choose a section of the tutorial to start on from this page, or use the navigation bar at the top.
+Choose a section of the tutorial to start on from this page, or use the
+navigation bar at the top.
 
-Most of the tutorial pages have code examples for you to try out. The examples have a ':raw-xaml:`<Run FontWeight="Bold" FontFamily="Consolas, Monaco, Lucida Console, Global Monospace" FontSize="15" Foreground="#000080">&#160;>>>&#160;</Run>`' button that copies them to the console. Try it out with the traditional Python *Hello World*:
+Most of the tutorial pages have code examples for you to try out. The examples
+have a ':raw-xaml:`<Run FontWeight="Bold" FontFamily="Consolas, Monaco, Lucida Console, Global Monospace" FontSize="15" Foreground="#000080">&#160;>>>&#160;</Run>`'
+button that copies them to the console. Try it out with the traditional Python
+*Hello World*:
 
 .. code-block:: pycon
 
@@ -33,4 +40,5 @@ Here's a slightly longer version for those who prefer object oriented programmin
     >>> hello.say_hello()
     Hello world!
 
-If you want an explanation of how the code above works, then you need to read the tutorial...
+If you want an explanation of how the code above works, then you need to read
+the tutorial...
