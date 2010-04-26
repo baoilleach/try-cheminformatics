@@ -1,0 +1,47 @@
+Accessing generic types
+=======================
+
+.NET supports *generic types* which allow the same code to support multiple
+type parameters which retaining the advantages of types safety. Collection
+types (like lists, vectors, etc) are the canonical example where generic types
+are useful. .NET has a number of generic collection types in the
+``System.Collections.Generic`` namespace.
+
+IronPython exposes generic types as a special `type` object which supports
+indexing with `type` object(s) as the index (or indices):
+
+.. code-block:: pycon
+
+   >>> from System.Collections.Generic import List, Dictionary
+   >>> int_list = List[int]()
+   >>> str_float_dict = Dictionary[str, float]()
+
+Note that there might exist a non-generic type as well as one or more 
+generic types with the same name. This refers to the user-friendly name.
+Under the hoods, the .NET type name includes the number of type parameters:
+
+.. code-block:: pycon
+
+   >>> import clr
+   >>> from System import EventHandler, EventArgs
+   >>> clr.GetClrType(EventHandler[EventArgs]).Name
+   'EventHandler`1'
+
+Where the type has both generic and non-generic forms, the name can be used
+without any indexing to access the non-generic type, and it can be indexed
+with different number of types to access the generic type with the
+corresponding number of type parameters. The code below accesses
+``System.EventHandler`` and also ``System.EventHandler<TEventArgs>``:
+
+.. code-block:: pycon
+
+   >>> from System import EventHandler, EventArgs
+   >>> EventHandler # this is the combo type object
+   <types 'EventHandler', 'EventHandler[TEventArgs]'>
+   >>> # Access the non-generic type 
+   >>> dir(EventHandler)
+   ['BeginInvoke', 'Clone', 'DynamicInvoke', 'EndInvoke', ...
+   >>> # Access the generic type with 1 type paramter
+   >>> dir(EventHandler[EventArgs])
+   ['BeginInvoke', 'Call', 'Clone', 'Combine', ...
+

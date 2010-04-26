@@ -1,0 +1,40 @@
+Loading Assemblies
+==================
+
+The smallest unit of distribution of functionality in .NET is an *assembly*
+which usually corresponds to a single file with the `.dll` file extension. The 
+assembly is available either in the installation folder of the application, or 
+in the GAC (Global assembly cache). 
+
+Assemblies can be loaded by using the methods of the ``clr`` module. The
+following code will load the ``System.Xml.dll`` assembly which is part of the
+standard .NET implementation, and installed in the GAC:
+
+.. code-block:: pycon
+
+   >>> import clr
+   >>> clr.AddReference("System.Xml")
+
+The full list of assemblies loaded by IronPython is available in `clr.References`:
+
+.. code-block:: pycon
+
+   >>> "System.Xml" in [assembly.GetName().Name for assembly in clr.References]
+   True
+
+All .NET assemblies have a unique version number which allows using a specific
+version of a given assembly. The following code will load the version of 
+System.Xml.dll that ships with Silverlight:
+
+.. code-block:: pycon
+
+   >>> import clr
+   >>> clr.AddReference("System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")
+
+(Note: due to an issue with reflection this example doesn't currently run in all
+versions of Silverlight.)
+   
+You can load assemblies that are neither in the GAC nor in the *appbase*
+(typically, the folder of ipy.exe or your host appplication executable) either
+by using ``clr.AddReferenceToFileAndPath`` or by setting ``sys.path``.
+See the ``clr.AddReference`` -methods for details. 

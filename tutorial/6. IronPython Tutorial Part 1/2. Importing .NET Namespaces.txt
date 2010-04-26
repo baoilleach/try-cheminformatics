@@ -1,0 +1,89 @@
+Importing .NET namespaces
+=========================
+
+Once an assembly is loaded, the namespaces and types contained in the assembly
+can be accessed from IronPython code.
+
+.NET namespaces and sub-namespaces of loaded assemblies are exposed as 
+Python modules:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> System
+   <module 'System' (CLS module, ... assemblies loaded)>
+   >>> System.Collections
+   <module 'Collections' (CLS module, ... assemblies loaded)>
+
+The types in the namespaces are exposed as Python types, and are accessed
+as attributes of the namespace. The following code accesses the 
+``System.Environment``:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> System.Environment
+   <type 'Environment'>
+
+Just like with normal Python modules, you can also use all the other forms
+of `import` as well:
+
+.. code-block:: pycon
+
+   >>> from System import Environment
+   >>> Environment
+   <type 'Environment'>
+
+.. code-block:: pycon
+
+
+   >>> from System import *
+   >>> Environment
+   <type 'Environment'>
+
+Warning: Using ``from <namespace> import *`` can cause Python builtins 
+(elements of ``__builtins__``) to be hidden
+by .NET types or sub-namespaces. Specifically, after doing
+``from System import *``, ``Exception`` will access the ``System.Exception``
+.NET type, not Python's Exception type.
+   
+The root namespaces are stored as modules in ``sys.modules``:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> import sys
+   >>> sys.modules["System"]
+   <module 'System' (CLS module, ... assemblies loaded)>
+
+When new assemblies are loaded, they can add attributes to existing
+namespace module objects.
+
+
+Import precedence relative to Python modules
+============================================
+
+``import`` gives precedence to ``.py`` files. For example, if a file
+called `System.py` exists in the path, it will get imported instead of the
+`System` namespace:
+
+.. code-block:: pycon
+
+   >>> # create System.py in the current folder
+   >>> f = open("System.py", "w")
+   >>> f.write('print "Loading System.py"')
+   >>> f.close()
+   >>>
+   >>> # unload the System namespace if it has been loaded
+   >>> import sys
+   >>> if sys.modules.has_key("System"):
+   ...     sys.modules.pop("System") 
+   <module 'System' (CLS module, ... assemblies loaded)>
+   >>>
+   >>> import System
+   Loading System.py
+   >>> System
+   <module 'System' from '...System.py'>
+
+(This particular example doesn't work yet as imports are not done from the
+local browser storage where files are written.)

@@ -1,0 +1,13 @@
+============================
+ IronPython Tutorial Part 1
+============================
+
+IronPython aims to be a fully compatible implementation of the Python language.
+At the same time, the value of a separate implementation than CPython is 
+to make available the .NET ecosystem of libraries. IronPython does this by
+exposing .NET concepts as Python entities. Existing Python syntax and new
+Python libraries (like ``clr``) are used to make .NET features available
+to IronPython code.
+
+This tutorial is from the ``dotnet-integration.rst`` tutorial that comes with
+IronPython.

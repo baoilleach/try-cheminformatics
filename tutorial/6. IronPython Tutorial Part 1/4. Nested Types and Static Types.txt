@@ -1,0 +1,90 @@
+Accessing nested types
+======================
+
+Nested types are exposed as attributes of the outer class:
+
+.. code-block:: pycon
+
+   >>> from System.Environment import SpecialFolder
+   >>> SpecialFolder
+   <type 'SpecialFolder'>
+
+Importing .NET members from a type
+==================================
+
+.NET types are exposed as Python classes. Like Python classes, you usually
+cannot import *all* the attributes of .NET types using 
+``from <name> import *``:
+
+.. code-block:: pycon
+
+   >>> from System.Guid import *
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   ImportError: no module named Guid
+
+You can import specific members, both static and instance:
+
+.. code-block:: pycon
+
+   >>> from System.Guid import NewGuid, ToByteArray
+   >>> g = NewGuid()
+   >>> ToByteArray(g)
+   Array[Byte](...
+
+Note that if you import a static property, you will import the value
+when the `import` executes, not a named object to be evaluated
+on every use as you might mistakenly expect:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> from System.DateTime import Now
+   >>> Now
+   <System.DateTime object at ...>
+   >>> # Let's make it even more obvious that "Now" is evaluated only once
+   >>> a_second_ago = Now
+   >>> import time
+   >>> time.sleep(1)
+   >>> a_second_ago is Now
+   True
+   >>> a_second_ago is System.DateTime.Now
+   False
+
+
+Importing all .NET members from a static type
+=============================================
+
+
+Some .NET types only have static methods, and are comparable to namespaces.
+`C#` refers to them as `static classes` , and requires such classes to have
+only static methods. IronPython allows you to import all the static methods of
+such `static classes`. ``System.Environment``
+is an example of a static class:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> from System.Environment import *
+   >>> GetFolderPath is System.Environment.GetFolderPath
+   True
+
+Nested types are also imported:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> from System.Environment import *
+   >>> SpecialFolder is System.Environment.SpecialFolder
+   True
+
+However, properties are not imported:
+
+.. code-block:: pycon
+
+   >>> OSVersion
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   NameError: name 'OSVersion' is not defined
+   >>> System.Environment.OSVersion
+   <System.OperatingSystem object at ...>
