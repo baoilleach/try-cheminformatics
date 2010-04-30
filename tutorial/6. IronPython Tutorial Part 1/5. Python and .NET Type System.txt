@@ -71,3 +71,36 @@ immutable. i.e. you cannot add or delete descriptors from .NET types:
    Traceback (most recent call last):
      File "<stdin>", line 1, in <module>
    TypeError: can't set attributes of built-in/extension type 'DateTime'
+
+
+Instantiating .NET types
+========================
+
+.NET types are exposed as Python classes, and you can do many of the
+same operations on .NET types as with Python classes. In either cases, you 
+create an instance by calling the type:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5) # Creates a bit array of size 5
+
+IronPython also supports inline initializing of the attributes of the instance.
+Consider the following two lines:
+
+.. code-block:: pycon
+
+   >>> ba = BitArray(5)
+   >>> ba.Length = 10
+
+The above two lines are equivalent to this single line:
+
+.. code-block:: pycon
+
+   >>> ba = BitArray(5, Length = 10)
+
+You can also call the `__new__` method to create an instance:
+
+.. code-block:: pycon
+
+   >> ba = BitArray.__new__(BitArray, 5)
