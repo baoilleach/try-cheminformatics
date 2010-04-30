@@ -1,0 +1,129 @@
+Invoking .NET methods
+=====================
+
+.NET methods are exposed as Python methods. Invoking .NET methods works
+just like invoking Python methods.
+
+Invoking .NET instance methods
+------------------------------
+
+Invoking .NET instance methods works just like invoking methods on a Python
+object using the attribute notation:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba.Set(0, True) # call the Set method
+   >>> ba[0]
+   True
+
+IronPython also supports named arguments:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba.Set(index = 1, value = True)
+   >>> ba[1]
+   True
+
+IronPython also supports dict arguments:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> args = [2, True] # list of arguments
+   >>> ba.Set(*args)
+   >>> ba[2]
+   True
+
+IronPython also supports keyword arguments:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> args = { "index" : 3, "value" : True }
+   >>> ba.Set(**args)
+   >>> ba[3]
+   True
+
+
+Invoking .NET instance methods
+------------------------------
+
+Invoking .NET instance methods works just like invoking methods on a Python
+object using the attribute notation:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba.Set(0, True) # call the Set method
+   >>> ba[0]
+   True
+
+IronPython also supports named arguments:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba.Set(index = 1, value = True)
+   >>> ba[1]
+   True
+
+IronPython also supports dict arguments:
+
+.. code-block:: pycon
+
+   >>> args = [2, True] # list of arguments
+   >>> ba.Set(*args)
+   >>> ba[2]
+   True
+
+IronPython also supports keyword arguments:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> args = { "index" : 3, "value" : True }
+   >>> ba.Set(**args)
+   >>> ba[3]
+   True
+
+   
+Argument conversions
+--------------------
+
+When the argument type does not exactly match the parameter type expected
+by the .NET method, IronPython tries to convert the argument. IronPython
+uses conventional .NET conversion rules, as well as IronPython-specific rules.
+
+This snippet shows how arguments are converted when calling the ``Set(System.Int32, System.Boolean)`` method:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba.Set(0, "hello") # converts the second argument to True.
+   >>> ba[0]
+   True
+   >>> ba.Set(1, None) # converts the second argument to False.
+   >>> ba[1]
+   False
+
+See *type conversion rules* for the detailed conversion 
+rules. Note that some Python types are implemented as .NET types and no conversion
+is required in such cases.
+
+Some of the conversions supported (from Python argument type to .NET method
+parameter type) are:
+
+* ``int`` : ``System.Int8``, ``System.Int16``
+* ``float`` : ``System.Float``
+* ``tuple`` with only elements of type T : ``System.Collections.Generic.IEnumerable<T>``
+* function, method : ``System.Delegate`` and any of its sub-classes
