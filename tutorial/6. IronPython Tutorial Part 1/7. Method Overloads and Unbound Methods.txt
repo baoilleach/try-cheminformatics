@@ -1,0 +1,85 @@
+Method overloads
+================
+
+.NET supports overloading methods 
+by both number of arguments and type of arguments. When IronPython 
+code calls an overloaded method, IronPython tries to select one of the 
+overloads *at runtime* based on the number and type of arguments
+passed to the method, and also names of any keyword arguments. In most cases, 
+the expected overload gets selected. Selecting an overload is easy
+when the argument types are an exact match with one of the overload signatures:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5) # calls __new__(System.Int32)
+   >>> ba = BitArray(5, True) # calls __new__(System.Int32, System.Boolean)
+   >>> ba = BitArray(ba) # calls __new__(System.Collections.BitArray)
+
+The argument types do not have be an exact match with the method signature. 
+IronPython will try to convert the arguments if an *unamibguous* conversion
+exists to one of the overload signatures. The following code calls 
+`__new__(System.Int32)` even though there are two constructors which take
+one argument, and neither of them accept a `float` as an argument:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5.0)
+
+However, note that IronPython will raise a ``TypeError`` if there are conversions
+to more than one of the overloads:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> BitArray((1, 2, 3))
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   TypeError: Multiple targets could match: BitArray(Array[Byte]), BitArray(Array[bool]), BitArray(Array[int])
+
+If you want to control the exact overload that gets called, you can use the
+`Overloads` method on `method` objects:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> int_bool_new = BitArray.__new__.Overloads[int, type(True)]
+   >>> ba = int_bool_new(BitArray, 5, True) # calls __new__(System.Int32, System.Boolean)
+   >>> ba = int_bool_new(BitArray, 5, "hello") # converts "hello" to a System.Boolan
+   >>> ba = int_bool_new(BitArray, 5)
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   TypeError: __new__() takes exactly 2 arguments (1 given)
+
+**TODO** - Example of indexing Overloads with an Array, byref, etc using Type.MakeByrefType
+
+
+Using unbound class instance methods
+====================================
+
+It is sometimes desirable to invoke an instance method using the unbound
+class instance method and passing an explicit `self` object as the first argument.
+For example, .NET allows a class to declare an instance method with the same name
+as a method in a base type, but without overriding the base method. See
+``System.Reflection.MethodAttributes.NewSlot``
+for more information. In such cases, using the unbound class instance method
+syntax allows you chose precisely which slot you wish to call:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> System.IFormattable.ToString(3, 'D3', None) # same as : 3 .ToString('D3')
+   '003'
+
+The unbound class instance method syntax results in a virtual call, and
+calls the most derived implementation of the virtual method slot:
+
+.. code-block:: pycon
+
+   >>> s = "hello"
+   >>> System.Object.GetHashCode(s) == System.String.GetHashCode(s)
+   True
+   >>> from System.Runtime.CompilerServices import RuntimeHelpers
+   >>> RuntimeHelpers.GetHashCode(s) == System.String.GetHashCode(s)
+   False

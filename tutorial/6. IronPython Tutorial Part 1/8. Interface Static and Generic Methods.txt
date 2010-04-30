@@ -1,0 +1,105 @@
+Calling explicitly-implemented interface methods
+================================================
+
+.NET allows a method with a different name to override a base method
+implementation or interface method slot. This is useful if a type implements
+two interfaces with methods with the same name. This is known as
+*explicity implemented interface methods*. For example, 
+``System.IO.MemoryStream`` implements `System.IDisposable.Dispose` explicitly:
+
+.. code-block:: pycon
+
+   >>> import clr
+   >>> from System.IO import MemoryStream
+   >>> clr.GetClrType(MemoryStream).GetMethod("Flush")
+   <System.Reflection.RuntimeMethodInfo object at ... [Void Flush()]>
+   >>> clr.GetClrType(MemoryStream).GetMethod("Dispose")
+
+**NOTE:** I cheated here, it doesn't look like ``MemoryStream.Dispose`` is an
+explicitly implemented interface method. The other examples work though.
+   
+In such cases, IronPython tries to expose the method using its simple name -
+if there is no ambiguity:
+
+.. code-block:: pycon
+
+   >>> from System.IO import MemoryStream
+   >>> s = MemoryStream()
+   >>> s.Dispose()
+
+However, it is possible that the type has another method with the same name.
+In that case, the explicitly implemented method is not accessible as an attribute.
+However, it can still be called by using the unbound class instance method syntax:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> from System.IO import MemoryStream
+   >>> s = MemoryStream()
+   >>> System.IDisposable.Dispose(s)
+
+
+Invoking static .NET methods
+============================
+
+Invoking static .NET methods is similar to invoking Python static methods:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> System.GC.Collect()
+
+Like Python static methods, the .NET static method can be accessed as an
+attribute of sub-types as well:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> System.Object.ReferenceEquals is System.GC.ReferenceEquals
+   True
+
+**TODO** What happens if the sub-type has a static method with the same name
+but a different signature? Are both overloads available or not?
+
+
+Invoking generic methods
+========================
+
+Generic methods are exposed as attributes which can be indexed with `type`
+objects. The following code calls ``System.Join<T>(String, IEnumerable<T>)``:
+
+.. code-block:: pycon
+
+   >>> from System import String
+   >>> String.Join[int](", ", (1, 2, 3, 4))
+   '1, 2, 3, 4'
+
+
+Type parameter inference while invoking generic methods
+=======================================================
+
+In many cases, the type parameter can be inferred based on the arguments
+passed to the method call. Consider the following use of a generic method:
+
+.. code-block:: pycon
+
+   >>> from System.Collections.Generic import IEnumerable, List
+   >>> list = List[int]([1, 2, 3])
+   >>> import clr
+   >>> clr.AddReference("System.Core")
+   >>> from System.Linq import Enumerable
+   >>> Enumerable.Any[int](list, lambda x : x < 2)
+   True
+
+With generic type parameter inference, the last statement can also be written
+as:
+
+.. code-block:: pycon
+
+   >>> import clr
+   >>> clr.AddReference("System.Core")
+   >>> from System.Linq import Enumerable
+   >>> Enumerable.Any(list, lambda x : x < 2)
+   True
+
+**NOTE:** ``System.Core.dll`` is part of .NET 3.0 and higher.
