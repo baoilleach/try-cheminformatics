@@ -1,0 +1,73 @@
+Type-system unification (type and System.Type)
+==============================================
+
+.NET represents types using ``System.Type``.
+However, when you access a .NET type in Python code, you get a Python 
+`type` object:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> isinstance(type(ba), type)
+   True
+
+This allows a unified (Pythonic) view of both Python and .NET types. For example, 
+`isinstance` works with .NET types as well:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> isinstance(ba, BitArray)
+   True
+
+If need to get the `System.Type` instance for the .NET type, you need to use
+``clr.GetClrType``. Conversely, you can use ``clr.GetPythonType`` to get
+a `type` object corresponding to a ``System.Type`` object.
+
+The unification also extends to other type system entities like methods. .NET
+methods are exposed as instances of `method`:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> type(BitArray.Xor)
+   <type 'method_descriptor'>
+   >>> type(ba.Xor)
+   <type 'builtin_function_or_method'>
+
+
+Note that the Python type corresponding to a .NET type is a sub-type of
+``type``:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> isinstance(type(ba), type)
+   True
+   >>> type(ba) is type
+   False
+
+This is an implementation detail.
+
+
+Similarity with builtin types
+=============================
+
+.NET types behave like builtin types (like `list`), and are
+immutable. i.e. you cannot add or delete descriptors from .NET types:
+
+.. code-block:: pycon
+
+   >>> del list.append
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   AttributeError: cannot delete attribute 'append' of builtin type 'list'
+   >>>
+   >>> import System
+   >>> del System.DateTime.ToByteArray
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   TypeError: can't set attributes of built-in/extension type 'DateTime'

@@ -19,7 +19,10 @@ The full list of assemblies loaded by IronPython is available in `clr.References
 
 .. code-block:: pycon
 
-   >>> "System.Xml" in [assembly.GetName().Name for assembly in clr.References]
+   >>> import clr
+   >>> clr.AddReference("System.Xml")
+   >>> from System.Reflection import AssemblyName
+   >>> "System.Xml" in [AssemblyName(assembly.FullName).Name for assembly in clr.References]
    True
 
 All .NET assemblies have a unique version number which allows using a specific
@@ -30,9 +33,6 @@ System.Xml.dll that ships with Silverlight:
 
    >>> import clr
    >>> clr.AddReference("System.Xml, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e")
-
-(Note: due to an issue with reflection this example doesn't currently run in all
-versions of Silverlight.)
    
 You can load assemblies that are neither in the GAC nor in the *appbase*
 (typically, the folder of ipy.exe or your host appplication executable) either
