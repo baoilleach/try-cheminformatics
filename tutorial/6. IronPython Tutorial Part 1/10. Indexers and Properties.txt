@@ -1,0 +1,82 @@
+Accessing .NET indexers
+=======================
+
+.NET indexers are exposed as `__getitem__` and `__setitem__`. Thus, the Python indexing
+syntax can be used to index .NET collections (and any type with an indexer):
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba[0]
+   False
+   >>> ba[0] = True
+   >>> ba[0]
+   True
+
+The indexer can be called using the unbound class instance method syntax
+using `__getitem__` and `__setitem__`. This is useful if the indexer is 
+virtual and is implemented as an explicitly-implemented interface method:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> BitArray.__getitem__(ba, 0)
+   True
+
+Non-default .NET indexers
+=========================
+
+Note that a default indexer is just a property (typically called `Item`) with
+one argument. It is considered as an indexer if the declaraing type uses
+``DefaultMemberAttribute`` to declare the property as the default member.
+
+See `property-with-parameters` for information on non-default indexers.
+
+
+Accessing .NET properties
+=========================
+
+.NET properties are exposed similar to Python attributes. Under the hood,
+.NET properties are implemented as a pair of methods to get and set the
+property, and IronPython calls the appropriate method depending on
+whether you are reading or writing to the properity:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba.Length # calls "BitArray.get_Length()"
+   5
+   >>> ba.Length = 10 # calls "BitArray.set_Length()"
+
+To call the get or set method using the unbound class instance method syntax,
+IronPython exposes methods called `GetValue` and `SetValue` on the property
+descriptor. The code above is equivalent to the following:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> BitArray.Length.GetValue(ba)
+   5
+   >>> BitArray.Length.SetValue(ba, 10)
+
+
+Properties with parameters
+==========================
+
+COM and VB.NET support properties with paramters. They are also known as
+non-default indexers. C# does not support declaring or using properties
+with parameters. 
+
+IronPython does support properties with parameters. For example, the default 
+indexer above can also be accessed using the non-default format as such:
+
+.. code-block:: pycon
+
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray(5)
+   >>> ba.Item[0]
+   False
