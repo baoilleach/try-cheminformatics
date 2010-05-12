@@ -1,0 +1,96 @@
+.NET Exceptions
+===============
+
+`raise` can raise both Python exceptions as well as .NET 
+exceptions:
+
+.. code-block:: pycon
+
+   >>> raise ZeroDivisionError()
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   ZeroDivisionError
+   >>> import System
+   >>> raise System.DivideByZeroException()
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   ZeroDivisionError: Attempted to divide by zero.
+
+The `except` keyword can catch both Python exceptions as well as .NET
+exceptions:
+
+.. code-block:: pycon
+
+   >>> try:
+   ...    import System
+   ...    raise System.DivideByZeroException()
+   ... except System.DivideByZeroException:
+   ...    print "This line will get printed..."
+   ...
+   This line will get printed...
+   >>>
+
+The underlying .NET exception object
+------------------------------------
+
+IronPython implements the Python exception mechanism on top of the .NET
+exception mechanism. This allows Python exception thrown from Python code to
+be caught by non-Python code, and vice versa. However, Python exception
+objects need to behave like Python user objects, not builtin types. 
+For example, Python code can set arbitrary attributes on Python exception
+objects, but not on .NET exception objects:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> e = ZeroDivisionError()
+   >>> e.foo = 1 # this works
+   >>> e = System.DivideByZeroException()
+   >>> e.foo = 1
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   AttributeError: 'DivideByZeroException' object has no attribute 'foo'
+
+To support these two different views, IronPython creates a pair of objects,
+a Python exception object and a .NET exception object, where the Python type
+and the .NET exception type have a unique one-to-one mapping as defined
+in the table on the next page. Both objects know about each other. 
+The .NET exception object is the one that actually
+gets thrown by the IronPython runtime when Python code executes a `raise`
+statement. When Python code uses the `except` keyword to
+catch the Python exception, the Python exception object is used. However,
+if the exception is caught by C# (for example) code that called the Python
+code, then the C# code naturally catches the .NET exception object.
+
+The .NET exception object corresponding to a Python exception object
+can be accessed by using the `clsException` attribute (if the module
+has excecuted `import clr`):
+
+.. code-block:: pycon
+
+   >>> import clr
+   >>> try:
+   ...     1/0
+   ... except ZeroDivisionError as e:
+   ...     pass
+   ...
+   >>> type(e)
+   <type 'exceptions.ZeroDivisionError'>
+   >>> type(e.clsException)
+   <type 'DivideByZeroException'>
+
+IronPython is also able to access the Python exception object corresponding
+to a .NET exception object, thought this is not exposed to the user.
+
+The Python exception object corresponding to a .NET exception object is 
+accessible (to the IronPython runtime) via the `System.Exception.Data` 
+property. Note that this is an implementation detail
+and subject to change:
+
+.. code-block:: pycon
+
+  >>> e.clsException.Data["PythonExceptionInfo"] 
+  <IronPython.Runtime.Exceptions.PythonExceptions+ExceptionDataWrapper object at ...>
+
+The Python exception object *can* be accessed through the DLR Hosting API using
+``ScriptEngine.GetService<ExceptionOperations>().GetExceptionMessage``.

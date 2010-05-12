@@ -1,0 +1,58 @@
+Accessing .NET events
+=====================
+
+.NET events are exposed as objects with ``__iadd__`` and ``__isub__`` methods which
+allows using `+=` and `-=` to subscribe and unsubscribe from the event. The
+following code shows how to subscribe a Python function to an event using `+=`,
+and unsubscribe using `-=` :
+
+
+.. code-block:: pycon
+
+    >>> from System.Net import WebClient
+    >>> from System import Uri, UriKind
+    >>> client = WebClient()
+    >>> def callback(sender, event):
+    ...     print event.Result
+    ...
+    >>> client.DownloadStringCompleted += callback
+    >>> client.DownloadStringAsync(Uri('/', UriKind.Relative))
+    <html>...
+
+You can also subscribe using a bound method:
+
+.. code-block:: pycon
+
+    >>> from System.Net import WebClient
+    >>> from System import Uri, UriKind
+    >>> client = WebClient()
+    >>> class MyClass(object):
+    ...     def callback(self, sender, event):
+    ...         print event.Result
+    ...
+    >>> o = MyClass()
+    >>> client.DownloadStringCompleted += o.callback
+    >>> client.DownloadStringAsync(Uri('/', UriKind.Relative))
+    <html>...
+
+You can also explicitly create a ``delegate``
+instance to subscribe to the event. Otherwise, IronPython automatically
+does it for you.
+
+.. code-block:: pycon
+
+    >>> from System.Net import WebClient, DownloadStringCompletedEventHandler
+    >>> from System import Uri, UriKind
+    >>> client = WebClient()
+    >>> def callback(sender, event):
+    ...     print event.Result
+    ...
+    >>> delegate = DownloadStringCompletedEventHandler(callback)
+    >>> client.DownloadStringCompleted += delegate
+    >>> client.DownloadStringAsync(Uri('/', UriKind.Relative))
+    <html>...
+
+The only advantage to creating an explicit delegate is that it is uses less
+memory. You should consider it if you subscribe to lots of events, and 
+notice excessive ``System.WeakReference`` objects.
+   

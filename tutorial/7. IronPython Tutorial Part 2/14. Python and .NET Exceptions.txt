@@ -1,0 +1,50 @@
+Python and .NET Exception Types
+===============================
+
+Some Python exception types map directly to .NET exception types. Others are provided in the ``IronPython.Runtime.Exceptions``
+namespace:
+
+* ``Exception`` : ``System.Exception``
+* ``SystemExit`` :  ``IP.R.E.SystemExit``
+* ``StopIteration`` : ``System.InvalidOperationException`` (subtype)
+* ``StandardError`` : ``System.SystemException``
+* ``KeyboardInterrupt`` : ``IP.R.E.KeyboardInterruptException``
+* ``ImportError`` : ``IP.R.E.PythonImportError``
+* ``EnvironmentError`` : ``IP.R.E.PythonEnvironmentError``
+* ``IOError`` : ``System.IO.IOException``
+* ``OSError`` : ``S.R.InteropServices.ExternalException``
+* ``WindowsError`` : ``System.ComponentModel.Win32Exception``
+* ``EOFError`` : ``System.IO.EndOfStreamException``
+* ``RuntimeError`` : ``IP.R.E.RuntimeException``
+* ``NotImplementedError`` : ``System.NotImplementedException``
+* ``NameError`` : ``IP.R.E.NameException``
+* ``UnboundLocalError`` : ``IP.R.E.UnboundLocalException``
+* ``AttributeError`` : ``System.MissingMemberException``
+* ``SyntaxError`` : ``IP.R.E.SyntaxErrorException`` (``System.Data`` has something close)
+* ``IndentationError`` : ``IP.R.E.IndentationErrorException``
+* ``TabError`` : ``IP.R.E.TabErrorException``
+* ``TypeError`` : ``Microsoft.Scripting.ArgumentTypeException``
+* ``AssertionError`` : ``IP.R.E.AssertionException``
+* ``LookupError`` : ``IP.R.E.LookupException``
+* ``IndexError`` : ``System.IndexOutOfRangeException``
+* ``KeyError`` : ``S.C.G.KeyNotFoundException``
+* ``ArithmeticError`` : ``System.ArithmeticException``
+* ``OverflowError`` : ``System.OverflowException``
+* ``ZeroDivisionError`` : ``System.DivideByZeroException``
+* ``FloatingPointError`` : ``IP.R.E.PythonFloatingPointError``
+* ``ValueError`` : ``ArgumentException``
+* ``UnicodeError`` : ``IP.R.E.UnicodeException``
+* ``UnicodeEncodeError`` : ``System.Text.EncoderFallbackException``
+* ``UnicodeDecodeError`` : ``System.Text.DecoderFallbackException``
+* ``UnicodeTranslateError`` : ``IP.R.E.UnicodeTranslateException``
+* ``ReferenceError`` : ``IP.R.E.ReferenceException``
+* ``SystemError`` : ``IP.R.E.PythonSystemError``
+* ``MemoryError`` : ``System.OutOfMemoryException``
+* ``Warning`` : ``System.ComponentModel.WarningException``
+* ``UserWarning`` : ``IP.R.E.PythonUserWarning``
+* ``DeprecationWarning`` : ``IP.R.E.PythonDeprecationWarning``
+* ``PendingDeprecationWarning`` : ``IP.R.E.PythonPendingDeprecationWarning``
+* ``SyntaxWarning`` : ``IP.R.E.PythonSyntaxWarning``
+* ``OverflowWarning`` : ``IP.R.E.PythonOverflowWarning``
+* ``RuntimeWarning`` : ``IP.R.E.PythonRuntimeWarning``
+* ``FutureWarning`` : ``IP.R.E.PythonFutureWarning``

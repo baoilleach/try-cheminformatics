@@ -1,0 +1,58 @@
+Special .NET types
+==================
+.NET arrays 
+-----------
+
+IronPython supports indexing of `System.Array` with a `type` object to access 
+one-dimensional strongly-typed arrays:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> System.Array[int]
+   <type 'Array[int]'>
+
+IronPython also adds a `__new__` method that accepts an `IList<T>`
+to initialize the array. This allows using a Python `list`
+(or `tuple`) literal to initialize a .NET array:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> a = System.Array[int]([1, 2, 3])
+
+Further, IronPython exposes `__getitem__` and `__setitem__` allowing the
+array objects to be indexed using the Python indexing syntax:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> a = System.Array[int]([1, 2, 3])
+   >>> a[2]
+   3
+
+Note that the indexing syntax yields Python semantics. If you index with a
+negative value, it results in indexing from the end of the array, whereas
+.NET indexing (demonstrated by calling `GetValue` below) raises a
+`System.IndexOutOfRangeException` exception:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> a = System.Array[int]([1, 2, 3])
+   >>> a.GetValue(-1)
+   Traceback (most recent call last):
+     File "<stdin>", line 1, in <module>
+   IndexError: Index was outside the bounds of the array.
+   >>> a[-1]
+   3
+
+Similarly, slicing is also supported:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> a = System.Array[int]([1, 2, 3])
+   >>> a[1:3]
+   Array[int]((2, 3))
+

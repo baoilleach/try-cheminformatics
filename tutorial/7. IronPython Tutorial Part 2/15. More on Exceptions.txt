@@ -1,0 +1,69 @@
+Revisiting the except keyword
+=============================
+
+Given that `raise` results in the creation of both a Python exception 
+object and a .NET exception object, and given that `except` can catch
+both Python exceptions and .NET exceptions, a question arises of which of
+the exception objects will be used by the `except` keyword. The answer is 
+that it is the type used in the `except` clause. i.e. if the `except` clause
+uses the Python exception, then the Python exception object
+will be used. If the `except` clause uses the .NET exception, then the 
+.NET exception object will be used.
+
+The following example shows how ``1/0`` results in the creation of two objects,
+and how they are linked to each other. The exception is first caught as a
+.NET exception. The .NET exception is raised again, but is then caught as
+a Python exception:
+
+.. code-block:: pycon
+
+   >>> import System   
+   >>> try:
+   ...     try:
+   ...         1/0
+   ...     except System.DivideByZeroException as e1:
+   ...         raise e1
+   ... except ZeroDivisionError as e2:
+   ...     pass      
+   ...
+   >>> type(e1)
+   <type 'DivideByZeroException'>
+   >>> type(e2)
+   <type 'exceptions.ZeroDivisionError'>
+   >>> e2.clsException is e1
+   True
+
+
+User-defined exceptions
+=======================
+
+Python user-defined exceptions get mapped to `System.Exception`. If non-Python code
+catches a Python user-defined exception, it will be an instance of 
+`System.Exception`, and will not be able to access the exception details:
+
+.. code-block:: pycon
+
+   >>> # since "Exception" might be System.Exception after "from System import *"
+   >>> if "Exception" in globals(): del Exception
+   ...
+   >>> import clr
+   >>> import System
+   >>> class MyException(Exception):
+   ...     def __init__(self, value):
+   ...         self.value = value
+   ...     def __str__(self):
+   ...         return repr(self.value)
+   ...
+   >>> try:
+   ...     raise MyException("some message")
+   ... except System.Exception as e:
+   ...     pass
+   ...
+   >>> clr.GetClrType(type(e)).FullName
+   'System.Exception'
+   >>> e.Message
+   'Python Exception: MyException'
+
+In this case, the non-Python code can use the
+`ScriptEngine.GetService<ExceptionOperations>().GetExceptionMessage` DLR Hosting
+API to get the exception message.
