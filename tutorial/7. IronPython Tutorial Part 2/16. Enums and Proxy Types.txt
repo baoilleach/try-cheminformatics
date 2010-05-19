@@ -1,0 +1,31 @@
+Enumerations
+============
+
+.NET enumeration types are sub-types of `System.Enum`. The enumeration values
+of an enumeration type are exposed as class attributes:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> print System.AttributeTargets.All # access the value "All"
+   All
+
+IronPython also supports using the bit-wise operators with the enumeration
+values:
+
+.. code-block:: pycon
+
+   >>> import System
+   >>> System.AttributeTargets.Class | System.AttributeTargets.Method
+   <enum System.AttributeTargets: Class, Method>
+
+Proxy types
+===========
+
+IronPython cannot directly use ``System.MarshalByRefObject``
+instances. IronPython uses reflection at runtime to determine how to access an
+object. However, `System.MarshalByRefObject` instances do not support
+reflection.
+
+You *can* use `unbound-class-instance-method` syntax to call methods
+on such proxy objects.

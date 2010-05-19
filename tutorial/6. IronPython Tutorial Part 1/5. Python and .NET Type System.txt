@@ -90,6 +90,7 @@ Consider the following two lines:
 
 .. code-block:: pycon
 
+   >>> from System.Collections import BitArray
    >>> ba = BitArray(5)
    >>> ba.Length = 10
 
@@ -97,10 +98,12 @@ The above two lines are equivalent to this single line:
 
 .. code-block:: pycon
 
+   >>> from System.Collections import BitArray
    >>> ba = BitArray(5, Length = 10)
 
 You can also call the `__new__` method to create an instance:
 
 .. code-block:: pycon
 
-   >> ba = BitArray.__new__(BitArray, 5)
+   >>> from System.Collections import BitArray
+   >>> ba = BitArray.__new__(BitArray, 5)

@@ -1,0 +1,81 @@
+Value types
+===========
+
+Python expects all mutable values to be represented as a reference type. .NET, 
+on the other hand, introduces the concept of value types which are mostly 
+copied instead of referenced. In particular .NET methods and properties 
+returning a value type will always return a copy. 
+
+This can be confusing from a Python programmer’s perspective since a subsequent 
+update to a field of such a value type will occur on the local copy, not within 
+whatever enclosing object originally provided the value type.
+
+While most .NET value types are designed to be immutable, and the .NET design
+guidelines recommend value tyeps be immutable, this is not enforced by .NET, 
+and so there do exist some .NET valuetype that are mutable. 
+
+For example, take the following C# definitions::
+
+   struct Point {
+       # Poorly defined struct - structs should be immutable
+       public int x;
+       public int y;
+   }
+   
+   class Line {
+       public Point start;
+       public Point end;
+   	
+       public Point Start { get { return start; } }
+       public Point End { get { return end; } }
+   }
+
+If `line` is an instance of the reference type Line, then a Python programmer 
+may well expect "`line.Start.x = 1`" to set the x coordinate of the start of 
+that line. In fact the property `Start` returned a copy of the `Point` 
+value type and it’s to that copy the update is made::
+
+   print line.Start.x    # prints ‘0’
+   line.Start.x = 1
+   print line.Start.x    # still prints ‘0’
+	
+This behavior is subtle and confusing enough that C# produces a compile-time 
+error if similar code is written (an attempt to modify a field of a value type 
+just returned from a property invocation).
+
+Even worse, when an attempt is made to modify the value type directly 
+via the start field exposed by Line (i.e. “`line.start.x = 1`”), IronPython 
+will still update a local copy of the `Point` structure. That’s because 
+Python is structured so that “foo.bar” will always produce a useable 
+value: in the case above “line.start” needs to return a full value 
+type which in turn implies a copy.
+
+C#, on the other hand, interprets the entirety of the “`line.start.x = 1`” 
+statement and actually yields a value type reference for the “line.start” 
+part which in turn can be used to set the “x” field in place.
+
+This highlights a difference in semantics between the two languages. 
+In Python “line.start.x = 1” and “foo = line.start; foo.x = 1” are 
+semantically equivalent. In C# that is not necessarily so.
+
+So in summary: a Python programmer making updates to a value type 
+embedded in an object will silently have those updates lost where the 
+same syntax would yield the expected semantics in C#. An update to 
+a value type returned from a .NET property will also appear to 
+succeed will updating a local copy and will not cause an error 
+as it does in the C# world. These two issues could easily become 
+the source of subtle, hard to trace bugs within a large application.
+
+In an effort to prevent the unintended update of local value type copies 
+and at the same time preserve as pythonic and consistent a view of 
+the world as possible, direct updates to value type fields are not
+allowed by IronPython, and raise a ValueError::
+
+   >>> line.start.x = 1 #doctest: +SKIP
+   Traceback (most recent call last):
+      File , line 0, in input##7
+   ValueError Attempt to update field x on value type Point; value type fields can not be directly modified
+
+This renders value types “mostly” immutable; updates are still possible 
+via instance methods on the value type itself.
+
