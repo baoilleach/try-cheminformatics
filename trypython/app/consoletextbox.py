@@ -152,7 +152,12 @@ class ConsoleTextBox(TextBox):
         
         source = self.engine.CreateScriptSourceFromString(text, 'stdin', SourceCodeKind.InteractiveCode)
         
-        result = source.GetCodeProperties()
+        try:
+            result = source.GetCodeProperties()
+        except TypeError:
+            # happens when text is 'lambda' for some reason
+            return True
+        
         if result == ScriptCodeParseResult.IncompleteToken:
             return False
         elif result == ScriptCodeParseResult.IncompleteStatement:
