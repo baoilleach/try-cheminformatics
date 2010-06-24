@@ -1,6 +1,6 @@
 import sys
 
-__version__ = '0.4.0'
+__version__ = '0.4.1'
 
 doc = "Try Python: version %s" % __version__
 title = "Interactive Cheminformatics Tutorial %s" % __version__
@@ -18,5 +18,5 @@ banner = ("Python %s on Silverlight\nTry Python %s by Michael Foord\n"
           % (python_version, __version__))
 home = 'http://code.google.com/p/trypython/'
 
-ps1 = sys.ps1
-ps2 = sys.ps2
+sys.ps1 = ps1 = getattr(sys, 'ps1', '>>> ')
+sys.ps2 = ps2 = getattr(sys, 'ps2', '... ')

@@ -7,7 +7,6 @@ from utils import always_invoke, invoke
 from utils import _debug
 
 
-
 class StatefulPrinter(object):
     def __init__(self, parent, scroller, prompt):
         self.block = None

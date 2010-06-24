@@ -1,0 +1,29 @@
+[Project ID]
+Signature=UE Proj: v.1
+[Project Information]
+Create Tagfile=1
+Filter=
+Include Sub Directories=1
+Project Start=DA07040004000100000003001900000006
+Project Tagfile=
+Project Wordfile=
+Relative to Project File=1
+Use Relative Directory=1
+Working Time=160142
+[Files]
+0=C:\compile\trypython\
+[Folders]
+C:\compile\trypython\=1
+C:\compile\trypython\ - trypython=1
+[Open Files]
+Active File Display Mode=3
+Active File Index=1
+Open File Line0=466
+Open File Line1=527
+Open File Pos0=870
+Open File Pos1=1075
+Open File Window Pos0=0,1,-1,-1,-9,-36,120,120,1319,657
+Open File Window Pos1=2,3,-1,-1,-9,-36,150,150,1353,691
+Open File0=C:\compile\trypython\trypython\index.html
+Open File1=C:\compile\trypython\trypython\app\main.py
+Open File2=
