@@ -1,0 +1,5 @@
+===============
+ Using Cinfony
+===============
+
+This tutorial introduces the use of Python in cheminformatics. It uses the Python library Cinfony, which is a gateway to several powerful cheminformatics toolkits.

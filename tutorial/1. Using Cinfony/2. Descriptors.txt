@@ -1,0 +1,114 @@
+=============
+ Descriptors
+=============
+
+Many aspects of cheminformatics deal with predicting or explaining properties of molecules based on their chemical structure. In this tutorial we discuss two common methods for handling this: molecular fingerprints and molecular descriptors.
+
+Calculate molecular descriptors
+===============================
+
+A common aim in cheminformatics is to develop a statistical model relating the chemical structure to a physical or biological property. To do so, we need numeric values that somehow encode aspects of the chemical structure. Such values are referred to as molecular descriptors.
+
+The list of available descriptors can be found using the ``getdescs()`` method as follows:
+
+.. code-block:: pycon
+
+    >>> import webel
+    >>> descs = webel.getdescs()
+    >>> print descs
+    ['ALOGPDescriptor', 'APolDescriptor', ...
+    ...
+    'XLogPDescriptor', 'ZagrebIndexDescriptor']
+    >>> print len(descs)
+    44
+
+The descriptors available through Webel are all calculated by a webservice that uses the CDK. The website at http://pele.farmbio.uu.se/nightly-1.2.x/dnames.html describes the meaning of each descriptor.
+
+To calculate descriptor values for a molecule, you use the molecule's ``calcdesc()`` method. Here is the docstring for the method:
+
+.. code-block:: pycon
+
+    >>> help(webel.Molecule.calcdesc)
+    Help on method calcdesc in module webel:
+
+    calcdesc(self, descnames=[])
+        Calculate descriptor values.
+
+        Optional parameter:
+           descnames -- a list of names of descriptors
+
+        If descnames is not specified, all available descriptors are
+        calculated. See the descs variable for a list of available
+        descriptors.
+
+``calcdesc()`` returns a dictionary of descriptor values:
+
+.. code-block:: pycon
+
+    >>> mol = webel.readstring("name", "aspirin")
+    >>> mol.calcdesc(["WeightDescriptor"])
+    {'WeightDescriptor_MW': 180.04225880000001}
+    >>> mol.calcdesc(["WeightDescriptor", "TPSADescriptor"])
+    {'TPSADescriptor_TopoPSA': 63.600000000000001,
+    'WeightDescriptor_MW': 180.04225880000001}
+
+Note that many descriptors calculate more than one value:
+
+.. code-block:: pycon
+
+    >>> mol.calcdesc(["WienerNumbersDescriptor"])
+    {'WienerNumbersDescriptor_WPOL': 16.0,
+    'WienerNumbersDescriptor_WPATH': 246.0}
+
+As a result the total number of descriptor values is much more than the number of descriptor names (note that the following command will take several seconds):
+
+.. code-block:: pycon
+
+    >>> descvalues = mol.calcdesc() # Calculate all 44 descriptors
+    >>> print len(descvalues)
+    142
+
+In the next section we will use descriptor values to implement a Rule of Fives Filter.
+
+Rule of Fives Filter
+====================
+
+In an influential paper, Lipsinki et al performed an analysis of drug compounds that reached Phase II clinical trials and found that they tended to occupy a certain range of values for molecular weight, LogP, and number of hydrogen bond donors and acceptors. Based on this, they proposed a rule with four criteria to identify molecules that might have poor absorption or permeation properties. This is the Lipinski Rule of Fives, so-called as the numbers involved are all multiples of five:
+
+* Molecular weight < 500
+* Number of hydrogen bond donors < 5
+* Number of hydrogen bond acceptors < 10
+* LogP <= 5.0
+
+All of these values can be calculated using available CDK descriptors. Here is a function that determines how many of the criteria a particular molecule passes:
+
+.. code-block:: pycon
+
+    >>> def lipinski(mol):
+    ...     descs = [('WeightDescriptor', 'MW'),
+    ...              ('HBondDonorCountDescriptor', 'nHBDon'),
+    ...              ('HBondAcceptorCountDescriptor', 'nHBAcc'),
+    ...              ('ALOGPDescriptor', 'ALogp2')]
+    ...     targets = [500, 5, 10, 5.0]
+    ...     descvalues = mol.calcdesc([x[0] for x in descs])
+    ...     failures = 0
+    ...     for desc, target in zip(descs, targets):
+    ...         descvalue = descvalues["%s_%s" % (desc[0], desc[1])]
+    ...         if descvalue > target:
+    ...             failures += 1
+    ...     return failures
+
+Not surprisingly, most common drugs pass the Lipinski rules:
+
+.. code-block:: pycon
+
+    >>> for name in ['aspirin', 'tylenol', 'ampicillin']:
+    ...     print name, lipinski(webel.readstring("name", name))
+
+Drugs that fail the rules often have poor adsorption and have to be administered by injection. Compare the number of failures for the following drugs:
+
+.. code-block:: pycon
+
+    >>> for name in ['docetaxel', 'atosiban', 'kinevac']:
+    ...     print name, lipinski(webel.readstring("name", name))
+

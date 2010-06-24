@@ -1,0 +1,11 @@
+============
+ Conclusion
+============
+
+This tutorial has introduced one module of Cinfony called Webel. This module runs entirely on webservices and so is suited to an online tutorial.
+
+To continue your study of cheminformatics, here are some ideas:
+
+* Install Python on your computer, and repeat the tutorial the webel.py that comes as part of Cinfony. See http://cinfony.googlecode.com.
+* Install OpenBabel and its Python bindings. This includes the Cinfony module Pybel so you can easily apply the same commands that you used for Webel (although other formats will be available). See http://openbabel.org/wiki/Python.
+* Read the documentation for the different toolkits (that is, RDKit, the CDK or OpenBabel) and access them through Cinfony to take full advantage of the additional features.

@@ -1,0 +1,157 @@
+=========
+ Cinfony
+=========
+
+Cinfony is a Python library that makes it easy to use three Open Source cheminformatics libraries: the CDK, OpenBabel, and the RDKit.
+
+In this tutorial we will use the Cinfony module Webel, which uses web services to carry out cheminformatics analysis. As Webel uses the same API (that is, the set of classes, methods and variables in a library) as the other Cinfony modules, this means that the commands learnt here can also be used to access the CDK, OpenBabel or the RDKit.
+
+Getting started
+===============
+
+To use Webel, simple import the ``webel`` module as follows:
+
+.. code-block:: pycon
+
+    >>> import webel
+
+Create a molecule from an identifier
+====================================
+
+As you might expect, the main class in Cinfony is the ``Molecule`` class. In Webel, a ``Molecule`` is created from a chemical identifier. The list of available identifiers for input is stored in the ``informats`` dictionary:
+
+.. code-block:: pycon
+
+    >>> print webel.informats
+    {'inchikey': 'InChIKey', 'inchi': 'InChI', 'smi':
+    'SMILES', 'name': 'Common name'}
+
+The keys in this dictionary are the format codes, while the values are a succinct description of the format.
+
+The ``readstring()`` method converts an identifier to a Molecule. To read the documentation for any method or class, you can use the ``help()`` command as follows:
+
+.. code-block:: pycon
+
+    >>> help(webel.readstring)
+    Help on function readstring in module webel:
+
+    readstring(format, string)
+        Read in a molecule from a string.
+
+        Required parameters:
+           format - see the informats variable for a list of available
+                    input formats
+           string
+
+        Example:
+        >>> input = "C1=CC=CS1"
+        >>> mymol = readstring("smi", input)
+
+So, let us convert a common name such as 'aspirin' to a Molecule:
+
+.. code-block:: pycon
+
+    >>> mol = webel.readstring("name", "aspirin")
+
+Or how about converting a SMILES string for butane ('CCCC') to a Molecule?
+
+.. code-block:: pycon
+
+    >>> mol = webel.readstring("smi", "CCCC")
+
+Now that you have a Molecule, the next section looks at what you can do with it.
+
+Molecule attributes and methods
+===============================
+
+We have already introduced the ``help()`` command to show the documentation for a particular method or class. If you use this command to look at the documentation available for webel.Molecule and use the scrollbar to scroll up to the start, you will see the following summary:
+
+.. code-block:: pycon
+
+    >>> help(webel.Molecule)
+    Help on class Molecule in module webel:
+
+    class Molecule(__builtin__.object)
+     |  Represent a Webel Molecule.
+     |
+     |  Required parameter:
+     |     smiles -- a SMILES string or any type of cinfony Molecule
+     |
+     |  Attributes:
+     |     formula, molwt, title
+     |
+     |  Methods:
+     |     calcfp(), calcdesc(), draw(), write()
+     |
+     |  The underlying SMILES string can be accessed using the attribute:
+     |     smiles
+
+The sections of interest here are the list of attributes and methods. The ``formula`` and ``molwt`` attributes refer to molecular formula and molecular weight respectively. They can be used as follows to find the formula and molecular weight of a molecule:
+
+.. code-block:: pycon
+
+    >>> mol = webel.readstring("name", "aspirin")
+    >>> print "The molecular weight of aspirin is", mol.molwt
+    The molecular weight of aspirin is 180.157768812
+    >>> print "The molecular formula for aspirin is", mol.formula
+    The molecular formula for aspirin is C9H8O4
+
+Try this for some other molecules. Note that if the molecule name is not recognized when using ``readstring()``, an error message is shown.
+
+Next let's look at the ``draw()`` method. It should be obvious what this does, but let's look at the documentation anyway:
+
+.. code-block:: pycon
+
+    >>> help(webel.Molecule.draw)
+    draw(self)
+        Create a 2D depiction of the molecule.
+
+Let's try it out, using the Molecule object we have just created:
+
+.. code-block:: pycon
+
+    >>> mol.draw()
+
+After a second or two (remember that we are using web services), you should see a 2D image of aspirin popup on the left hand side. Click the Close button to close it.
+
+In the next few sections, we look at the remaining Molecule methods: ``write()``, ``calcfp()`` and ``calcdesc()``.
+
+Convert a Molecule to a chemical identifier
+===========================================
+
+We already know how to convert a chemical identifier to a Molecule but how about the reverse, converting a Molecule to a chemical identifier? The Molecule ``write()`` method allows us to do this. The list of available output formats is in the ``outformats`` dictionary:
+
+.. code-block:: pycon
+
+    >>> webel.outformats
+    {'inchi': 'InChI', 'names': 'Common names', 
+    'smi': 'SMILES', 'mol2': 'Tripos Sybyl MOL2', 'sdf': 'Symyx SDF',
+    'cml': 'Chemical Markup Language', ...}
+
+A large number of formats are listed, only some of which are shown here. Note that only some of these are chemical identifiers, such as the InChI, SMILES or common names. The others are chemical file formats that can include information on the coordinates of the atoms. In the case of Webel, only information on 2D coordinates is included (this is useful for depiction).
+
+Another point to note is that the 'names' format returns a list of common names not just one (or none). We can use this to find other common names for aspirin, for example:
+
+.. code-block:: pycon
+
+    >>> mol = webel.readstring("name", "aspirin")
+    >>> names = mol.write("names")
+    >>> len(names)
+    222
+    >>> print names[0:10] ## Just print the first 10 names
+    ['2-Acetoxybenzoic acid', '50-78-2', '2-Acetoxybenzenecarboxylic acid', 'Acetyls
+    alicylate', 'Acetylsalicylic acid', 'Aspirin', 'C01405', 'component of A.S.A. Co
+    mpound', 'component of A.S.A. and Codeine Compound', 'component of Ansemco 2']
+
+The fact than more than 200 common names for aspirin were found suggests that perhaps such names should not be used as unique identifiers. IUPAC developed the InChI format for just this purpose. Webel returns both the InChI and the AuxInfo (auxiliary information) separated by a tab. To get just the InChI we need to ``split()`` the string, and access the first element. Let's find the InChI for aspirin:
+
+.. code-block:: pycon
+
+    >>> inchi = webel.readstring("name", "aspirin").write("inchi")
+    >>> print inchi
+    InChI=1/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)/f/h11H
+    AuxInfo=...
+    >>> print inchi.split()[0]
+    InChI=1/C9H8O4/c1-6(10)13-8-5-3-2-4-7(8)9(11)12/h2-5H,1H3,(H,11,12)/f/h11H
+
+To continue onto the next chapter use the navigation bar at the top or bottom, or click the *Next* button below.

@@ -1,0 +1,156 @@
+========================
+ Molecular Fingerprints
+========================
+
+A molecular fingerprint is an encoding of the structure of a molecule as a series of ones and zeros (a binary fingerprint). It is commonly used to measure molecular similarity.
+
+How to calculate a fingerprint
+==============================
+
+The ``calcfp()`` method of a Molecule calculates a molecular fingerprint. Several different fingerprint types are available the names of which are stored in the the fps variable:
+
+.. code-block:: pycon
+
+    >>> print webel.fps
+    ['std', 'maccs', 'estate']
+    >>> help(webel.Molecule.calcfp)
+    Help on method calcfp in module webel:
+
+    calcfp(self, fptype='std') unbound webel.Molecule method
+        Calculate a molecular fingerprint.
+
+        Optional parameters:
+           fptype -- the fingerprint type (default is "std"). See the
+                     fps variable for a list of of available fingerprint
+                     types.
+
+The default fingerprint is 'std', a Daylight-type fingerprint that encodes all paths in the molecule up to a length of 6 atoms. The following code calculates the molecular fingerprint of methane:
+
+.. code-block:: pycon
+
+    >>> methane = webel.readstring("name", "methane")
+    >>> methanefp = methane.calcfp()
+
+methanefp is a ``Fingerprint`` object. The next section looks at the attributes of this object.
+
+The Fingerprint class
+=====================
+
+When ``calcfp()`` is called it returns a ``Fingerprint`` object. This has two important attributes, ``fp`` and ``bits``, as the docstring describes:
+
+.. code-block:: pycon
+
+    >>> help(webel.Fingerprint)
+    class Fingerprint(__builtin__.object)
+     |  A Molecular Fingerprint.
+     |
+     |  Required parameters:
+     |     fingerprint -- a string of 0's and 1's representing a binary fingerprint
+     |
+     |  Attributes:
+     |     fp -- the underlying fingerprint object
+     |     bits -- a list of bits set in the Fingerprint
+
+
+Let's look at the values of these attributes for our methane fingerprint:
+
+.. code-block:: pycon
+
+    >>> print methanefp.fp
+    00000000000000000000000000000...
+    00000000000000000000001000000...
+    00000000000000000000000000000000
+    >>> print len(methanefp.fp)
+    1024
+    >>> methanefp.fp.count('1')
+    1
+    >>> methanefp.bits
+    [742]
+
+The underlying fingerprint is composed of 1024 bits of which only a single bit is set to 1, bit number 742. To understand more fully how these bits can be used to measure similarity, let's look at the bits that are set in a series of related small molecules:
+
+.. code-block:: pycon
+
+    >>> names = ['methane', 'methanol', 'ethane', 'propanol']
+    >>> mols = [webel.readstring("name", x) for x in names]
+    >>> fps = [mol.calcfp() for mol in mols]
+    >>> for name, fp in zip(names, fps):
+    ...     print name, fp.bits
+    ...
+    methane [742]
+    methanol [741, 742, 929]
+    ethane [637, 742]
+    propanol [300, 542, 637, 644, 741, 742, 929]
+
+Methane has a single bit set, for a C atom. Methanol has the same bit set, as well as one as an O atom and another for the CO path. Ethane has only two bits set; one for a C atom, and another for the CC path. Note that although there are two C atoms, each bit is set only once. For propanol, there are seven bits set: C, O, CC, CO, CCC, CCO and CCCO.
+
+Measuring fingerprint similarity
+================================
+
+The Tanimoto coefficient is a measure of the similarity of two sets; specifically, it is the intersection of two sets divided by the union. It is bounded by 1 (identical) and 0 (no similarity). The greater the intersection and the fewer items in one set that are not in the other, the greater the value of the Tanimoto coefficient.
+
+We can use the Tanimoto coefficient to determine the similarity of the fingerprints for two molecules, and use this as a measure of the molecules' similarity. Considering the fingerprints for methanol and propanol, the intersection is [742] and the union is [637, 741, 742, 929]. This gives a Tanimoto coefficient of 1/4 or 0.25.
+
+Let's use Python set objects to do the same for methanol and propanol:
+
+.. code-block:: pycon
+
+    >>> bitsets = [set(fps[1].bits), set(fps[3].bits)]
+    >>> intersection = bitsets[0] & bitsets[1]
+    >>> union = bitsets[0] | bitsets[1]
+    >>> print intersection
+    set([929, 741, 742])
+    >>> print union
+    set([929, 644, 741, 742, 300, 637, 542])
+    >>> len(intersection) / float(len(union))
+    0.42857142857142855
+    >>>
+
+There are many other set similarity measures that you can easily implement in this way. Since the Tanimoto coefficient is one of the most widely used, it is already included in Cinfony. To get the Tanimoto coefficient of two Fingerprints, simply combine them using the | notation as follows:
+
+.. code-block:: pycon
+
+    >>> print fps[1] | fps[3]
+    0.42857142857142855
+
+Finding similar molecules
+=========================
+
+In general for two molecules to be considered structurally similar, a Tanimoto coefficient > 0.7 or more is required (the exact value depends on the fingerprint type as well as the property of interest). Such a cutoff should be considered as a rule of thumb, as very similar molecules can have quite different activities.
+
+For example, the following two molecules are worryingly similar:
+
+.. code-block:: pycon
+
+    >>> aspirin = webel.readstring("name", "aspirin")
+    >>> wartremover = webel.readstring("name", "Dr. Scholl's Wart Remover Kit")
+    >>> aspirin.calcfp() | wartremover.calcfp()
+    0.59375
+
+This similarity is not surprising as aspirin is acetylsalicylic acid, while salicylic acid itself is the active ingredient in wart removers.
+
+In the following example we will use the Tanimoto coefficient to identify which of the following steroids have the most similar structure: cholesterol, testosterone, progesterone, cortisone, and estradiol:
+
+.. code-block:: pycon
+
+    >>> names = ['cholesterol', 'testosterone', 'progesterone',
+    ... 'cortisone', 'estradiol']
+    >>> mols = [webel.readstring("name", x) for x in names]
+    >>> fps = [mol.calcfp() for mol in mols]
+    >>> for i in range(len(names)-1):
+    ...     for j in range(i+1, len(names)):
+    ...             print "The Tanimoto of %s and %s is %.2f" % (
+    ... names[i], names[j], fps[i] | fps[j])
+    ...
+    The Tanimoto of cholesterol and testosterone is 0.63
+    The Tanimoto of cholesterol and progesterone is 0.50
+    The Tanimoto of cholesterol and cortisone is 0.50
+    The Tanimoto of cholesterol and estradiol is 0.19
+    The Tanimoto of testosterone and progesterone is 0.85
+    The Tanimoto of testosterone and cortisone is 0.76
+    The Tanimoto of testosterone and estradiol is 0.16
+    The Tanimoto of progesterone and cortisone is 0.65
+    The Tanimoto of progesterone and estradiol is 0.09
+    The Tanimoto of cortisone and estradiol is 0.15
+
+Testosterone and progresterone have the highest pairwise similarity. You can verify this using their 2D structures (using the ``draw()`` method).
