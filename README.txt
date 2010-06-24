@@ -27,6 +27,11 @@ If you change the ReStructured Text source files in the 'tutorial' directory
 and run maketutorial.py then new xaml files will be generated for the new
 source documents.
 
+To deploy the application, run:
+
+  ``Chiron\Chiron.exe /z:app.xap /d:trypython/app``
+
+This creates app.xap. Copy this to a web-accessible directory along with trypython\assets and trypython\index.html.
 
 Installing
 ==========

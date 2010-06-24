@@ -2,6 +2,7 @@
 
 import os
 import shutil
+import glob
 import sys
 
 # This installs the pygments directive
@@ -98,15 +99,15 @@ top_index_dest = os.path.join(doc_dir, 'index.xaml')
 read_and_write(top_index_src, top_index_dest)
 
 parts = []
-for i, path in enumerate(os.listdir(tut_dir)):
-    folder = os.path.join(tut_dir, path)
-    if not os.path.isdir(folder) or path == '.svn':
+
+for i, path in enumerate(glob.glob(os.path.join(tut_dir, "*"))):
+    if not os.path.isdir(path):
         continue
-    parts.append(path)
-    out_folder = os.path.join(doc_dir, 'part%s' % i)
+    parts.append(os.path.basename(path))
+    out_folder = os.path.join(doc_dir, 'part%d' % (i + 1,))
     os.mkdir(out_folder)
     
-    process_directory(folder, out_folder)
+    process_directory(path, out_folder)
 
 print 'Writing list file'
 parts = sorted(parts, key=name_index)

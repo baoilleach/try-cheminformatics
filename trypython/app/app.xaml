@@ -10,16 +10,16 @@
          FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
          >Try Python: Interactive Python Tutorial</TextBlock>
         <StackPanel x:Name="topNavbar" Orientation="Horizontal">
-            <HyperlinkButton Content="Voidspace" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
-             NavigateUri="http://www.voidspace.org.uk/" />
+            <HyperlinkButton Content="Cinfony" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
+             NavigateUri="http://cinfony.googlecode.com" />
             <Button Margin="5" FontSize="15"  Height="25" Content="First" x:Name="topFirst" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Prev" x:Name="topPrev" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Next" x:Name="topNext" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <Button Margin="5" FontSize="15"  Height="25" Content="Last" x:Name="topLast" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <ComboBox Margin="5" FontSize="15" x:Name="topComboBoxPart" Height="25" Width="225" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
             <ComboBox Margin="5" FontSize="15" x:Name="topComboBoxPage" Height="25" Width="375" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif" />
-            <HyperlinkButton Content="Report a Bug" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
-             NavigateUri="mailto:michael@voidspace.org.uk" />
+            <HyperlinkButton Content="Noel O'Blog" FontSize="15" Margin="5" FontFamily="Verdana,Tahoma,Geneva,Lucida Grande,Trebuchet MS,Helvetica,Arial,Serif"
+             NavigateUri="http://baoilleach.blogspot.com" />
         </StackPanel>
     </StackPanel>
     <StackPanel Orientation="Horizontal" x:Name="container">

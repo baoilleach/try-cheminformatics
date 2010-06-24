@@ -1,36 +1,24 @@
-=============================
- Interactive Python Tutorial
-=============================
-------------------------------------
- Made with rst2xaml for Silverlight
-------------------------------------
+======================================
+ Interactive Cheminformatics Tutorial
+======================================
 
 .. role:: raw-xaml(raw)
    :format: xaml
 
+Welcome to the Interactive Cheminformatics Tutorial. This tutorial was developed by Noel O'Boyle using the **Try Python** software created by Michael Foord. Please send any suggestions for improvements to baoilleach@gmail.com.
 
-**Try Python** is an interactive Python tutorial created for Silverlight and Moonlight by Michael Foord.
+Instructions
+============
 
 The Python console to the right behaves like the Python interactive interpreter. It runs IronPython 2.0, which is the equivalent of Python 2.5. The code you enter in the console runs in the browser.
-
-Choose a section of the tutorial to start on from this page, or use the navigation bar at the top.
 
 Most of the tutorial pages have code examples for you to try out. The examples have a ':raw-xaml:`<Run FontWeight="Bold" FontFamily="Consolas, Monaco, Lucida Console, Global Monospace" FontSize="15" Foreground="#000080">&#160;>>>&#160;</Run>`' button that copies them to the console. Try it out with the traditional Python *Hello World*:
 
 .. code-block:: pycon
 
-    >>> print 'Hello world!'
+    >>> print 'Hello Chemistry World!'
 
-Here's a slightly longer version for those who prefer object oriented programming:
+Start the tutorial
+==================
 
-.. code-block:: pycon
-
-    >>> class HelloWorld(object):
-    ...     def say_hello(self):
-    ...         print 'Hello world!'
-    ... 
-    >>> hello = HelloWorld()
-    >>> hello.say_hello()
-    Hello world!
-
-If you want an explanation of how the code above works, then you need to read the tutorial...
+To start the tutorial, choose one of the following chapters (or use the navigation bar at the top):
